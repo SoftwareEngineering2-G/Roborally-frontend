@@ -12,11 +12,18 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import z from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Form, FormField } from "@/components/ui/form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import ElectricBorder from "@/components/ElectricBorder/electric-border";
 
 const formSchema = z.object({
   username: z
@@ -57,111 +64,112 @@ export const SignIn = () => {
         transition={{ duration: 0.5 }}
         className="w-full max-w-md"
       >
-        <Card className="glass-panel glow-teal">
-          <CardHeader className="text-center space-y-4">
-            <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ delay: 0.2, type: "spring" }}
-              className="mx-auto w-16 h-16 rounded-full bg-gradient-primary flex items-center justify-center glow-teal"
-            >
-              <Zap className="w-8 h-8 text-accent-foreground" />
-            </motion.div>
-            <CardTitle className="text-3xl font-bold text-neon-magenta">
-              RoboRally
-            </CardTitle>
-            <CardDescription className="text-lg text-chrome-light">
-              Power up your robot and enter the arena
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Form {...form}>
-              <form
-                onSubmit={form.handleSubmit(onSubmit)}
-                className="space-y-6"
+        <ElectricBorder
+          color="#7df9ff"
+          speed={1}
+          chaos={1}
+          thickness={2}
+          style={{ borderRadius: 16 }}
+        >
+          <Card className="glass-panel glow-teal">
+            <CardHeader className="text-center space-y-4">
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ delay: 0.2, type: "spring" }}
+                className="mx-auto w-16 h-16 rounded-full bg-gradient-primary flex items-center justify-center glow-teal"
               >
-                <div className="space-y-2">
+                <Zap className="w-8 h-8 text-accent-foreground" />
+              </motion.div>
+              <CardTitle className="text-3xl font-bold text-neon-magenta">
+                RoboRally
+              </CardTitle>
+              <CardDescription className="text-lg text-chrome-light">
+                Power up your robot and enter the arena
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Form {...form}>
+                <form
+                  onSubmit={form.handleSubmit(onSubmit)}
+                  className="space-y-6"
+                >
                   <FormField
                     control={form.control}
                     name="username"
                     render={({ field }) => (
-                      <>
-                        <Label
-                          htmlFor="username"
-                          className="text-chrome-light font-medium"
-                        >
+                      <FormItem>
+                        <FormLabel className="text-chrome-light font-medium">
                           Username
-                        </Label>
-                        <Input
-                          id="username"
-                          type="text"
-                          placeholder="Enter your pilot name"
-                          {...field}
-                          required
-                          className="bg-surface-dark border-neon-teal/30 focus:border-neon-teal focus:ring-neon-teal text-foreground placeholder:text-metallic"
-                        />
-                      </>
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            type="text"
+                            placeholder="Enter your pilot name"
+                            {...field}
+                            className="bg-surface-dark border-neon-teal/30 focus:border-neon-teal focus:ring-neon-teal text-foreground placeholder:text-metallic"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
                     )}
                   />
-                </div>
-                <div className="space-y-2">
+
                   <FormField
                     control={form.control}
                     name="password"
                     render={({ field }) => (
-                      <>
-                        <Label
-                          htmlFor="password"
-                          className="text-chrome-light font-medium"
-                        >
+                      <FormItem>
+                        <FormLabel className="text-chrome-light font-medium">
                           Password
-                        </Label>
-                        <Input
-                          id="password"
-                          type="password"
-                          placeholder="Enter your access code"
-                          {...field}
-                          required
-                          className="bg-surface-dark border-neon-teal/30 focus:border-neon-teal focus:ring-neon-teal text-foreground placeholder:text-metallic"
-                        />
-                      </>
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            type="password"
+                            placeholder="Enter your access code"
+                            {...field}
+                            className="bg-surface-dark border-neon-teal/30 focus:border-neon-teal focus:ring-neon-teal text-foreground placeholder:text-metallic"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
                     )}
                   />
-                </div>
-                <motion.div
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  <Button
-                    type="submit"
-                    disabled={isLoading}
-                    className="w-full bg-gradient-secondary hover:glow-magenta text-accent-foreground font-bold py-3 text-lg transition-all duration-300"
+                  <motion.div
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
                   >
-                    {isLoading ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Connecting...
-                      </>
-                    ) : (
-                      "Login"
-                    )}
-                  </Button>
-                </motion.div>
-              </form>
-            </Form>
-            <div className="mt-6 text-center">
-              <p className="text-metallic">
-                Don't have an account?{" "}
-                <Link
-                  href="/signup"
-                  className="text-neon-magenta hover:text-neon-blue transition-colors font-medium"
-                >
-                  Sign Up
-                </Link>
-              </p>
-            </div>
-          </CardContent>
-        </Card>
+                    <Button
+                      type="submit"
+                      disabled={isLoading}
+                      className="w-full bg-gradient-secondary hover:glow-magenta text-accent-foreground font-bold py-3 text-lg transition-all duration-300"
+                    >
+                      {isLoading ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Connecting...
+                        </>
+                      ) : (
+                        "Sign In"
+                      )}
+                    </Button>
+                  </motion.div>
+                </form>
+              </Form>
+              <div className="mt-6 text-center">
+                <p className="text-metallic">
+                  Don't have an account?{" "}
+                  <Link
+                    href="/signup"
+                    className="text-neon-magenta hover:text-neon-blue transition-colors font-medium"
+                  >
+                    Sign Up
+                  </Link>
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        </ElectricBorder>
       </motion.div>
     </div>
   );
