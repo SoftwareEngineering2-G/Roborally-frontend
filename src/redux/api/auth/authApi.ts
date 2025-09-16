@@ -10,11 +10,27 @@ type SignupResponse = {
   userId: string;
 };
 
+type SigninRequest = {
+  username: string;
+  password: string;
+};
+
+type SigninResponse = {
+  userId: string;
+};
+
 export const authApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     signup: builder.mutation<SignupResponse, SignupRequest>({
       query: (data) => ({
-        url: "/users",
+        url: "/users/signup",
+        method: "POST",
+        body: data,
+      }),
+    }),
+    signin: builder.mutation<SigninResponse, SigninRequest>({
+      query: (data) => ({
+        url: "/users/signin",
         method: "POST",
         body: data,
       }),
@@ -22,4 +38,4 @@ export const authApi = baseApi.injectEndpoints({
   }),
 });
 
-export const { useSignupMutation } = authApi;
+export const { useSignupMutation, useSigninMutation } = authApi;

@@ -1,8 +1,9 @@
 "use client";
-import React from "react";
+import React, { useEffect } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Zap, Loader2 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import {
   Card,
   CardContent,
@@ -24,6 +25,8 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import ElectricBorder from "@/components/ElectricBorder/electric-border";
+import { useSigninMutation } from "@/redux/api/auth/authApi";
+import { showErrorToast, showSuccessToast } from "@/lib/toast-handler";
 
 const formSchema = z.object({
   username: z
@@ -41,6 +44,9 @@ const formSchema = z.object({
 type FormData = z.infer<typeof formSchema>;
 
 export const SignIn = () => {
+  const [signin, { isLoading, error, isSuccess, data }] = useSigninMutation();
+  const router = useRouter();
+
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -49,12 +55,35 @@ export const SignIn = () => {
     },
   });
 
-  const isLoading = form.formState.isSubmitting;
-
   const onSubmit = async (data: FormData) => {
-    console.log("Login data:", data);
-    // TODO: Implement actual login logic here
+    await signin({
+      username: data.username,
+      password: data.password,
+    });
   };
+
+  // Handle success
+  useEffect(() => {
+    if (isSuccess && data) {
+      // Store userId in localStorage
+      localStorage.setItem("userId", data.userId);
+
+      showSuccessToast(
+        "Pilot Authenticated",
+        "Welcome back to the RoboRally arena! Robot systems online."
+      );
+
+      // Redirect to main page
+      router.push("/");
+    }
+  }, [isSuccess, data, router]);
+
+  // Handle errors
+  useEffect(() => {
+    if (error) {
+      showErrorToast(error, "Failed to authenticate pilot");
+    }
+  }, [error]);
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 circuit-bg">

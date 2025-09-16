@@ -1,4 +1,4 @@
-import { SignIn } from "../../modules/Signin/sign-in";
+import { SignIn } from "@/modules/Signin/sign-in";
 
 const Page = () => {
   return <SignIn />;
