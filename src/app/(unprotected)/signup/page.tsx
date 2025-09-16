@@ -1,4 +1,5 @@
-import { Signup } from "../../modules/Signup/sign-up";
+"use client";
+import { Signup } from "@/modules/Signup/sign-up";
 
 const Page = () => {
   return <Signup />;

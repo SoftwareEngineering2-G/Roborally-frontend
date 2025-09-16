@@ -4,6 +4,7 @@ import Link from "next/link";
 
 import { motion } from "framer-motion";
 import { UserPlus, Loader2, CalendarIcon } from "lucide-react";
+import { useRouter } from "next/navigation";
 import {
   Card,
   CardContent,
@@ -32,9 +33,9 @@ import {
 } from "@/components/ui/popover";
 import { format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
+import ElectricBorder from "@/components/ElectricBorder/electric-border";
 import { useSignupMutation } from "@/redux/api/auth/authApi";
 import { showErrorToast, showSuccessToast } from "@/lib/toast-handler";
-import ElectricBorder from "@/components/ElectricBorder/electric-border";
 
 const formSchema = z.object({
   username: z.string().min(2).max(100).trim().nonempty(),
@@ -45,7 +46,8 @@ const formSchema = z.object({
 type FormData = z.infer<typeof formSchema>;
 
 export const Signup = () => {
-  const [signup, { isLoading, error, isSuccess }] = useSignupMutation();
+  const [signup, { isLoading, error, isSuccess, data }] = useSignupMutation();
+  const router = useRouter();
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -66,15 +68,19 @@ export const Signup = () => {
 
   // Handle success
   useEffect(() => {
-    if (isSuccess) {
+    if (isSuccess && data) {
+      // Store userId in localStorage
+      localStorage.setItem("userId", data.userId);
+
       showSuccessToast(
         "Pilot Registration Complete",
         "Welcome to the RoboRally arena! You can now command your robot."
       );
-      // Handle post-signup logic here (e.g., redirect, reset form)
-      form.reset();
+
+      // Redirect to main page
+      router.push("/");
     }
-  }, [isSuccess, form]);
+  }, [isSuccess, data, router]);
 
   // Handle errors
   useEffect(() => {
@@ -162,7 +168,6 @@ export const Signup = () => {
                       </FormItem>
                     )}
                   />
-
                   <FormField
                     control={form.control}
                     name="birthday"
