@@ -1,3 +1,4 @@
+"use client";
 import { SignIn } from "@/modules/Signin/sign-in";
 
 const Page = () => {

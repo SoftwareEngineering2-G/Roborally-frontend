@@ -33,9 +33,9 @@ import {
 } from "@/components/ui/popover";
 import { format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
+import ElectricBorder from "@/components/ElectricBorder/electric-border";
 import { useSignupMutation } from "@/redux/api/auth/authApi";
 import { showErrorToast, showSuccessToast } from "@/lib/toast-handler";
-import ElectricBorder from "@/components/ElectricBorder/electric-border";
 
 const formSchema = z.object({
   username: z.string().min(2).max(100).trim().nonempty(),
@@ -168,7 +168,6 @@ export const Signup = () => {
                       </FormItem>
                     )}
                   />
-
                   <FormField
                     control={form.control}
                     name="birthday"
