@@ -1,13 +1,14 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 
 export const Home = () => {
-  let userId;
+  const [userId, setUserId] = useState<string | null>(null);
 
-  if (typeof window !== "undefined") {
-    userId = localStorage.getItem("userId");
-  }
+  useEffect(() => {
+    const storedUserId = localStorage.getItem("userId");
+    setUserId(storedUserId);
+  }, []);
 
   return <h1>{userId}</h1>;
 };
