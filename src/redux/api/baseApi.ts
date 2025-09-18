@@ -7,5 +7,6 @@ export const baseApi = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl,
   }),
+  tagTypes: ["Lobby"],
   endpoints: () => ({}),
 });
