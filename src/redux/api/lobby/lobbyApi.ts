@@ -13,6 +13,8 @@ export interface Room {
     maxPlayers: number;
     joinedUsers: Player[];
     gameStarted: boolean;
+    createdAt: string;
+    hostUsername: string;
 }
 
 export const lobbyApi = baseApi.injectEndpoints({
@@ -29,7 +31,7 @@ export const lobbyApi = baseApi.injectEndpoints({
 
         createLobby: builder.mutation<
             { gameRoomId: string },
-            { hostUserId: string; gameRoomName: string; isPrivate: boolean }
+            { hostUsername: string; gameRoomName: string; isPrivate: boolean }
         >({
             query: (body) => ({
                 url: "/game-lobbies",
@@ -41,14 +43,15 @@ export const lobbyApi = baseApi.injectEndpoints({
 
         joinLobby: builder.mutation<
             {
-                gameLobby: Room;
+                message: string;
+                success: boolean;
             },
-            { lobbyId: string; userId: string }
+            { lobbyId: string; username: string }
         >({
-            query: ({ lobbyId, userId }) => ({
-                url: "/game-lobbies/join",
+            query: ({ lobbyId, username }) => ({
+                url: `/game-lobbies/${lobbyId}/join`,
                 method: "POST",
-                body: { userId, GameLobbyId: lobbyId },
+                body: { username },
             }),
             invalidatesTags: ["Lobby"],
         }),

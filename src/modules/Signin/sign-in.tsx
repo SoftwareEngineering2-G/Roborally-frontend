@@ -66,7 +66,7 @@ export const SignIn = () => {
   useEffect(() => {
     if (isSuccess && data) {
       // Store userId in localStorage
-      localStorage.setItem("userId", data.userId);
+      localStorage.setItem("username", data.username);
 
       showSuccessToast(
         "Pilot Authenticated",
