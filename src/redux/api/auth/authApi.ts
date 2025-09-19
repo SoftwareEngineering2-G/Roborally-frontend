@@ -7,7 +7,7 @@ type SignupRequest = {
 };
 
 type SignupResponse = {
-  userId: string;
+  username: string;
 };
 
 type SigninRequest = {
@@ -16,7 +16,7 @@ type SigninRequest = {
 };
 
 type SigninResponse = {
-  userId: string;
+  username: string;
 };
 
 export const authApi = baseApi.injectEndpoints({
