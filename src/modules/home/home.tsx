@@ -37,8 +37,8 @@ export default function Home() {
     const [user, setUser] = useState<{ id: string; username: string } | null>(null);
 
     useEffect(() => {
-        const id = localStorage.getItem("userId");
-        if (id) setUser({ id, username: id });
+        const username = localStorage.getItem("username");
+        if (username) setUser({ id: username, username });
         else router.push("/signin");
     }, [router]);
 
@@ -57,7 +57,7 @@ export default function Home() {
         if (!user || !roomName.trim()) return;
         try {
             const response = await createLobby({
-                hostUserId: user.id,
+                hostUsername: user.username,
                 gameRoomName: roomName.trim(),
                 isPrivate,
             }).unwrap();
@@ -115,7 +115,7 @@ export default function Home() {
                     </Badge>
                     <Button
                         onClick={() => {
-                            localStorage.removeItem("userId");
+                            localStorage.removeItem("username");
                             router.push("/signin");
                         }}
                         variant="outline"
@@ -228,7 +228,7 @@ export default function Home() {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.5, delay: 0.2 }}
                     >
-                        <PublicLobbies userId={user.id} />
+                        <PublicLobbies username={user.id} />
                     </motion.div>
                 </div>
             </div>

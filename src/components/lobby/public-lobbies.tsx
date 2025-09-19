@@ -20,10 +20,10 @@ import { Users, Gamepad2, Clock, RefreshCw } from "lucide-react";
 import type { AppError } from "@/types/AppError";
 
 interface PublicLobbiesProps {
-    userId: string;
+    username: string;
 }
 
-export default function PublicLobbies({ userId }: PublicLobbiesProps) {
+export default function PublicLobbies({ username }: PublicLobbiesProps) {
     const router = useRouter();
     const dispatch = useAppDispatch();
 
@@ -42,14 +42,14 @@ export default function PublicLobbies({ userId }: PublicLobbiesProps) {
 
         setJoiningLobbyId(lobby.gameId);
         try {
-            const { gameLobby } = await joinLobby({
+            await joinLobby({
                 lobbyId: lobby.gameId,
-                userId,
+                username,
             }).unwrap();
 
-            dispatch(setCurrentRoom(gameLobby));
-            showSuccessToast("Joined lobby!", `Welcome to ${gameLobby.gameRoomName}`);
-            router.push(`/room/${gameLobby.gameId}`);
+            dispatch(setCurrentRoom(lobby));
+            showSuccessToast("Joined lobby!", `Welcome to ${lobby.gameRoomName}`);
+            router.push(`/room/${lobby.gameId}`);
         } catch (err) {
             console.error("Error joining lobby:", err);
             const errorMessage =
