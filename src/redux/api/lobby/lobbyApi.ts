@@ -1,17 +1,32 @@
 import { baseApi } from "../baseApi";
 
-export interface Player { id: string; username: string; avatar?: string }
+export interface Player {
+    id: string;
+    username: string;
+    avatar?: string;
+}
 export interface Room {
-    id: string; name: string; isPrivate: boolean; roomKey?: string;
-    maxPlayers: number; players: Player[]; gameStarted: boolean;
+    gameId: string;
+    gameRoomName: string;
+    isPrivate: boolean;
+    roomKey?: string;
+    maxPlayers: number;
+    joinedUsers: Player[];
+    gameStarted: boolean;
 }
 
 export const lobbyApi = baseApi.injectEndpoints({
     endpoints: (builder) => ({
-        // getLobbies: builder.query<Room[], void>({
-        //     query: () => ({ url: "/lobby", method: "GET" }),
-        //     providesTags: ["Lobby"],
-        // }),
+        getPublicLobbies: builder.query<
+            {
+                publicLobbies: Room[];
+            },
+            void
+        >({
+            query: () => ({ url: "/game-lobbies", method: "GET" }),
+            providesTags: ["Lobby"],
+        }),
+
         createLobby: builder.mutation<
             { gameRoomId: string },
             { hostUserId: string; gameRoomName: string; isPrivate: boolean }
@@ -24,16 +39,25 @@ export const lobbyApi = baseApi.injectEndpoints({
             invalidatesTags: ["Lobby"],
         }),
 
-        joinLobby: builder.mutation<Room, { lobbyId: string; userId: string }>({
+        joinLobby: builder.mutation<
+            {
+                gameLobby: Room;
+            },
+            { lobbyId: string; userId: string }
+        >({
             query: ({ lobbyId, userId }) => ({
-
-                url: `/lobby/${lobbyId}/join`, method: "POST", body: { userId },
+                url: "/game-lobbies/join",
+                method: "POST",
+                body: { userId, GameLobbyId: lobbyId },
             }),
             invalidatesTags: ["Lobby"],
         }),
+
         joinPrivateLobby: builder.mutation<Room, { roomKey: string; userId: string }>({
             query: ({ roomKey, userId }) => ({
-                url: `/lobby/join`, method: "POST", body: { roomKey, userId },
+                url: "/lobby/join",
+                method: "POST",
+                body: { roomKey, userId },
             }),
             invalidatesTags: ["Lobby"],
         }),
@@ -41,7 +65,7 @@ export const lobbyApi = baseApi.injectEndpoints({
 });
 
 export const {
-   // useGetLobbiesQuery,
+    useGetPublicLobbiesQuery,
     useCreateLobbyMutation,
     useJoinLobbyMutation,
     useJoinPrivateLobbyMutation,
