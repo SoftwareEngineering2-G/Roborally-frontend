@@ -4,8 +4,8 @@ import { redirect } from "next/navigation";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   React.useEffect(() => {
-    const userId = localStorage.getItem("userId");
-    if (!userId) {
+    const username = localStorage.getItem("username");
+    if (!username) {
       redirect("/signin");
     }
   }, []);
