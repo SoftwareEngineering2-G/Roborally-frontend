@@ -3,9 +3,6 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { useJoinLobbyMutation } from "@/redux/api/lobby/lobbyApi";
-import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import { setCurrentRoom } from "@/redux/game/gameSlice";
 
 import {
   Card,
@@ -16,16 +13,12 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { showSuccessToast, showErrorToast } from "@/lib/toast-handler";
 import { JoinLobbyDialog } from "@/components/JoinLobbyDialog/join-lobby-dialog";
-import { CreateRoomDialog } from "@/components/CreateRoomDialog/create-room-dialog";
+import { CreateLobbyDialog } from "@/components/CreateLobbyDialog/create-lobby-dialog";
 import { LogOut } from "lucide-react";
 
 export default function Home() {
   const router = useRouter();
-  const dispatch = useAppDispatch();
-
-  const currentRoom = useAppSelector((s) => s.game.currentRoom);
 
   // user state (loaded after mount)
   const [username, setUsername] = useState<string>("");
@@ -35,10 +28,6 @@ export default function Home() {
     if (username) setUsername(username);
     else router.push("/signin");
   }, [router]);
-
-  useEffect(() => {
-    if (currentRoom?.gameStarted) router.push(`/game/${currentRoom.id}`);
-  }, [currentRoom, router]);
 
   // While user is loading, render placeholder to keep SSR markup stable
   if (!username) {
@@ -62,7 +51,7 @@ export default function Home() {
           </Badge>
           <Button
             onClick={() => {
-              localStorage.removeItem("userId");
+              localStorage.removeItem("username");
               router.push("/signin");
             }}
             variant="outline"
@@ -89,7 +78,7 @@ export default function Home() {
             </CardHeader>
             <CardContent className="space-y-4">
               {/* Create Room */}
-              <CreateRoomDialog username={username} />
+              <CreateLobbyDialog username={username} />
 
               {/* Join Room */}
               <JoinLobbyDialog username={username} />

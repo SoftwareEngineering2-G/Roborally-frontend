@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { useCreateLobbyMutation } from "@/redux/api/lobby/lobbyApi";
 import { showSuccessToast, showErrorToast } from "@/lib/toast-handler";
 
@@ -23,52 +24,52 @@ interface CreateRoomDialogProps {
   trigger?: React.ReactNode;
 }
 
-export const CreateRoomDialog = ({
+export const CreateLobbyDialog = ({
   username,
   trigger,
 }: CreateRoomDialogProps) => {
-  const [createLobby, { isLoading: creating }] = useCreateLobbyMutation();
+  const router = useRouter();
+  const [createLobby, { isLoading: creating, isSuccess, data }] =
+    useCreateLobbyMutation();
 
-  const [roomName, setRoomName] = useState("");
+  const [lobbyName, setLobbyName] = useState("");
   const [isPrivate, setIsPrivate] = useState(false);
   const [showDialog, setShowDialog] = useState(false);
 
-  const handleCreateRoom = async () => {
-    if (!username || !roomName.trim()) return;
-
-    try {
-      const response = await createLobby({
-        hostUsername: username,
-        gameRoomName: roomName.trim(),
-        isPrivate,
-      }).unwrap();
-
-      showSuccessToast(
-        "Room created!",
-        isPrivate ? `Room key: ${response.gameRoomId}` : "Players can now join"
-      );
-
-      console.log(
-        "Room created with id:",
-        response.gameRoomId,
-        "and room name:",
-        roomName
-      );
-
+  // Handle successful lobby creation with proper Next.js routing
+  useEffect(() => {
+    if (isSuccess && data?.gameRoomId) {
       // Reset form and close dialog
       setShowDialog(false);
-      setRoomName("");
+      setLobbyName("");
       setIsPrivate(false);
+
+      // Navigate using Next.js router
+      router.push(`/lobby/${data.gameRoomId}`);
+
+      showSuccessToast("Lobby created!", "Redirecting to your new lobby...");
+    }
+  }, [isSuccess, data, router]);
+
+  const handleCreateLobby = async () => {
+    if (!username || !lobbyName.trim()) return;
+
+    try {
+      await createLobby({
+        hostUsername: username,
+        gameRoomName: lobbyName.trim(),
+        isPrivate,
+      });
     } catch (err) {
       console.error("Error creating lobby:", err);
-      showErrorToast("Failed to create room", "Something went wrong");
+      showErrorToast("Failed to create lobby", "Something went wrong");
     }
   };
 
   const defaultTrigger = (
     <Button className="w-full bg-gradient-primary" disabled={creating}>
       <Plus className="w-4 h-4 mr-2" />
-      Create Room
+      Create Lobby
     </Button>
   );
 
@@ -84,12 +85,12 @@ export const CreateRoomDialog = ({
         </DialogHeader>
         <div className="space-y-4 pt-4">
           <div className="space-y-2">
-            <Label htmlFor="roomName">Room Name</Label>
+            <Label htmlFor="lobbyName">Lobby Name</Label>
             <Input
-              id="roomName"
-              value={roomName}
-              onChange={(e) => setRoomName(e.target.value)}
-              placeholder="Enter room name"
+              id="lobbyName"
+              value={lobbyName}
+              onChange={(e) => setLobbyName(e.target.value)}
+              placeholder="Enter lobby name"
               className="bg-surface-dark border-neon-teal/30 focus:border-neon-teal focus:ring-neon-teal"
             />
           </div>
@@ -105,16 +106,16 @@ export const CreateRoomDialog = ({
               className="flex items-center space-x-2 cursor-pointer"
             >
               <Lock className="w-4 h-4" />
-              <span>Private Room</span>
+              <span>Private Lobby</span>
             </Label>
           </div>
 
           <Button
-            onClick={handleCreateRoom}
-            disabled={!roomName.trim() || creating}
+            onClick={handleCreateLobby}
+            disabled={!lobbyName.trim() || creating}
             className="w-full bg-gradient-secondary hover:glow-magenta"
           >
-            {creating ? "Creating..." : "Create Room"}
+            {creating ? "Creating..." : "Create Lobby"}
           </Button>
         </div>
       </DialogContent>

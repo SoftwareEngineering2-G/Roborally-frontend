@@ -1,8 +1,11 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-import type { Room } from "../api/lobby/lobbyApi";
 
 interface GameState {
     currentRoom: Room | null;
+}
+
+interface Room {
+    // Empty to fix issue
 }
 const initialState: GameState = { currentRoom: null };
 

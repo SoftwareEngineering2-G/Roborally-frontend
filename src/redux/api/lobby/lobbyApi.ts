@@ -6,16 +6,6 @@ export interface Player {
   avatar?: string;
 }
 
-export interface Room {
-  id: string;
-  name: string;
-  isPrivate: boolean;
-  roomKey?: string;
-  maxPlayers: number;
-  players: Player[];
-  gameStarted: boolean;
-}
-
 interface CreateLobbyRequest {
   hostUsername: string;
   gameRoomName: string;
@@ -31,17 +21,20 @@ interface JoinLobbyRequest {
   username: string;
 }
 
-interface JoinPrivateLobbyRequest {
-  roomKey: string;
+interface GetLobbyInfoRequest {
+  gameId: string;
   username: string;
+}
+
+interface GetLobbyInfoResponse {
+  gameId: string;
+  lobbyname: string;
+  joinedUsernames: string[];
+  hostUsername: string;
 }
 
 export const lobbyApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    // getLobbies: builder.query<Room[], void>({
-    //     query: () => ({ url: "/lobby", method: "GET" }),
-    //     providesTags: ["Lobby"],
-    // }),
     createLobby: builder.mutation<CreateLobbyResponse, CreateLobbyRequest>({
       query: (body) => ({
         url: "/game-lobbies",
@@ -51,19 +44,27 @@ export const lobbyApi = baseApi.injectEndpoints({
       invalidatesTags: ["Lobby"],
     }),
 
-    joinLobby: builder.mutation<Room, JoinLobbyRequest>({
+    joinLobby: builder.mutation<void, JoinLobbyRequest>({
       query: ({ gameId, username }) => ({
-        url: `/lobby/${gameId}/join`,
+        url: `/game-lobbies/${gameId}/join`,
         method: "POST",
         body: { username },
       }),
       invalidatesTags: ["Lobby"],
     }),
+
+    getLobbyInfo: builder.query<GetLobbyInfoResponse, GetLobbyInfoRequest>({
+      query: ({ gameId, username }) => ({
+        url: `/game-lobbies/${gameId}`,
+        method: "GET",
+        params: { username },
+      }),
+    }),
   }),
 });
 
 export const {
-  // useGetLobbiesQuery,
   useCreateLobbyMutation,
   useJoinLobbyMutation,
+  useGetLobbyInfoQuery,
 } = lobbyApi;

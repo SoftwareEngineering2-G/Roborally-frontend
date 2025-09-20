@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import z from "zod";
 import { useJoinLobbyMutation } from "@/redux/api/lobby/lobbyApi";
-import { useAppDispatch } from "@/redux/hooks";
-import { setCurrentRoom } from "@/redux/game/gameSlice";
 import { showErrorToast } from "@/lib/toast-handler";
 
 import {
@@ -17,8 +18,22 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Key } from "lucide-react";
+
+// UUID validation schema
+const formSchema = z.object({
+  gameId: z.string().uuid("Invalid game ID format").trim(),
+});
+
+type FormData = z.infer<typeof formSchema>;
 
 interface JoinLobbyDialogProps {
   username: string;
@@ -30,29 +45,35 @@ export const JoinLobbyDialog = ({
   trigger,
 }: JoinLobbyDialogProps) => {
   const router = useRouter();
-  const dispatch = useAppDispatch();
-  const [joinLobby] = useJoinLobbyMutation();
+  const [joinLobby, { isLoading, isSuccess }] = useJoinLobbyMutation();
 
-  const [privateKey, setPrivateKey] = useState("");
   const [showDialog, setShowDialog] = useState(false);
 
-  const handleJoinPrivateRoom = async () => {
-    if (!username || privateKey.trim().length !== 6) return;
+  const form = useForm<FormData>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      gameId: "",
+    },
+  });
 
+  const onSubmit = async (data: FormData) => {
     try {
-      const room = await joinLobby({
-        gameId: privateKey.trim().toUpperCase(),
+      await joinLobby({
+        gameId: data.gameId,
         username,
-      }).unwrap();
-
-      dispatch(setCurrentRoom(room));
-      setShowDialog(false);
-      setPrivateKey("");
-      router.push(`/room/${room.id}`);
+      });
     } catch {
       showErrorToast("Invalid room key", "Room not found or is full");
     }
   };
+
+  useEffect(() => {
+    if (isSuccess) {
+      setShowDialog(false);
+      router.push(`/lobby/${form.getValues("gameId")}`);
+      form.reset();
+    }
+  }, [isSuccess, router, form]);
 
   const defaultTrigger = (
     <Button variant="outline">
@@ -68,27 +89,42 @@ export const JoinLobbyDialog = ({
         <DialogHeader>
           <DialogTitle>Join Private Room</DialogTitle>
           <DialogDescription>
-            Enter the 6-character room key to join a private game
+            Enter the game ID to join a private room
           </DialogDescription>
         </DialogHeader>
-        <div className="space-y-4 pt-4">
-          <Label htmlFor="privateKey">Room Key</Label>
-          <Input
-            id="privateKey"
-            value={privateKey}
-            onChange={(e) => setPrivateKey(e.target.value)}
-            maxLength={6}
-            className="uppercase"
-            placeholder="ABC123"
-          />
-          <Button
-            onClick={handleJoinPrivateRoom}
-            disabled={privateKey.trim().length !== 6}
-            className="w-full"
+        <Form {...form}>
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="space-y-4 pt-4"
           >
-            Join Room
-          </Button>
-        </div>
+            <FormField
+              control={form.control}
+              name="gameId"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-chrome-light font-medium">
+                    Game ID
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      placeholder="Enter game ID (UUID format)"
+                      className="bg-surface-dark border-neon-magenta/30 focus:border-neon-magenta focus:ring-neon-magenta text-foreground placeholder:text-metallic"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <Button
+              type="submit"
+              disabled={isLoading}
+              className="w-full bg-gradient-secondary hover:glow-magenta"
+            >
+              {isLoading ? "Joining..." : "Join Room"}
+            </Button>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   );
