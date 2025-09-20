@@ -278,36 +278,12 @@ export const Lobby = ({ gameId }: Props) => {
       return;
     }
 
-    // Send start game via SignalR if connected
-    if (signalRConnection.isConnected && signalRLobby) {
-      try {
-        await signalRLobby.startGame();
-        toast.success("Game Starting!", {
-          description: "Initializing RoboRally battle...",
-        });
-        return; // SignalR will handle navigation via the event
-      } catch (error) {
-        toast.error("Failed to start game", {
-          description: "Connection issue with the battle arena",
-        });
-        return;
-      }
-    }
-
-    // Fallback to simulated game start if SignalR not available
-    toast.success("Game Starting!", {
-      description: "Initializing RoboRally battle...",
-    });
-
-    // Simulate game start
-    setTimeout(() => {
-      router.push(`/lobby/${lobbyData.gameId}/game`);
-    }, 2000);
+    // TODO: Implement start game via here....
   };
 
   const copyRoomKey = () => {
     // Hardcoded room key since API doesn't provide it yet
-    const roomKey = "RALLY2024";
+    const roomKey = lobbyData?.gameId;
     navigator.clipboard.writeText(roomKey);
     toast.success("Room key copied!", {
       description: "Share this key with friends to join",
@@ -327,7 +303,6 @@ export const Lobby = ({ gameId }: Props) => {
   // Hardcoded values for UI elements not available in API yet
   const maxPlayers = 6;
   const isPrivate = true; // Hardcoded for now
-  const lobbyKey = "RALLY2024"; // Hardcoded for now
 
   return (
     <div className="min-h-screen bg-background">
