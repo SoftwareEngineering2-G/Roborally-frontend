@@ -24,9 +24,7 @@ export const LobbyHeader = ({
   const router = useRouter();
 
   const copyRoomKey = () => {
-    // Hardcoded room key since API doesn't provide it yet
-    const roomKey = "RALLY2024";
-    navigator.clipboard.writeText(roomKey);
+    navigator.clipboard.writeText(gameId);
     toast.success("Room key copied!", {
       description: "Share this key with friends to join",
     });
