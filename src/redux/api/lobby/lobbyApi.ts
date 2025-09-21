@@ -1,40 +1,20 @@
 import { baseApi } from "../baseApi";
-
-export interface Player {
-  id: string;
-  username: string;
-  avatar?: string;
-}
-
-interface CreateLobbyRequest {
-  hostUsername: string;
-  gameRoomName: string;
-  isPrivate: boolean;
-}
-
-interface CreateLobbyResponse {
-  gameRoomId: string;
-}
-
-interface JoinLobbyRequest {
-  gameId: string;
-  username: string;
-}
-
-interface GetLobbyInfoRequest {
-  gameId: string;
-  username: string;
-}
-
-interface GetLobbyInfoResponse {
-  gameId: string;
-  lobbyname: string;
-  joinedUsernames: string[];
-  hostUsername: string;
-}
+import type {
+  Lobby,
+  CreateLobbyRequest,
+  CreateLobbyResponse,
+  GetLobbyInfoRequest,
+  GetLobbyInfoResponse,
+  JoinLobbyRequest,
+} from "./types";
 
 export const lobbyApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
+    getPublicLobbies: builder.query<Lobby[], void>({
+      query: () => ({ url: "/game-lobbies", method: "GET" }),
+      providesTags: ["Lobby"],
+    }),
+
     createLobby: builder.mutation<CreateLobbyResponse, CreateLobbyRequest>({
       query: (body) => ({
         url: "/game-lobbies",
@@ -64,6 +44,7 @@ export const lobbyApi = baseApi.injectEndpoints({
 });
 
 export const {
+  useGetPublicLobbiesQuery,
   useCreateLobbyMutation,
   useJoinLobbyMutation,
   useGetLobbyInfoQuery,

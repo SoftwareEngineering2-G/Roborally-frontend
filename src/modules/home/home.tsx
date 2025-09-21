@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { JoinLobbyDialog } from "@/components/JoinLobbyDialog/join-lobby-dialog";
 import { CreateLobbyDialog } from "@/components/CreateLobbyDialog/create-lobby-dialog";
+import PublicLobbies from "@/components/lobby/public-lobbies";
 import { LogOut } from "lucide-react";
 
 export default function Home() {
@@ -64,27 +65,41 @@ export default function Home() {
       </header>
 
       <div className="container mx-auto px-4 py-8">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          <Card className="glass-panel">
-            <CardHeader>
-              <CardTitle className="text-xl text-neon-teal">
-                Quick Actions
-              </CardTitle>
-              <CardDescription>Start your RoboRally adventure</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {/* Create Room */}
-              <CreateLobbyDialog username={username} />
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Left side - Quick Actions */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <Card className="glass-panel">
+              <CardHeader>
+                <CardTitle className="text-xl text-neon-teal">
+                  Quick Actions
+                </CardTitle>
+                <CardDescription>
+                  Start your RoboRally adventure
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {/* Create Room */}
+                <CreateLobbyDialog username={username} />
 
-              {/* Join Room */}
-              <JoinLobbyDialog username={username} />
-            </CardContent>
-          </Card>
-        </motion.div>
+                {/* Join Room */}
+                <JoinLobbyDialog username={username} />
+              </CardContent>
+            </Card>
+          </motion.div>
+
+          {/* Right side - Public Lobbies */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+          >
+            <PublicLobbies username={username} />
+          </motion.div>
+        </div>
       </div>
     </div>
   );
