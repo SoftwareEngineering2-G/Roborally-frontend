@@ -69,7 +69,7 @@ export const Signup = () => {
   // Handle success
   useEffect(() => {
     if (isSuccess && data) {
-      // Store userId in localStorage
+      // Store username in localStorage
       localStorage.setItem("username", data.username);
 
       showSuccessToast(
