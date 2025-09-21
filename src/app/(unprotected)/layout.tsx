@@ -1,5 +1,6 @@
 "use client";
-import React, { useEffect } from "react";
+import type React from "react";
+import { useEffect } from "react";
 import { redirect } from "next/navigation";
 
 export default function Layout({ children }: { children: React.ReactNode }) {

@@ -1,18 +1,13 @@
-// Sachin: I am commenting this out because there are errors.
-
-/*
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import {
   useGetPublicLobbiesQuery,
   useJoinLobbyMutation,
-  type Room,
 } from "@/redux/api/lobby/lobbyApi";
 import { useAppDispatch } from "@/redux/hooks";
-import { setCurrentRoom } from "@/redux/game/gameSlice";
 
 import {
   Card,
@@ -22,43 +17,57 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
 import { showSuccessToast, showErrorToast } from "@/lib/toast-handler";
 import { Users, Gamepad2, Clock, RefreshCw } from "lucide-react";
 import type { AppError } from "@/types/AppError";
+import { Lobby } from "@/redux/api/lobby/types";
+import PublicLobbiesSkeleton from "./public-lobbies-skeleton";
+import PublicLobbiesError from "./public-lobbies-error";
 
-interface PublicLobbiesProps {
-  userId: string;
+interface Props {
+  username: string;
 }
 
-export default function PublicLobbies({ userId }: PublicLobbiesProps) {
+export default function PublicLobbies({ username }: Props) {
   const router = useRouter();
   const dispatch = useAppDispatch();
 
   const {
-    data: { publicLobbies = [] } = {},
+    data: publicLobbies = [],
     isLoading,
     error,
     refetch,
   } = useGetPublicLobbiesQuery();
 
-  const [joinLobby, { isLoading: joining }] = useJoinLobbyMutation();
+  const [joinLobby, { isLoading: joining, isSuccess: joinSuccess, data }] =
+    useJoinLobbyMutation();
   const [joiningLobbyId, setJoiningLobbyId] = useState<string | null>(null);
+  const [successfulLobby, setSuccessfulLobby] = useState<Lobby | null>(null);
 
-  const handleJoinLobby = async (lobby: Room) => {
-    if (joining || lobby.players.length >= lobby.maxPlayers) return;
+  // Handle successful join
+  useEffect(() => {
+    if (joinSuccess && successfulLobby) {
+      showSuccessToast(
+        "Joined lobby!",
+        `Welcome to ${successfulLobby.gameRoomName}`
+      );
+      router.push(`/game/${successfulLobby.gameId}`);
+      setSuccessfulLobby(null);
+    }
+  }, [joinSuccess, successfulLobby, router]);
+
+  const handleJoinLobby = async (lobby: Lobby) => {
+    if (joining || lobby.currentAmountOfPlayers >= 6) return;
 
     setJoiningLobbyId(lobby.gameId);
     try {
-      const { gameLobby } = await joinLobby({
-        lobbyId: lobby.gameId,
-        userId,
-      }).unwrap();
+      await joinLobby({
+        gameId: lobby.gameId,
+        username,
+      });
 
-      dispatch(setCurrentRoom(gameLobby));
-      showSuccessToast("Joined lobby!", `Welcome to ${gameLobby.gameRoomName}`);
-      router.push(`/room/${gameLobby.gameId}`);
+      // Store the lobby info for the success useEffect
+      setSuccessfulLobby(lobby);
     } catch (err) {
       console.error("Error joining lobby:", err);
       const errorMessage =
@@ -75,56 +84,11 @@ export default function PublicLobbies({ userId }: PublicLobbiesProps) {
   };
 
   if (isLoading) {
-    return (
-      <Card className="glass-panel">
-        <CardHeader>
-          <CardTitle className="text-xl text-neon-teal flex items-center gap-2">
-            <Gamepad2 className="w-5 h-5" />
-            Public Lobbies
-          </CardTitle>
-          <CardDescription>Join an existing game</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          {Array.from({ length: 3 }, (_, i) => (
-            <div
-              key={`skeleton-${Date.now()}-${i}`}
-              className="p-4 border border-neon-teal/20 rounded-lg bg-surface-dark/30"
-            >
-              <div className="flex items-center justify-between">
-                <div className="space-y-2 flex-1">
-                  <Skeleton className="h-5 w-32 bg-muted/20" />
-                  <Skeleton className="h-4 w-20 bg-muted/20" />
-                </div>
-                <Skeleton className="h-9 w-16 bg-muted/20" />
-              </div>
-            </div>
-          ))}
-        </CardContent>
-      </Card>
-    );
+    return <PublicLobbiesSkeleton />;
   }
 
   if (error) {
-    return (
-      <Card className="glass-panel">
-        <CardHeader>
-          <CardTitle className="text-xl text-neon-teal flex items-center gap-2">
-            <Gamepad2 className="w-5 h-5" />
-            Public Lobbies
-          </CardTitle>
-          <CardDescription>Join an existing game</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="text-center py-8">
-            <p className="text-muted-foreground mb-4">Failed to load lobbies</p>
-            <Button onClick={handleRefresh} variant="outline">
-              <RefreshCw className="w-4 h-4 mr-2" />
-              Retry
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-    );
+    return <PublicLobbiesError onRetry={handleRefresh} />;
   }
 
   return (
@@ -162,7 +126,7 @@ export default function PublicLobbies({ userId }: PublicLobbiesProps) {
         ) : (
           publicLobbies.map((lobby, index) => (
             <motion.div
-              key={lobby.gameId}
+              key={index}
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: index * 0.1, duration: 0.3 }}
@@ -174,21 +138,11 @@ export default function PublicLobbies({ userId }: PublicLobbiesProps) {
                     <h3 className="font-semibold text-foreground">
                       {lobby.gameRoomName}
                     </h3>
-                    {lobby.gameStarted && (
-                      <Badge
-                        variant="secondary"
-                        className="bg-neon-magenta/20 text-neon-magenta border-neon-magenta/30"
-                      >
-                        In Progress
-                      </Badge>
-                    )}
                   </div>
                   <div className="flex items-center gap-4 text-sm text-muted-foreground">
                     <div className="flex items-center gap-1">
                       <Users className="w-4 h-4" />
-                      <span>
-                        {lobby.joinedUsers.length}/{lobby.maxPlayers} players
-                      </span>
+                      <span>{lobby.currentAmountOfPlayers}/6 players</span>
                     </div>
                   </div>
                 </div>
@@ -197,8 +151,7 @@ export default function PublicLobbies({ userId }: PublicLobbiesProps) {
                   disabled={
                     joining ||
                     joiningLobbyId === lobby.gameId ||
-                    lobby.joinedUsers.length >= lobby.maxPlayers ||
-                    lobby.gameStarted
+                    lobby.currentAmountOfPlayers >= 6
                   }
                   className="bg-gradient-primary"
                   size="sm"
@@ -208,10 +161,8 @@ export default function PublicLobbies({ userId }: PublicLobbiesProps) {
                       <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
                       Joining...
                     </>
-                  ) : lobby.joinedUsers.length >= lobby.maxPlayers ? (
+                  ) : lobby.currentAmountOfPlayers >= 6 ? (
                     "Full"
-                  ) : lobby.gameStarted ? (
-                    "Started"
                   ) : (
                     "Join"
                   )}
@@ -224,4 +175,3 @@ export default function PublicLobbies({ userId }: PublicLobbiesProps) {
     </Card>
   );
 }
-*/
