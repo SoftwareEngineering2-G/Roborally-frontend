@@ -88,8 +88,6 @@ export const Lobby = ({ gameId }: Props) => {
     },
   });
 
-  const user: User | null = username ? { id: username, username } : null;
-
   if (isLoading || !username) return <LobbyLoadingSkeleton />;
   if (error && "status" in error && (error as any).status === 403) {
     return (
@@ -106,7 +104,7 @@ export const Lobby = ({ gameId }: Props) => {
         onRetry={() => refetch?.()}
       />
     );
-  if (!lobbyData || !user)
+  if (!lobbyData || !username)
     return (
       <LobbyErrorState
         message="Lobby not found."
@@ -121,7 +119,7 @@ export const Lobby = ({ gameId }: Props) => {
   const handleStartGame = async () => {
     // TODO: No start game implemented yet
     if (!username || !isHost || isStartingGame || !lobbyData) return;
-    await startGame({ gameId: lobbyData.gameId, username: user.username });
+    await startGame({ gameId: lobbyData.gameId, username });
   };
 
   const copyGameId = () => {
@@ -145,7 +143,6 @@ export const Lobby = ({ gameId }: Props) => {
               players={players}
               maxPlayers={6}
               hostUsername={lobbyData.hostUsername}
-              currentUserId={user.id}
               currentPlayerReady={lobbyState.currentPlayerReady}
             />
           </div>

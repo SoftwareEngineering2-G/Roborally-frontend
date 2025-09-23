@@ -21,7 +21,6 @@ interface PlayersGridProps {
   players: Player[];
   maxPlayers: number;
   hostUsername: string;
-  currentUserId: string;
   currentPlayerReady: boolean;
 }
 
@@ -29,7 +28,6 @@ export const PlayersGrid = ({
   players,
   maxPlayers,
   hostUsername,
-  currentUserId,
   currentPlayerReady,
 }: PlayersGridProps) => {
   return (
@@ -50,7 +48,7 @@ export const PlayersGrid = ({
           <div className="grid gap-4 sm:grid-cols-2">
             {players.map((player, index) => {
               const isPlayerReady =
-                player.username === currentUserId
+                player.username === hostUsername
                   ? currentPlayerReady
                   : player.isReady;
               return (
