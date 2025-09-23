@@ -1,20 +1,11 @@
-import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { toast } from "sonner";
 import { useLobbySignalR, useSignalRConnection } from "@/hooks/signalr";
-import {
-  userJoinedLobby,
-  userLeftLobby,
-  playerReadyChanged,
-  gameStarted,
-  lobbyUpdated,
-} from "@/redux/lobby/lobbySlice";
+import { userJoinedLobby, userLeftLobby } from "@/redux/lobby/lobbySlice";
 import {
   UserJoinedLobbyEvent,
   UserLeftLobbyEvent,
-  PlayerReadyEvent,
   GameStartedEvent,
-  LobbyUpdatedEvent,
 } from "@/types/signalr";
 import { AppDispatch } from "@/redux/store";
 
@@ -64,12 +55,8 @@ export function useLobbySignalREffects({
       },
 
       onGameStarted: (event: GameStartedEvent) => {
-        // Dispatch Redux action
-        dispatch(gameStarted({ startedBy: event.startedBy }));
-
-        // Show toast notification
         toast.success("Battle commencing!", {
-          description: `Game started by ${event.startedBy}`,
+          description: `Game has started. Good luck!`,
         });
 
         // Call navigation callback if provided
@@ -78,11 +65,6 @@ export function useLobbySignalREffects({
             onGameStarted(gameId);
           }, 2000);
         }
-      },
-
-      onLobbyUpdated: (event: LobbyUpdatedEvent) => {
-        // Dispatch Redux action
-        dispatch(lobbyUpdated(event));
       },
     },
     {

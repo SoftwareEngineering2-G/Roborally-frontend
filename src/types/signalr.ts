@@ -33,9 +33,6 @@ export interface PlayerReadyEvent {
 
 export interface GameStartedEvent {
   gameId: string;
-  startedBy: string;
-  players: string[];
-  timestamp: string;
 }
 
 export interface LobbyUpdatedEvent {

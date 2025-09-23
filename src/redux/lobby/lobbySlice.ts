@@ -71,16 +71,6 @@ export const lobbySlice = createSlice({
       }
     },
 
-    gameStarted: (state, action: PayloadAction<{ startedBy: string }>) => {
-      // Could add game started state here if needed
-      // For now, navigation will be handled by middleware/effects
-    },
-
-    lobbyUpdated: (state, action: PayloadAction<any>) => {
-      // Handle general lobby updates
-      // Could refetch or update specific fields
-    },
-
     // Local state changes (from UI interactions)
     setCurrentPlayerReady: (state, action: PayloadAction<boolean>) => {
       state.currentPlayerReady = action.payload;
@@ -117,7 +107,6 @@ export const lobbySlice = createSlice({
 
           // Initialize players from API data
           state.players = lobbyData.joinedUsernames.map((username) => ({
-            id: username,
             username,
             isReady: true, // Default everyone to ready
             isHost: username === lobbyData.hostUsername,
@@ -141,8 +130,6 @@ export const {
   userJoinedLobby,
   userLeftLobby,
   playerReadyChanged,
-  gameStarted,
-  lobbyUpdated,
   setCurrentPlayerReady,
   clearLobbyState,
   setError,
