@@ -1,30 +1,11 @@
 // SignalR Configuration for your RoboRally Backend
 
 import { SignalRProvider } from "@/lib/signalr/SignalRProvider";
-import { SignalRConfig } from "@/types/signalr";
+import { getConfig } from "@/lib/signalr/base-config";
 
-// Configuration matching your backend setup
-export const lobbySignalRConfig: SignalRConfig = {
-  baseUrl: "http://localhost:5100",
-  hubPath: "/game-lobbies", // Primary hub for lobby events
-  automaticReconnect: true,
-  reconnectDelays: [0, 2000, 10000, 30000],
-};
-
-// Future hub configurations (if you need multiple hubs)
-export const gamePlaySignalRConfig: SignalRConfig = {
-  baseUrl: "http://localhost:5100",
-  hubPath: "/game-play", // For actual gameplay events
-  automaticReconnect: true,
-  reconnectDelays: [0, 2000, 10000, 30000],
-};
-
-export const chatSignalRConfig: SignalRConfig = {
-  baseUrl: "http://localhost:5100",
-  hubPath: "/chat", // For chat functionality
-  automaticReconnect: true,
-  reconnectDelays: [0, 2000, 10000, 30000],
-};
+// Configuration for different hubs
+export const lobbySignalRConfig = getConfig("/game-lobbies"); // Primary hub for lobby events
+export const gamePlaySignalRConfig = getConfig("/game-play"); // For actual gameplay events
 
 // Lobby-specific SignalR Provider (only use in lobby pages)
 export function LobbySignalRProvider({

@@ -6,6 +6,7 @@ import type {
   GetLobbyInfoRequest,
   GetLobbyInfoResponse,
   JoinLobbyRequest,
+  StartGameRequest,
 } from "./types";
 
 export const lobbyApi = baseApi.injectEndpoints({
@@ -40,6 +41,16 @@ export const lobbyApi = baseApi.injectEndpoints({
         params: { username },
       }),
     }),
+
+    startGame: builder.mutation<void, StartGameRequest>({
+      query: ({ gameId, username }) => ({
+        url: `/game-lobbies/${gameId}/start`,
+        method: "POST",
+        body: {
+          username,
+        },
+      }),
+    }),
   }),
 });
 
@@ -48,4 +59,5 @@ export const {
   useCreateLobbyMutation,
   useJoinLobbyMutation,
   useGetLobbyInfoQuery,
+  useStartGameMutation,
 } = lobbyApi;
