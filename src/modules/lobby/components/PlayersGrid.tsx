@@ -13,7 +13,6 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Crown, Users, Check, X } from "lucide-react";
 
 interface Player {
-  id: string;
   username: string;
   isReady: boolean;
 }
@@ -22,7 +21,6 @@ interface PlayersGridProps {
   players: Player[];
   maxPlayers: number;
   hostUsername: string;
-  currentUserId: string;
   currentPlayerReady: boolean;
 }
 
@@ -30,7 +28,6 @@ export const PlayersGrid = ({
   players,
   maxPlayers,
   hostUsername,
-  currentUserId,
   currentPlayerReady,
 }: PlayersGridProps) => {
   return (
@@ -51,12 +48,12 @@ export const PlayersGrid = ({
           <div className="grid gap-4 sm:grid-cols-2">
             {players.map((player, index) => {
               const isPlayerReady =
-                player.id === currentUserId
+                player.username === hostUsername
                   ? currentPlayerReady
                   : player.isReady;
               return (
                 <motion.div
-                  key={player.id}
+                  key={player.username}
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: index * 0.1 }}

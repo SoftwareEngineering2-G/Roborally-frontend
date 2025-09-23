@@ -1,5 +1,4 @@
-import { Lobby } from "@/modules/lobby/lobby";
-import { LobbySignalRProvider } from "@/lib/signalr/roborally-config";
+import Game from "@/modules/game/game";
 
 export default async function Page({
   params,
@@ -8,9 +7,5 @@ export default async function Page({
 }) {
   const { gameId } = await params;
 
-  return (
-    <LobbySignalRProvider>
-      <Lobby gameId={gameId} />
-    </LobbySignalRProvider>
-  );
+  return <Game gameId={gameId} />;
 }

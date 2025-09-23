@@ -12,7 +12,6 @@ import {
 import { Copy, Check, X, Play } from "lucide-react";
 
 interface Player {
-  id: string;
   username: string;
   isReady: boolean;
 }
@@ -27,7 +26,7 @@ interface GameControlsProps {
   gameId: string;
   onToggleReady: () => void;
   onStartGame: () => void;
-  onCopyRoomKey: () => void;
+  onCopyGameId: () => void;
 }
 
 export const GameControls = ({
@@ -40,7 +39,7 @@ export const GameControls = ({
   gameId,
   onToggleReady,
   onStartGame,
-  onCopyRoomKey,
+  onCopyGameId,
 }: GameControlsProps) => {
   return (
     <motion.div
@@ -108,7 +107,7 @@ export const GameControls = ({
                 <code className="flex-1 p-2 bg-muted rounded text-primary font-mono text-sm">
                   {gameId}
                 </code>
-                <Button size="sm" variant="outline" onClick={onCopyRoomKey}>
+                <Button size="sm" variant="outline" onClick={onCopyGameId}>
                   <Copy className="w-4 h-4" />
                 </Button>
               </div>
