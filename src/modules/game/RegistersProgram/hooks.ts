@@ -128,6 +128,15 @@ export const useProgrammingPhase = (
     return false;
   }, [state.registers]);
 
+  // Set hand (for dealing cards)
+  const handleSetHand = useCallback((newHand: ProgramCard[]) => {
+    setState((prev) => ({
+      ...prev,
+      hand: newHand,
+      selectedCard: null,
+    }));
+  }, []);
+
   return {
     state,
     handlers: {
@@ -138,6 +147,7 @@ export const useProgrammingPhase = (
       handleDragEnd,
       handleDrop,
       handleUploadProgram,
+      handleSetHand,
     },
   };
 };

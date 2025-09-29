@@ -1,9 +1,10 @@
 "use client";
 
+import { useRef } from "react";
 import { motion } from "framer-motion";
 import { GameBoard } from "@/components/GameBoard";
 import { ProgrammingControls } from "./ProgrammingControls";
-import { DeckArea } from "./DeckArea";
+import { DeckArea } from "./DeckAreaSimple";
 import { DragDropIndicator } from "./DragDropIndicator";
 import { ProgramCard, ProgrammingPhaseState } from "./types";
 
@@ -20,6 +21,10 @@ interface ProgrammingPhaseProps {
   showProgrammingControls: boolean;
   onToggleProgrammingControls: () => void;
   filledCount: number;
+  deckCount: number;
+  isDealing: boolean;
+  onDrawCards: (deckElement: HTMLElement, handContainer: HTMLElement) => void;
+  onResetDeck?: () => void;
 }
 
 export const ProgrammingPhase = ({
@@ -28,7 +33,18 @@ export const ProgrammingPhase = ({
   showProgrammingControls,
   onToggleProgrammingControls,
   filledCount,
+  deckCount,
+  isDealing,
+  onDrawCards,
+  onResetDeck,
 }: ProgrammingPhaseProps) => {
+  const handContainerRef = useRef<HTMLDivElement>(null);
+
+  const handleDrawCardsWithRef = (deckElement: HTMLElement) => {
+    if (handContainerRef.current) {
+      onDrawCards(deckElement, handContainerRef.current);
+    }
+  };
   return (
     <motion.div
       key="programming"
@@ -42,22 +58,24 @@ export const ProgrammingPhase = ({
       <div className="flex items-center justify-center min-h-[calc(100vh-5rem)] p-4">
         <GameBoard className="max-w-5xl w-full" />
       </div>
-
       {/* Programming Controls */}
       <ProgrammingControls
+        ref={handContainerRef}
         state={state}
         handlers={handlers}
         showControls={showProgrammingControls}
         onToggleControls={onToggleProgrammingControls}
         filledCount={filledCount}
       />
-
       {/* Programming and Discard Piles - Top Right */}
       <DeckArea
         showControls={showProgrammingControls}
         handSize={state.hand.length}
-      />
-
+        deckCount={deckCount}
+        isDealing={isDealing}
+        onDrawCards={handleDrawCardsWithRef}
+        onResetDeck={onResetDeck}
+      />{" "}
       {/* Drag Drop Zones Indicator */}
       <DragDropIndicator isDragging={state.isDragging} />
     </motion.div>

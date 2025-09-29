@@ -1,5 +1,6 @@
 "use client";
 
+import { forwardRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -23,13 +24,10 @@ interface ProgrammingControlsProps {
   filledCount: number;
 }
 
-export const ProgrammingControls = ({
-  state,
-  handlers,
-  showControls,
-  onToggleControls,
-  filledCount,
-}: ProgrammingControlsProps) => {
+export const ProgrammingControls = forwardRef<
+  HTMLDivElement,
+  ProgrammingControlsProps
+>(({ state, handlers, showControls, onToggleControls, filledCount }, ref) => {
   return (
     <>
       {/* Controls Visibility Toggle - Floating Action Button */}
@@ -149,7 +147,10 @@ export const ProgrammingControls = ({
                     {state.hand.length} cards
                   </div>
                 </div>
-                <div className="grid grid-cols-9 gap-2 max-w-4xl mx-auto">
+                <div
+                  ref={ref}
+                  className="grid grid-cols-9 gap-2 max-w-4xl mx-auto"
+                >
                   {state.hand.map((card) => (
                     <ProgramCardComponent
                       key={card.id}
@@ -186,4 +187,4 @@ export const ProgrammingControls = ({
       )}
     </>
   );
-};
+});

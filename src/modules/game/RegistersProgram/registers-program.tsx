@@ -5,9 +5,11 @@ import { AnimatePresence } from "framer-motion";
 import { PhaseHeader } from "./PhaseHeader";
 import { ActivationPhase } from "./ActivationPhase";
 import { ProgrammingPhase } from "./ProgrammingPhase";
+import { DealingAnimationOverlaySimple } from "./DealingAnimationSimple";
 import { SAMPLE_CARDS, INITIAL_REGISTERS } from "./types";
 import { getFilledRegistersCount, isProgramComplete } from "./utils";
 import { useProgrammingPhase } from "./hooks";
+import { useCardDealing } from "./useCardDealing";
 
 type GamePhase = "programming" | "activation";
 
@@ -15,9 +17,12 @@ export const RegistersProgram = () => {
   const [currentPhase, setCurrentPhase] = useState<GamePhase>("programming");
   const [showProgrammingControls, setShowProgrammingControls] = useState(true);
   const { state, handlers } = useProgrammingPhase(
-    SAMPLE_CARDS,
+    [], // Start with empty hand
     INITIAL_REGISTERS
   );
+
+  const { dealingState, startDealing, markCardAsDealt, resetDeck } =
+    useCardDealing(20);
 
   const filledCount = getFilledRegistersCount(state.registers);
   const programComplete = isProgramComplete(state.registers);
@@ -30,6 +35,22 @@ export const RegistersProgram = () => {
 
   const toggleProgrammingControls = () => {
     setShowProgrammingControls((prev) => !prev);
+  };
+
+  const handleDrawCards = (
+    deckElement: HTMLElement,
+    handContainer: HTMLElement
+  ) => {
+    startDealing(deckElement, handContainer, (newCards) => {
+      // Replace the hand with the newly dealt cards
+      handlers.handleSetHand(newCards);
+    });
+  };
+
+  const handleResetDeck = () => {
+    // Clear the hand and reset deck
+    handlers.handleSetHand([]);
+    resetDeck();
   };
 
   return (
@@ -55,10 +76,20 @@ export const RegistersProgram = () => {
               showProgrammingControls={showProgrammingControls}
               onToggleProgrammingControls={toggleProgrammingControls}
               filledCount={filledCount}
+              deckCount={dealingState.deckCount}
+              isDealing={dealingState.isDealing}
+              onDrawCards={handleDrawCards}
+              onResetDeck={handleResetDeck}
             />
           )}
         </AnimatePresence>
       </div>
+
+      {/* Card Dealing Animation Overlay */}
+      <DealingAnimationOverlaySimple
+        dealingCards={dealingState.dealingCards}
+        onCardDealt={markCardAsDealt}
+      />
     </div>
   );
 };
