@@ -113,14 +113,13 @@ export const useProgrammingPhase = (
 
   // Upload program
   const handleUploadProgram = useCallback(() => {
-    const filledRegisters = state.registers.filter((r) => !r.locked);
-    const isComplete = filledRegisters.every((reg) => reg.card !== null);
+    const isComplete = state.registers.every((reg) => reg.card !== null);
 
     if (isComplete) {
       // Here you would send the program to the server
       console.log(
         "Uploading program:",
-        filledRegisters.map((r) => r.card)
+        state.registers.map((r) => r.card)
       );
       // For now, just show an alert
       alert("Program uploaded successfully!");

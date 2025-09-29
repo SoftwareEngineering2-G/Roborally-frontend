@@ -8,7 +8,6 @@ interface Props {
 export default function Game({ gameId }: Props) {
   return (
     <div>
-      Game ID: {gameId}
       <RegistersProgram />
     </div>
   );
