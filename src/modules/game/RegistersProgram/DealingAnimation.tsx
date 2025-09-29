@@ -14,27 +14,20 @@ export const DealingCardComponent = ({
 }: DealingCardComponentProps) => {
   const { startPosition, endPosition, delay, card, id } = dealingCard;
 
-  console.log("Rendering dealing card:", {
-    id,
-    startPosition,
-    endPosition,
-    delay,
-  });
-
   return (
     <motion.div
       key={id}
       className="fixed z-50 pointer-events-none"
       initial={{
-        x: startPosition.x,
-        y: startPosition.y,
+        x: startPosition.x - 32, // Offset by half width (64px / 2 = 32px)
+        y: startPosition.y - 48, // Offset by half height (96px / 2 = 48px)
         scale: 0.3,
         rotate: -10,
         opacity: 1,
       }}
       animate={{
-        x: endPosition.x,
-        y: endPosition.y,
+        x: endPosition.x - 32, // Offset by half width to align top-left
+        y: endPosition.y - 48, // Offset by half height to align top-left
         scale: 1,
         rotate: 0,
         opacity: 1,
@@ -55,16 +48,16 @@ export const DealingCardComponent = ({
       onAnimationComplete={() => onAnimationComplete(id)}
     >
       <div className="relative">
-        {/* Card shadow for depth */}
+        {/* Card shadow for depth - Match exact card size */}
         <div
           className="absolute inset-0 bg-black/30 rounded-lg transform translate-x-1 translate-y-1 blur-sm"
-          style={{ width: "80px", height: "112px" }}
+          style={{ width: "64px", height: "96px" }}
         />
 
-        {/* Actual card */}
+        {/* Actual card - Match exact placeholder size (w-16 h-24 = 64px x 96px) */}
         <div
           className="relative bg-surface-medium border-2 border-glass-border rounded-lg overflow-hidden shadow-xl"
-          style={{ width: "80px", height: "112px" }}
+          style={{ width: "64px", height: "96px" }}
         >
           {/* Card back during dealing - shows front after arriving */}
           <motion.div

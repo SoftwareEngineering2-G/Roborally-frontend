@@ -86,33 +86,33 @@ export const useCardDealing = (initialDeckCount: number = 20) => {
   }, []);
 
   const calculateCardPositions = useCallback(
-    (handContainerRect: DOMRect, deckRect: DOMRect) => {
-      console.log("Calculating positions:", { handContainerRect, deckRect });
-
+    (placeholderElements: (HTMLElement | null)[], deckRect: DOMRect) => {
       const positions: { x: number; y: number }[] = [];
-      const cardWidth = 80; // Approximate card width
-      const cardSpacing = 8; // Gap between cards
-      const totalWidth = 9 * cardWidth + 8 * cardSpacing;
-      const startX =
-        handContainerRect.left + (handContainerRect.width - totalWidth) / 2;
 
+      // Get exact positions from placeholder elements
       for (let i = 0; i < 9; i++) {
-        positions.push({
-          x: startX + i * (cardWidth + cardSpacing),
-          y: handContainerRect.top,
-        });
+        const placeholder = placeholderElements[i];
+        if (placeholder) {
+          const rect = placeholder.getBoundingClientRect();
+          // Calculate top-left position for exact alignment
+          positions.push({
+            x: rect.left + rect.width / 2, // Still use center for calculation, offset applied in animation
+            y: rect.top + rect.height / 2, // Still use center for calculation, offset applied in animation
+          });
+        } else {
+          console.warn(`❌ Placeholder ${i} not found`);
+          positions.push({ x: 0, y: 0 });
+        }
       }
 
       const result = positions.map((pos, index) => ({
         startPosition: {
-          x: deckRect.left + deckRect.width / 2,
-          y: deckRect.top + deckRect.height / 2,
+          x: deckRect.left + deckRect.width / 2, // Start from deck center
+          y: deckRect.top + deckRect.height / 2, // Start from deck center
         },
-        endPosition: pos,
+        endPosition: pos, // End at placeholder center (offset applied in animation)
         delay: index * 150, // 150ms between each card
       }));
-
-      console.log("Position calculation result:", result);
       return result;
     },
     []
@@ -121,27 +121,17 @@ export const useCardDealing = (initialDeckCount: number = 20) => {
   const startDealing = useCallback(
     (
       deckElement: HTMLElement,
-      handContainer: HTMLElement,
+      placeholderElements: (HTMLElement | null)[],
       onComplete: (cards: ProgramCard[]) => void
     ) => {
-      console.log("Starting dealing...", {
-        deckElement,
-        handContainer,
-        isDealing: state.isDealing,
-        deckCount: state.deckCount,
-      });
-
       if (state.isDealing || state.deckCount < 9) {
-        console.log("Cannot deal - conditions not met");
         return;
       }
 
       const deckRect = deckElement.getBoundingClientRect();
-      const handRect = handContainer.getBoundingClientRect();
-      console.log("Element rects:", { deckRect, handRect });
 
       const newCards = generateMockHand();
-      const positions = calculateCardPositions(handRect, deckRect);
+      const positions = calculateCardPositions(placeholderElements, deckRect);
 
       const dealingCards: DealingCard[] = newCards.map((card, index) => ({
         id: `dealing-${card.id}-${Date.now()}`,
@@ -149,8 +139,6 @@ export const useCardDealing = (initialDeckCount: number = 20) => {
         ...positions[index],
         isDealt: false,
       }));
-
-      console.log("Created dealing cards:", dealingCards);
 
       setState((prev) => ({
         ...prev,
@@ -161,7 +149,6 @@ export const useCardDealing = (initialDeckCount: number = 20) => {
       // Complete dealing animation after all cards are dealt
       const totalDealTime = 9 * 150 + 500; // 9 cards * 150ms + 500ms for last card animation
       setTimeout(() => {
-        console.log("Dealing complete");
         setState((prev) => ({
           ...prev,
           isDealing: false,

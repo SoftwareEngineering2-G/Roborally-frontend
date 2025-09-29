@@ -29,29 +29,12 @@ export const DeckArea = ({
   if (!showControls) return null;
 
   const handleDrawClick = () => {
-    console.log("Draw button clicked!", {
-      deckRef: deckRef.current,
-      isDealing,
-      deckCount,
-    });
     if (deckRef.current && !isDealing && deckCount >= 9) {
       onDrawCards(deckRef.current);
     }
   };
 
-  const handleResetClick = () => {
-    console.log("Reset button clicked!", { onResetDeck, isDealing });
-    if (onResetDeck && !isDealing) {
-      onResetDeck();
-    }
-  };
-
-  console.log("DeckArea render:", {
-    showControls,
-    deckCount,
-    isDealing,
-    canDraw: deckCount >= 9,
-  });
+  const handleResetClick = () => {};
 
   return (
     <motion.div

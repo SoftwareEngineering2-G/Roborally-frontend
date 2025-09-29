@@ -40,7 +40,6 @@ export const RegisterSlotComponent = ({
       onClick();
     }
   };
-
   return (
     <div
       className={cn(
@@ -51,7 +50,7 @@ export const RegisterSlotComponent = ({
           : "border-glass-border hover:border-neon-teal/50",
         register.card && getCardTypeClasses(register.card.type),
         isDragTarget &&
-          "border-neon-cyan border-dashed animate-pulse shadow-glow-cyan"
+          "border-neon-cyan border-dashed animate-pulse shadow-glow-cyan bg-neon-cyan/20 scale-105"
       )}
       onClick={handleClick}
       onDragOver={handleDragOver}
@@ -87,9 +86,28 @@ export const RegisterSlotComponent = ({
         </div>
       )}
 
-      {/* Drop indicator */}
+      {/* Drop indicator with enhanced visibility */}
       {selected && (
-        <div className="absolute inset-0 border-2 border-dashed border-neon-teal/50 rounded-lg animate-neon-pulse" />
+        <>
+          <div className="absolute inset-0 border-2 border-dashed border-neon-teal/70 rounded-lg animate-neon-pulse" />
+          <div className="absolute inset-0 bg-neon-teal/15 rounded-lg animate-pulse" />
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-neon-teal text-xs font-bold">
+            DROP
+          </div>
+        </>
+      )}
+
+      {/* Enhanced drag target indicator */}
+      {isDragTarget && (
+        <>
+          <div className="absolute inset-0 bg-gradient-to-br from-neon-cyan/30 to-neon-magenta/20 rounded-lg" />
+          <div className="absolute inset-0 border-2 border-dashed border-neon-cyan/80 rounded-lg animate-bounce" />
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+            <div className="text-neon-cyan text-xs font-bold animate-pulse">
+              ⚡ DROP HERE ⚡
+            </div>
+          </div>
+        </>
       )}
     </div>
   );

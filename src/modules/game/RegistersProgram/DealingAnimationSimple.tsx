@@ -14,80 +14,110 @@ export const DealingCardComponentSimple = ({
 }: DealingCardComponentProps) => {
   const { startPosition, endPosition, delay, card, id } = dealingCard;
 
-  console.log("Rendering SIMPLE dealing card:", {
-    id,
-    startPosition,
-    endPosition,
-    delay,
-  });
-
   return (
     <motion.div
       key={id}
       className="fixed pointer-events-none"
-      style={{ zIndex: 9999 }} // Very high z-index
+      style={{ zIndex: 9999 }} // Inline style for guaranteed high z-index
       initial={{
-        x: startPosition.x,
-        y: startPosition.y,
-        scale: 0.3,
-        rotate: -15,
-        opacity: 1,
+        x: startPosition.x - 32, // Offset by half width (64px / 2 = 32px)
+        y: startPosition.y - 48, // Offset by half height (96px / 2 = 48px)
+        scale: 0.2,
+        rotate: -20,
+        opacity: 0.8,
       }}
       animate={{
-        x: endPosition.x,
-        y: endPosition.y,
+        x: endPosition.x - 32, // Offset by half width to align top-left
+        y: endPosition.y - 48, // Offset by half height to align top-left
         scale: 1,
         rotate: 0,
         opacity: 1,
       }}
       transition={{
         delay: delay / 1000,
-        duration: 0.8, // Realistic timing
-        ease: [0.25, 0.46, 0.45, 0.94], // Smooth curve
+        duration: 1.0, // Slightly longer for more dramatic effect
+        ease: [0.23, 1, 0.32, 1], // Improved easing curve (easeOutExpo)
       }}
       onAnimationComplete={() => {
-        console.log("Animation completed for card:", id);
         onAnimationComplete(id);
       }}
     >
-      {/* Realistic card with shadow and effects */}
+      {/* Enhanced card with multiple shadow layers - Match exact card size */}
       <div className="relative">
-        {/* Drop shadow */}
+        {/* Far shadow for depth */}
         <div
-          className="absolute bg-black/30 rounded-lg blur-sm"
+          className="absolute bg-black/20 rounded-lg blur-md"
           style={{
-            width: "80px",
-            height: "112px",
-            transform: "translate(3px, 3px)",
+            width: "64px",
+            height: "96px",
+            transform: "translate(6px, 6px)",
           }}
         />
 
-        {/* Card */}
+        {/* Close shadow for definition */}
         <div
-          className="relative bg-surface-medium border-2 border-glass-border rounded-lg overflow-hidden"
-          style={{ width: "80px", height: "112px" }}
+          className="absolute bg-black/40 rounded-lg blur-sm"
+          style={{
+            width: "64px",
+            height: "96px",
+            transform: "translate(2px, 2px)",
+          }}
+        />
+
+        {/* Main card with enhanced styling - Match exact placeholder size (w-16 h-24 = 64px x 96px) */}
+        <div
+          className="relative rounded-lg overflow-hidden border-2 border-glass-border shadow-2xl"
+          style={{
+            width: "64px",
+            height: "96px",
+            background: "linear-gradient(145deg, #1a1a2e, #16213e)",
+          }}
         >
-          {/* Try card image first */}
+          {/* Card image with enhanced fallback */}
           <img
             src={card.imagePath}
             alt={card.name}
             className="w-full h-full object-cover"
-            onLoad={() => console.log("Card image loaded:", card.imagePath)}
+            onLoad={() => {}}
             onError={(e) => {
-              console.log("Card image failed, using fallback:", card.imagePath);
+              console.log(
+                "Card image failed, using enhanced fallback:",
+                card.imagePath
+              );
               const target = e.target as HTMLImageElement;
               target.style.display = "none";
-              // Create fallback content
+              // Create enhanced fallback content
               const fallback = document.createElement("div");
               fallback.className =
-                "w-full h-full bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center text-white font-bold text-xs p-2";
-              fallback.innerHTML = `<div class="text-center"><div>${card.type}</div></div>`;
+                "w-full h-full bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-700 flex items-center justify-center text-white font-bold text-xs p-2 border border-blue-400/30";
+              fallback.innerHTML = `
+                <div class="text-center">
+                  <div class="text-xs opacity-75">${card.type}</div>
+                  <div class="text-yellow-300 text-[10px] mt-1">⚡</div>
+                </div>
+              `;
               target.parentElement!.appendChild(fallback);
             }}
           />
 
-          {/* Subtle glow effect */}
-          <div className="absolute inset-0 bg-neon-cyan/10 rounded-lg opacity-80" />
+          {/* Enhanced glow effect with animation */}
+          <div
+            className="absolute inset-0 rounded-lg"
+            style={{
+              background:
+                "linear-gradient(45deg, rgba(0, 255, 255, 0.1), rgba(255, 0, 255, 0.1))",
+              boxShadow: "inset 0 0 20px rgba(0, 255, 255, 0.2)",
+            }}
+          />
+
+          {/* Subtle border highlight */}
+          <div
+            className="absolute inset-0 rounded-lg border border-neon-cyan/30"
+            style={{
+              background:
+                "linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, transparent 50%)",
+            }}
+          />
         </div>
       </div>
     </motion.div>
@@ -103,8 +133,6 @@ export const DealingAnimationOverlaySimple = ({
   dealingCards,
   onCardDealt,
 }: DealingAnimationOverlayProps) => {
-  console.log("DealingAnimationOverlaySimple render:", { dealingCards });
-
   return (
     <div
       style={{

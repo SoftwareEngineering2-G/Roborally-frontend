@@ -85,7 +85,6 @@ class SignalRConnectionManager {
     this.connection.onreconnected(() => {
       this.updateConnectionState(SignalRConnectionState.Connected);
       this.reconnectAttempts = 0;
-      console.log("SignalR reconnected successfully");
     });
   }
 
@@ -95,7 +94,6 @@ class SignalRConnectionManager {
     }
 
     if (this.connectionState === SignalRConnectionState.Connected) {
-      console.log("SignalR already connected");
       return;
     }
 
@@ -103,7 +101,6 @@ class SignalRConnectionManager {
       this.updateConnectionState(SignalRConnectionState.Connecting);
       await this.connection.start();
       this.updateConnectionState(SignalRConnectionState.Connected);
-      console.log("SignalR connected successfully");
     } catch (error) {
       this.updateConnectionState(SignalRConnectionState.Disconnected);
       const signalRError = new Error(
@@ -126,7 +123,6 @@ class SignalRConnectionManager {
       this.updateConnectionState(SignalRConnectionState.Disconnecting);
       await this.connection.stop();
       this.updateConnectionState(SignalRConnectionState.Disconnected);
-      console.log("SignalR disconnected successfully");
     } catch (error) {
       this.notifyError(
         new Error(
@@ -188,7 +184,6 @@ class SignalRConnectionManager {
 
     try {
       await this.connection.invoke("JoinLobby", gameId);
-      console.log(`Joined lobby: ${gameId}`);
     } catch (error) {
       const joinError = new Error(
         `Failed to join lobby ${gameId}: ${(error as Error).message}`
@@ -205,7 +200,6 @@ class SignalRConnectionManager {
 
     try {
       await this.connection.invoke("LeaveLobby", gameId);
-      console.log(`Left lobby: ${gameId}`);
     } catch (error) {
       const leaveError = new Error(
         `Failed to leave lobby ${gameId}: ${(error as Error).message}`

@@ -32,6 +32,8 @@ export const useProgrammingPhase = (
       setState((prev) => {
         // If we have a selected card, place it in this register
         if (prev.selectedCard) {
+          const existingCard = register.card;
+
           return {
             ...prev,
             registers: prev.registers.map((reg) =>
@@ -41,7 +43,12 @@ export const useProgrammingPhase = (
                 ? { ...reg, card: null }
                 : reg
             ),
-            hand: prev.hand.filter((card) => card.id !== prev.selectedCard?.id),
+            hand: [
+              // Remove the selected card from hand
+              ...prev.hand.filter((card) => card.id !== prev.selectedCard?.id),
+              // Add the existing card back to hand if there was one
+              ...(existingCard ? [existingCard] : []),
+            ],
             selectedCard: null,
             selectedRegister: null,
           };
@@ -91,22 +98,33 @@ export const useProgrammingPhase = (
       const register = state.registers.find((r) => r.id === registerId);
       if (!register) return;
 
-      setState((prev) => ({
-        ...prev,
-        registers: prev.registers.map((reg) => {
-          if (reg.id === registerId) {
-            return { ...reg, card };
-          }
-          // Remove card from other registers if it was there
-          if (reg.card?.id === card.id) {
-            return { ...reg, card: null };
-          }
-          return reg;
-        }),
-        hand: prev.hand.filter((c) => c.id !== card.id),
-        selectedCard: null,
-        isDragging: false,
-      }));
+      setState((prev) => {
+        const targetRegister = prev.registers.find((r) => r.id === registerId);
+        const existingCard = targetRegister?.card;
+
+        return {
+          ...prev,
+          registers: prev.registers.map((reg) => {
+            if (reg.id === registerId) {
+              // Place the new card in this register
+              return { ...reg, card };
+            }
+            // Remove the dragged card from other registers if it was there
+            if (reg.card?.id === card.id) {
+              return { ...reg, card: null };
+            }
+            return reg;
+          }),
+          hand: [
+            // Remove the dragged card from hand
+            ...prev.hand.filter((c) => c.id !== card.id),
+            // Add the existing card back to hand if there was one
+            ...(existingCard ? [existingCard] : []),
+          ],
+          selectedCard: null,
+          isDragging: false,
+        };
+      });
     },
     [state.registers]
   );

@@ -3,7 +3,10 @@
 import { useRef } from "react";
 import { motion } from "framer-motion";
 import { GameBoard } from "@/components/GameBoard";
-import { ProgrammingControls } from "./ProgrammingControls";
+import {
+  ProgrammingControls,
+  ProgrammingControlsRef,
+} from "./ProgrammingControls";
 import { DeckArea } from "./DeckAreaSimple";
 import { DragDropIndicator } from "./DragDropIndicator";
 import { ProgramCard, ProgrammingPhaseState } from "./types";
@@ -23,7 +26,10 @@ interface ProgrammingPhaseProps {
   filledCount: number;
   deckCount: number;
   isDealing: boolean;
-  onDrawCards: (deckElement: HTMLElement, handContainer: HTMLElement) => void;
+  onDrawCards: (
+    deckElement: HTMLElement,
+    placeholderElements: (HTMLElement | null)[]
+  ) => void;
   onResetDeck?: () => void;
 }
 
@@ -38,12 +44,12 @@ export const ProgrammingPhase = ({
   onDrawCards,
   onResetDeck,
 }: ProgrammingPhaseProps) => {
-  const handContainerRef = useRef<HTMLDivElement>(null);
+  const programmingControlsRef = useRef<ProgrammingControlsRef>(null);
 
   const handleDrawCardsWithRef = (deckElement: HTMLElement) => {
-    if (handContainerRef.current) {
-      onDrawCards(deckElement, handContainerRef.current);
-    }
+    const placeholderElements =
+      programmingControlsRef.current?.getPlaceholderElements() ?? [];
+    onDrawCards(deckElement, placeholderElements);
   };
   return (
     <motion.div
@@ -60,7 +66,7 @@ export const ProgrammingPhase = ({
       </div>
       {/* Programming Controls */}
       <ProgrammingControls
-        ref={handContainerRef}
+        ref={programmingControlsRef}
         state={state}
         handlers={handlers}
         showControls={showProgrammingControls}

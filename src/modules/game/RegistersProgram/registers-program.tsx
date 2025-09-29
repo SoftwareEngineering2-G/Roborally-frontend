@@ -39,9 +39,9 @@ export const RegistersProgram = () => {
 
   const handleDrawCards = (
     deckElement: HTMLElement,
-    handContainer: HTMLElement
+    placeholderElements: (HTMLElement | null)[]
   ) => {
-    startDealing(deckElement, handContainer, (newCards) => {
+    startDealing(deckElement, placeholderElements, (newCards) => {
       // Replace the hand with the newly dealt cards
       handlers.handleSetHand(newCards);
     });

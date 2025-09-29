@@ -20,7 +20,6 @@ export const DeckArea = ({
   showControls,
   handSize,
   deckCount,
-  isDealing,
   onDrawCards,
 }: DeckAreaProps) => {
   const deckRef = useRef<HTMLDivElement>(null);

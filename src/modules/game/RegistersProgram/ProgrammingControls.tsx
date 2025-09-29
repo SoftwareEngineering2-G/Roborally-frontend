@@ -1,13 +1,18 @@
 "use client";
 
-import { forwardRef } from "react";
+import { forwardRef, useRef, useImperativeHandle } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Eye, EyeOff } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { RegisterSlotComponent } from "./RegisterSlot";
 import { ProgramCardComponent } from "./ProgramCard";
 import { ProgramCard, RegisterSlot, ProgrammingPhaseState } from "./types";
+
+export interface ProgrammingControlsRef {
+  getPlaceholderElements: () => (HTMLElement | null)[];
+}
 
 interface ProgrammingControlsProps {
   state: ProgrammingPhaseState;
@@ -25,9 +30,21 @@ interface ProgrammingControlsProps {
 }
 
 export const ProgrammingControls = forwardRef<
-  HTMLDivElement,
+  ProgrammingControlsRef,
   ProgrammingControlsProps
 >(({ state, handlers, showControls, onToggleControls, filledCount }, ref) => {
+  // Create refs for all 9 slots (both cards and placeholders)
+  const slotRefs = useRef<(HTMLElement | null)[]>(new Array(9).fill(null));
+
+  // Expose method to get placeholder elements
+  useImperativeHandle(
+    ref,
+    () => ({
+      getPlaceholderElements: () => slotRefs.current,
+    }),
+    []
+  );
+
   return (
     <>
       {/* Controls Visibility Toggle - Floating Action Button */}
@@ -147,21 +164,48 @@ export const ProgrammingControls = forwardRef<
                     {state.hand.length} cards
                   </div>
                 </div>
-                <div
-                  ref={ref}
-                  className="grid grid-cols-9 gap-2 max-w-4xl mx-auto"
-                >
-                  {state.hand.map((card) => (
-                    <ProgramCardComponent
-                      key={card.id}
-                      card={card}
-                      selected={state.selectedCard?.id === card.id}
-                      onClick={() => handlers.handleCardSelect(card)}
-                      onDragStart={() => handlers.handleDragStart(card)}
-                      onDragEnd={handlers.handleDragEnd}
-                      isDragging={state.isDragging}
-                    />
-                  ))}
+                <div className="grid grid-cols-9 gap-2 max-w-4xl mx-auto min-h-[6rem]">
+                  {/* Render all 9 slots with identical container styling */}
+                  {Array.from({ length: 9 }).map((_, index) => {
+                    const card = state.hand[index];
+                    return (
+                      <div
+                        key={card ? card.id : `slot-${index}`}
+                        className="relative w-16 h-24 rounded-lg flex items-center justify-center"
+                        data-slot-index={index}
+                        data-has-card={!!card}
+                      >
+                        {card ? (
+                          <div
+                            ref={(el) => {
+                              slotRefs.current[index] = el;
+                            }}
+                            className="w-16 h-24"
+                          >
+                            <ProgramCardComponent
+                              card={card}
+                              selected={state.selectedCard?.id === card.id}
+                              onClick={() => handlers.handleCardSelect(card)}
+                              onDragStart={() => handlers.handleDragStart(card)}
+                              onDragEnd={handlers.handleDragEnd}
+                              isDragging={state.isDragging}
+                            />
+                          </div>
+                        ) : (
+                          <div
+                            ref={(el) => {
+                              slotRefs.current[index] = el;
+                            }}
+                            className="w-16 h-24 rounded-lg border-2 border-dashed border-muted-foreground/20 bg-surface-dark/20 backdrop-blur-sm flex items-center justify-center"
+                          >
+                            <div className="text-xs text-muted-foreground/40">
+                              {index + 1}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               </Card>
             </div>
