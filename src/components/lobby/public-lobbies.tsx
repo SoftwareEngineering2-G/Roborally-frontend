@@ -51,7 +51,7 @@ export default function PublicLobbies({ username }: Props) {
         "Joined lobby!",
         `Welcome to ${successfulLobby.gameRoomName}`
       );
-      router.push(`/game/${successfulLobby.gameId}`);
+      router.push(`/lobby/${successfulLobby.gameId}`);
       setSuccessfulLobby(null);
     }
   }, [joinSuccess, successfulLobby, router]);
