@@ -1,5 +1,6 @@
 "use client";
-import { RegistersProgram } from "./RegistersProgram";
+
+import { RegistersProgram } from "./RegistersProgram/registers-program";
 
 interface Props {
   gameId: string;

@@ -9,6 +9,7 @@ interface RegisterSlotProps {
   onCardRemove: () => void;
   selected: boolean;
   onClick: () => void;
+  isDragTarget?: boolean;
 }
 
 export const RegisterSlotComponent = ({
@@ -17,6 +18,7 @@ export const RegisterSlotComponent = ({
   onCardRemove,
   selected,
   onClick,
+  isDragTarget = false,
 }: RegisterSlotProps) => {
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
@@ -47,17 +49,14 @@ export const RegisterSlotComponent = ({
         selected
           ? "border-neon-teal shadow-glow-teal"
           : "border-glass-border hover:border-neon-teal/50",
-        register.card && getCardTypeClasses(register.card.type)
+        register.card && getCardTypeClasses(register.card.type),
+        isDragTarget &&
+          "border-neon-cyan border-dashed animate-pulse shadow-glow-cyan"
       )}
       onClick={handleClick}
       onDragOver={handleDragOver}
       onDrop={handleDrop}
     >
-      {/* Register Number */}
-      <div className="absolute -top-2 left-1/2 transform -translate-x-1/2 w-6 h-6 rounded-full bg-surface-medium border border-glass-border flex items-center justify-center text-xs font-bold z-10">
-        {register.id}
-      </div>
-
       {/* Card Content */}
       {register.card && (
         <div className="absolute inset-0 animate-slide-up">
