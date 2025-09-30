@@ -1,193 +1,102 @@
-import { useState } from "react";
-import { useSignalREvent, useSignalRLobbyGroup } from "./useSignalR";
+"use client";
+
+import { useEffect, useCallback } from "react";
+import { useDispatch } from "react-redux";
+import { toast } from "sonner";
+import { useSignalR } from "./useSignalR";
 import {
-  SignalRHookOptions,
   UserJoinedLobbyEvent,
   UserLeftLobbyEvent,
-  PlayerReadyEvent,
   GameStartedEvent,
-  LobbyUpdatedEvent,
 } from "@/types/signalr";
+import { userJoinedLobby, userLeftLobby } from "@/redux/lobby/lobbySlice";
+import { AppDispatch } from "@/redux/store";
 
-/**
- * Hook for handling user joined events in a lobby
- */
-export function useUserJoinedSignalREvent(
-  gameId: string | null,
-  onUserJoined: (event: UserJoinedLobbyEvent) => void,
-  options: SignalRHookOptions = {}
-) {
-  // Join the lobby group
-  const { isInGroup, groupError } = useSignalRLobbyGroup(gameId, options);
+export const useLobbySignalR = (gameId: string) => {
+  const dispatch = useDispatch<AppDispatch>();
+  const hubUrl = "/lobbyHub";
+  const autoJoinLobby = true;
 
-  // Subscribe to user joined events
-  useSignalREvent("UserJoinedLobby", onUserJoined, {
-    ...options,
-    enabled: options.enabled !== false && isInGroup,
-  });
+  // Use the simple SignalR hook
+  const signalR = useSignalR(hubUrl);
 
-  return {
-    isInGroup,
-    groupError,
-  };
-}
+  // Join lobby when connected and gameId is available
+  useEffect(() => {
+    if (signalR.isConnected && gameId && autoJoinLobby) {
+      console.log(`Joining lobby: ${gameId}`);
+      signalR.joinGroup(gameId).catch((err) => {
+        console.error("Failed to join lobby:", err);
+      });
 
-/**
- * Hook for handling user left events in a lobby
- */
-export function useUserLeftSignalREvent(
-  gameId: string | null,
-  onUserLeft: (event: UserLeftLobbyEvent) => void,
-  options: SignalRHookOptions = {}
-) {
-  const { isInGroup, groupError } = useSignalRLobbyGroup(gameId, options);
+      // Leave lobby on cleanup
+      return () => {
+        if (gameId) {
+          signalR.leaveGroup(gameId).catch((err) => {
+            console.error("Failed to leave lobby:", err);
+          });
+        }
+      };
+    }
+  }, [signalR.isConnected, gameId, autoJoinLobby]);
 
-  useSignalREvent("UserLeftLobby", onUserLeft, {
-    ...options,
-    enabled: options.enabled !== false && isInGroup,
-  });
+  // Setup event listeners with Redux integration
+  useEffect(() => {
+    if (!signalR.isConnected) return;
 
-  return {
-    isInGroup,
-    groupError,
-  };
-}
-
-/**
- * Hook for handling player ready status changes
- */
-export function usePlayerReadySignalREvent(
-  gameId: string | null,
-  onPlayerReady: (event: PlayerReadyEvent) => void,
-  options: SignalRHookOptions = {}
-) {
-  const { isInGroup, groupError } = useSignalRLobbyGroup(gameId, options);
-
-  useSignalREvent("PlayerReady", onPlayerReady, {
-    ...options,
-    enabled: options.enabled !== false && isInGroup,
-  });
-
-  return {
-    isInGroup,
-    groupError,
-  };
-}
-
-/**
- * Hook for handling game started events
- */
-export function useGameStartedSignalREvent(
-  gameId: string | null,
-  onGameStarted: (event: GameStartedEvent) => void,
-  options: SignalRHookOptions = {}
-) {
-  const { isInGroup, groupError } = useSignalRLobbyGroup(gameId, options);
-
-  useSignalREvent("GameStarted", onGameStarted, {
-    ...options,
-    enabled: options.enabled !== false && isInGroup,
-  });
-
-  return {
-    isInGroup,
-    groupError,
-  };
-}
-
-/**
- * Hook for handling general lobby updates
- */
-export function useLobbyUpdatedSignalREvent(
-  gameId: string | null,
-  onLobbyUpdated: (event: LobbyUpdatedEvent) => void,
-  options: SignalRHookOptions = {}
-) {
-  const { isInGroup, groupError } = useSignalRLobbyGroup(gameId, options);
-
-  useSignalREvent("LobbyUpdated", onLobbyUpdated, {
-    ...options,
-    enabled: options.enabled !== false && isInGroup,
-  });
-
-  return {
-    isInGroup,
-    groupError,
-  };
-}
-
-/**
- * Comprehensive hook that provides all lobby SignalR functionality
- */
-export function useLobbySignalR(
-  gameId: string | null,
-  callbacks: {
-    onUserJoined?: (event: UserJoinedLobbyEvent) => void;
-    onUserLeft?: (event: UserLeftLobbyEvent) => void;
-    onPlayerReady?: (event: PlayerReadyEvent) => void;
-    onGameStarted?: (event: GameStartedEvent) => void;
-    onLobbyUpdated?: (event: LobbyUpdatedEvent) => void;
-  },
-  options: SignalRHookOptions = {}
-) {
-  const [sendError, setSendError] = useState<Error | null>(null);
-
-  // Join the lobby group
-  const { isInGroup, groupError } = useSignalRLobbyGroup(gameId, options);
-
-  // Subscribe to all events
-  if (callbacks.onUserJoined) {
-    useSignalREvent("UserJoinedLobby", callbacks.onUserJoined, {
-      ...options,
-      enabled: options.enabled !== false && isInGroup,
+    signalR.on("UserJoinedLobby", (data: UserJoinedLobbyEvent) => {
+      console.log("User joined:", data);
+      dispatch(userJoinedLobby({ username: data.username }));
+      toast.success(`${data.username} joined the lobby`);
     });
-  }
 
-  if (callbacks.onUserLeft) {
-    useSignalREvent("UserLeftLobby", callbacks.onUserLeft, {
-      ...options,
-      enabled: options.enabled !== false && isInGroup,
+    signalR.on("UserLeftLobby", (data: UserLeftLobbyEvent) => {
+      console.log("User left:", data);
+      dispatch(userLeftLobby({ username: data.username }));
+      toast.info(`${data.username} left the lobby`);
     });
-  }
 
-  if (callbacks.onPlayerReady) {
-    useSignalREvent("PlayerReady", callbacks.onPlayerReady, {
-      ...options,
-      enabled: options.enabled !== false && isInGroup,
+    signalR.on("GameStarted", (data: GameStartedEvent) => {
+      console.log("Game started:", data);
+      toast.success("Game is starting!");
     });
-  }
 
-  if (callbacks.onGameStarted) {
-    useSignalREvent("GameStarted", callbacks.onGameStarted, {
-      ...options,
-      enabled: options.enabled !== false && isInGroup,
-    });
-  }
+    // Cleanup all listeners
+    return () => {
+      signalR.off("UserJoinedLobby");
+      signalR.off("UserLeftLobby");
+      signalR.off("GameStarted");
+    };
+  }, [signalR.isConnected, dispatch]);
 
-  if (callbacks.onLobbyUpdated) {
-    useSignalREvent("LobbyUpdated", callbacks.onLobbyUpdated, {
-      ...options,
-      enabled: options.enabled !== false && isInGroup,
-    });
-  }
+  // Helper methods for common lobby actions
+  const togglePlayerReady = useCallback(
+    async (username: string) => {
+      if (!gameId || !username) {
+        throw new Error("GameId and username are required");
+      }
+      return signalR.send("TogglePlayerReady", gameId, username);
+    },
+    [gameId, signalR]
+  );
 
   return {
     // Connection state
-    isInGroup,
-    groupError,
-    sendError,
+    isConnected: signalR.isConnected,
+    isConnecting: signalR.isConnecting,
+    error: signalR.error,
 
-    // Error management
-    clearSendError: () => setSendError(null),
+    // Connection methods
+    connect: signalR.connect,
+    disconnect: signalR.disconnect,
+    clearError: signalR.clearError,
+
+    // Direct access to SignalR methods if needed
+    send: signalR.send,
+    joinGroup: signalR.joinGroup,
+    leaveGroup: signalR.leaveGroup,
+
+    // Raw SignalR instance for custom event handling
+    on: signalR.on,
+    off: signalR.off,
   };
-}
-
-/**
- * Simple hook for just the user joined event (as requested)
- */
-export function useUserJoinedEvent(
-  gameId: string | null,
-  onUserJoined: (event: UserJoinedLobbyEvent) => void
-) {
-  return useUserJoinedSignalREvent(gameId, onUserJoined);
-}
+};

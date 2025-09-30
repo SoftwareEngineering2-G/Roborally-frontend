@@ -11,24 +11,19 @@ import {
   LobbyLoadingSkeleton,
   LobbyErrorState,
 } from "@/components/lobby/lobby-skeleton";
-import { useLobbySignalREffects } from "@/redux/lobby/signalREffects";
+import { useLobbySignalR } from "@/hooks/signalr";
 import {
   selectLobbyState,
   selectLobbyPlayers,
   selectIsHost,
   selectAllPlayersReady,
   selectCanStartGame,
-  setCurrentPlayerReady,
   clearLobbyState,
   LobbyState,
 } from "@/redux/lobby/lobbySlice";
 import { RootState, AppDispatch } from "@/redux/store";
 import { LobbyHeader, PlayersGrid, GameControls, GameInfo } from "./components";
 
-interface User {
-  id: string;
-  username: string;
-}
 interface Props {
   gameId: string;
 }
@@ -79,14 +74,21 @@ export const Lobby = ({ gameId }: Props) => {
 
   const [startGame, { isLoading: isStartingGame }] = useStartGameMutation();
 
-  useLobbySignalREffects({
-    gameId,
-    username: username || undefined,
-    enabled: !!username && lobbyState.isInitialized && !error,
-    onGameStarted: (gameId: string) => {
+  // Simple SignalR connection - Redux dispatching is handled in the hook
+  const signalR = useLobbySignalR(gameId);
+
+  // Handle game started navigation
+  useEffect(() => {
+    if (!signalR.isConnected) return;
+
+    signalR.on("GameStarted", () => {
       router.push(`/game/${gameId}`);
-    },
-  });
+    });
+
+    return () => {
+      signalR.off("GameStarted");
+    };
+  }, [signalR.isConnected, router, gameId]);
 
   if (isLoading || !username) return <LobbyLoadingSkeleton />;
   if (error && "status" in error && (error as any).status === 403) {
@@ -112,14 +114,17 @@ export const Lobby = ({ gameId }: Props) => {
       />
     );
 
-  const handleToggleReady = async () => {
-    // TODO: No toggle ready implemented yet
-  };
-
   const handleStartGame = async () => {
-    // TODO: No start game implemented yet
     if (!username || !isHost || isStartingGame || !lobbyData) return;
-    await startGame({ gameId: lobbyData.gameId, username });
+
+    try {
+      // Only use REST API - backend will broadcast GameStarted event via SignalR
+      await startGame({ gameId: lobbyData.gameId, username });
+      toast.success("Starting game...");
+    } catch (error) {
+      console.error("Failed to start game:", error);
+      toast.error("Failed to start game");
+    }
   };
 
   const copyGameId = () => {
@@ -129,6 +134,22 @@ export const Lobby = ({ gameId }: Props) => {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Simple SignalR Connection Status */}
+      {!signalR.isConnected && (
+        <div className="bg-yellow-500/10 border-l-4 border-yellow-500 p-4 mb-4">
+          <div className="flex">
+            <div className="ml-3">
+              <p className="text-sm text-yellow-700">
+                {signalR.isConnecting
+                  ? "Connecting to lobby..."
+                  : "Not connected to lobby"}
+                {signalR.error && ` - Error: ${signalR.error}`}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       <LobbyHeader
         lobbyName={lobbyData.lobbyname}
         gameId={lobbyData.gameId}
@@ -155,7 +176,6 @@ export const Lobby = ({ gameId }: Props) => {
               allPlayersReady={allPlayersReady}
               isPrivate={true}
               gameId={lobbyData.gameId}
-              onToggleReady={handleToggleReady}
               onStartGame={handleStartGame}
               onCopyGameId={copyGameId}
             />

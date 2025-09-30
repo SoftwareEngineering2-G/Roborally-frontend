@@ -1,17 +1,4 @@
-// Core SignalR hooks
-export {
-  useSignalRConnection,
-  useSignalREvent,
-  useSignalRLobbyGroup,
-} from "./useSignalR";
+// Clean SignalR hooks
+export { useSignalR } from "./useSignalR";
 
-// Lobby-specific hooks
-export {
-  useUserJoinedSignalREvent,
-  useUserLeftSignalREvent,
-  usePlayerReadySignalREvent,
-  useGameStartedSignalREvent,
-  useLobbyUpdatedSignalREvent,
-  useLobbySignalR,
-  useUserJoinedEvent,
-} from "./useLobbySignalR";
+export { useLobbySignalR } from "./useLobbySignalR";

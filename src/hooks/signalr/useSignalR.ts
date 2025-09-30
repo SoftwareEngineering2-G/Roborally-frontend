@@ -1,181 +1,163 @@
-import { useEffect, useState, useCallback, useRef } from "react";
-import { signalRConnection } from "@/lib/signalr/connection";
+"use client";
+
+import { useEffect, useRef, useState } from "react";
 import {
-  SignalRConnectionState,
-  SignalRHookOptions,
-  EventHandler,
-  ErrorHandler,
-} from "@/types/signalr";
+  HubConnection,
+  HubConnectionBuilder,
+  LogLevel,
+} from "@microsoft/signalr";
 
-/**
- * Core hook for managing SignalR connection state
- */
-export function useSignalRConnection() {
-  const [connectionState, setConnectionState] =
-    useState<SignalRConnectionState>(signalRConnection.getConnectionState());
-  const [error, setError] = useState<Error | null>(null);
+export const useSignalR = (url: string) => {
+  const hubUrl = url;
+  const autoConnect = true;
+  const reconnectOnClose = true;
+  const connectionRef = useRef<HubConnection | null>(null);
+  const [isConnected, setIsConnected] = useState(false);
+  const [isConnecting, setIsConnecting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
+  // Initialize connection
   useEffect(() => {
-    // Subscribe to connection state changes
-    const unsubscribeState =
-      signalRConnection.onStateChange(setConnectionState);
+    const connection = new HubConnectionBuilder()
+      .withUrl(hubUrl)
+      .withAutomaticReconnect()
+      .configureLogging(LogLevel.Information)
+      .build();
 
-    // Subscribe to errors
-    const unsubscribeError = signalRConnection.onError((err) => {
-      setError(err);
-      console.error("SignalR Error:", err);
+    connectionRef.current = connection;
+
+    // Setup connection event handlers
+    connection.onclose((error) => {
+      console.log("SignalR connection closed:", error);
+      setIsConnected(false);
+      setIsConnecting(false);
+      if (error) {
+        setError(error.message || "Connection closed with error");
+      }
     });
 
-    // Cleanup subscriptions
-    return () => {
-      unsubscribeState();
-      unsubscribeError();
-    };
-  }, []);
-
-  const connect = useCallback(async () => {
-    try {
+    connection.onreconnecting(() => {
+      console.log("SignalR reconnecting...");
+      setIsConnecting(true);
       setError(null);
-      await signalRConnection.start();
-    } catch (err) {
-      setError(err as Error);
-    }
-  }, []);
+    });
 
-  const disconnect = useCallback(async () => {
-    try {
-      await signalRConnection.stop();
-    } catch (err) {
-      setError(err as Error);
-    }
-  }, []);
+    connection.onreconnected(() => {
+      console.log("SignalR reconnected");
+      setIsConnected(true);
+      setIsConnecting(false);
+      setError(null);
+    });
 
-  return {
-    connectionState,
-    isConnected: connectionState === SignalRConnectionState.Connected,
-    isConnecting: connectionState === SignalRConnectionState.Connecting,
-    isReconnecting: connectionState === SignalRConnectionState.Reconnecting,
-    error,
-    connect,
-    disconnect,
-    clearError: () => setError(null),
-  };
-}
-
-/**
- * Generic hook for subscribing to SignalR events
- */
-export function useSignalREvent<T = any>(
-  eventName: string,
-  handler: EventHandler<T>,
-  options: SignalRHookOptions = {}
-) {
-  const { enabled = true } = options;
-  const handlerRef = useRef(handler);
-
-  // Keep handler reference current
-  useEffect(() => {
-    handlerRef.current = handler;
-  }, [handler]);
-
-  useEffect(() => {
-    if (!enabled) return;
-
-    const wrappedHandler = (data: T) => {
-      handlerRef.current(data);
-    };
-
-    try {
-      signalRConnection.on(eventName, wrappedHandler);
-    } catch (error) {
-      console.error(`Failed to subscribe to event ${eventName}:`, error);
+    // Auto connect if enabled
+    if (autoConnect) {
+      connect();
     }
 
+    // Cleanup on unmount
     return () => {
-      try {
-        signalRConnection.off(eventName, wrappedHandler);
-      } catch (error) {
-        console.error(`Failed to unsubscribe from event ${eventName}:`, error);
+      if (connection.state !== "Disconnected") {
+        connection.stop().catch(console.error);
       }
     };
-  }, [eventName, enabled]);
-}
+  }, [hubUrl]);
 
-/**
- * Hook for managing lobby group membership
- */
-export function useSignalRLobbyGroup(
-  gameId: string | null,
-  options: SignalRHookOptions = {}
-) {
-  const { enabled = true } = options;
-  const [isInGroup, setIsInGroup] = useState(false);
-  const [groupError, setGroupError] = useState<Error | null>(null);
-
-  const connection = useSignalRConnection();
-
-  const joinGroup = useCallback(
-    async (groupId: string) => {
-      if (!connection.isConnected) {
-        throw new Error("SignalR not connected");
-      }
-
-      try {
-        await signalRConnection.joinLobby(groupId);
-        setIsInGroup(true);
-        setGroupError(null);
-      } catch (error) {
-        setGroupError(error as Error);
-        throw error;
-      }
-    },
-    [connection.isConnected]
-  );
-
-  const leaveGroup = useCallback(async (groupId: string) => {
-    try {
-      await signalRConnection.leaveLobby(groupId);
-      setIsInGroup(false);
-      setGroupError(null);
-    } catch (error) {
-      setGroupError(error as Error);
-      // Don't throw on leave, as it's often called during cleanup
-    }
-  }, []);
-
-  // Auto join/leave based on gameId
-  useEffect(() => {
-    if (!enabled || !gameId || !connection.isConnected) {
+  const connect = async () => {
+    if (!connectionRef.current || connectionRef.current.state === "Connected") {
       return;
     }
 
-    let mounted = true;
+    try {
+      setIsConnecting(true);
+      setError(null);
+      await connectionRef.current.start();
+      setIsConnected(true);
+      setIsConnecting(false);
+      console.log("SignalR connected successfully");
+    } catch (err) {
+      setIsConnecting(false);
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to connect";
+      setError(errorMessage);
+      console.error("SignalR connection failed:", err);
+    }
+  };
 
-    const handleJoin = async () => {
+  const disconnect = async () => {
+    if (connectionRef.current && connectionRef.current.state === "Connected") {
       try {
-        await joinGroup(gameId);
-      } catch (error) {
-        if (mounted) {
-          console.error(`Failed to join lobby group ${gameId}:`, error);
-        }
+        await connectionRef.current.stop();
+        setIsConnected(false);
+        setError(null);
+      } catch (err) {
+        console.error("Failed to disconnect:", err);
       }
-    };
+    }
+  };
 
-    handleJoin();
+  // Method to listen to events
+  const on = (eventName: string, handler: (...args: any[]) => void) => {
+    if (connectionRef.current) {
+      connectionRef.current.on(eventName, handler);
+    }
+  };
 
-    return () => {
-      mounted = false;
-      if (gameId) {
-        leaveGroup(gameId);
+  // Method to remove event listeners
+  const off = (eventName: string, handler?: (...args: any[]) => void) => {
+    if (connectionRef.current) {
+      if (handler) {
+        connectionRef.current.off(eventName, handler);
+      } else {
+        connectionRef.current.off(eventName);
       }
-    };
-  }, [gameId, connection.isConnected, enabled, joinGroup, leaveGroup]);
+    }
+  };
+
+  // Method to send messages to the hub
+  const send = async (methodName: string, ...args: any[]) => {
+    if (connectionRef.current && connectionRef.current.state === "Connected") {
+      try {
+        return await connectionRef.current.invoke(methodName, ...args);
+      } catch (err) {
+        console.error(`Failed to send ${methodName}:`, err);
+        throw err;
+      }
+    } else {
+      throw new Error("SignalR connection is not established");
+    }
+  };
+
+  // Method to join a group (common SignalR pattern)
+  const joinGroup = async (groupName: string) => {
+    return send("JoinGroup", groupName);
+  };
+
+  // Method to leave a group
+  const leaveGroup = async (groupName: string) => {
+    return send("LeaveGroup", groupName);
+  };
 
   return {
-    isInGroup,
-    groupError,
+    // Connection state
+    isConnected,
+    isConnecting,
+    error,
+
+    // Connection methods
+    connect,
+    disconnect,
+
+    // Event methods
+    on,
+    off,
+
+    // Send methods
+    send,
     joinGroup,
     leaveGroup,
-    clearGroupError: () => setGroupError(null),
+
+    // Utility
+    clearError: () => setError(null),
+    connection: connectionRef.current,
   };
-}
+};

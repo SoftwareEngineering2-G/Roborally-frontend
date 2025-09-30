@@ -24,7 +24,7 @@ interface GameControlsProps {
   allPlayersReady: boolean;
   isPrivate: boolean;
   gameId: string;
-  onToggleReady: () => void;
+  onToggleReady?: () => void; // Optional since player ready is not supported yet
   onStartGame: () => void;
   onCopyGameId: () => void;
 }
@@ -55,7 +55,7 @@ export const GameControls = ({
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          {!isHost && (
+          {!isHost && onToggleReady && (
             <Button
               onClick={onToggleReady}
               variant={currentPlayerReady ? "destructive" : "default"}
