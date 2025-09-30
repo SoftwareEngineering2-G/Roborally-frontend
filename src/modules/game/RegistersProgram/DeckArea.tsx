@@ -34,7 +34,9 @@ export const DeckArea = ({
     }
   };
 
-  const handleResetClick = () => {};
+  const handleResetClick = () => {
+    onResetDeck?.();
+  };
 
   return (
     <motion.div
