@@ -11,7 +11,6 @@ import {
   LobbyLoadingSkeleton,
   LobbyErrorState,
 } from "@/components/lobby/lobby-skeleton";
-import { useLobbySignalR } from "@/hooks/signalr";
 import {
   selectLobbyState,
   selectLobbyPlayers,
@@ -23,6 +22,7 @@ import {
 } from "@/redux/lobby/lobbySlice";
 import { RootState, AppDispatch } from "@/redux/store";
 import { LobbyHeader, PlayersGrid, GameControls, GameInfo } from "./components";
+import { useLobbySignalR } from "./hooks/useLobbySignalR";
 
 interface Props {
   gameId: string;

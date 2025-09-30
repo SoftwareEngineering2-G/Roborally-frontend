@@ -1,9 +1,9 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useStartCardDealingForAllMutation } from "@/redux/api/game/gameApi";
 import { useState } from "react";
+import { Crown, Play } from "lucide-react";
 
 interface GameHostControlsProps {
   gameId: string;
@@ -24,26 +24,21 @@ export const GameHostControls = ({ gameId }: GameHostControlsProps) => {
   };
 
   return (
-    <Card className="mb-4 bg-orange-50 border-orange-200">
-      <CardHeader>
-        <CardTitle className="text-lg font-semibold text-orange-800">
-          Host Controls
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-3">
-          <p className="text-sm text-orange-700">
-            Game Status: Ready for card dealing
-          </p>
-          <Button
-            onClick={handleStartCardDealing}
-            disabled={isLoading}
-            className="w-full bg-orange-600 hover:bg-orange-700"
-          >
-            {isLoading ? "Starting..." : "Start Card Dealing for All Players"}
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
+    <div className="flex items-center gap-2">
+      <div className="flex items-center gap-1 text-xs text-amber-400 bg-amber-400/10 px-2 py-1 rounded border border-amber-400/20">
+        <Crown className="w-3 h-3" />
+        <span>Host</span>
+      </div>
+      <Button
+        onClick={handleStartCardDealing}
+        disabled={isLoading}
+        size="sm"
+        variant="outline"
+        className="h-7 text-xs bg-blue-500/10 border-blue-500/30 text-blue-400 hover:bg-blue-500/20 hover:border-blue-500/50"
+      >
+        <Play className="w-3 h-3 mr-1" />
+        {isLoading ? "Starting..." : "Deal Cards"}
+      </Button>
+    </div>
   );
 };

@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useCallback } from "react";
+import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { toast } from "sonner";
-import { useSignalR } from "./useSignalR";
+import { useSignalR } from "../../../hooks/signalr/useSignalR";
 import {
   UserJoinedLobbyEvent,
   UserLeftLobbyEvent,
@@ -24,6 +24,7 @@ export const useLobbySignalR = (gameId: string) => {
   useEffect(() => {
     if (signalR.isConnected && gameId && autoJoinLobby) {
       console.log(`Joining lobby: ${gameId}`);
+      
       signalR.joinGroup(gameId).catch((err) => {
         console.error("Failed to join lobby:", err);
       });
@@ -67,17 +68,6 @@ export const useLobbySignalR = (gameId: string) => {
       signalR.off("GameStarted");
     };
   }, [signalR.isConnected, dispatch]);
-
-  // Helper methods for common lobby actions
-  const togglePlayerReady = useCallback(
-    async (username: string) => {
-      if (!gameId || !username) {
-        throw new Error("GameId and username are required");
-      }
-      return signalR.send("TogglePlayerReady", gameId, username);
-    },
-    [gameId, signalR]
-  );
 
   return {
     // Connection state

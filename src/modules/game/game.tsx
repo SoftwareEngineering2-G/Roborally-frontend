@@ -1,6 +1,6 @@
 "use client";
 
-import { RegistersProgram } from "./RegistersProgram/registers-program";
+import { CardProgramming } from "./CardProgramming";
 import { GameHostControls } from "./GameHostControls";
 
 interface Props {
@@ -9,10 +9,13 @@ interface Props {
 }
 
 export default function Game({ gameId, isHost }: Props) {
+  console.log("Is host:", isHost);
+  
   return (
     <div className="container mx-auto p-4">
-      {isHost && <GameHostControls gameId={gameId} />}
-      <RegistersProgram />
+      <CardProgramming 
+        hostControls={isHost ? <GameHostControls gameId={gameId} /> : undefined}
+      />
     </div>
   );
 }
