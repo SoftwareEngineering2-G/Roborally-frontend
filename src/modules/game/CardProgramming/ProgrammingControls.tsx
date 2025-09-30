@@ -197,6 +197,7 @@ export const ProgrammingControls = forwardRef<
                               slotRefs.current[index] = el;
                             }}
                             className="w-16 h-24 rounded-lg border-2 border-dashed border-muted-foreground/20 bg-surface-dark/20 backdrop-blur-sm flex items-center justify-center"
+                            data-hand-placeholder
                           >
                             <div className="text-xs text-muted-foreground/40">
                               {index + 1}

@@ -79,9 +79,8 @@ export const ProgrammingPhase = ({
         handSize={state.hand.length}
         deckCount={deckCount}
         isDealing={isDealing}
-        onDrawCards={handleDrawCardsWithRef}
         onResetDeck={onResetDeck}
-      />{" "}
+      />
       {/* Drag Drop Zones Indicator */}
       <DragDropIndicator isDragging={state.isDragging} />
     </motion.div>

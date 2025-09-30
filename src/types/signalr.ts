@@ -14,3 +14,10 @@ export interface UserLeftLobbyEvent {
 export interface GameStartedEvent {
   gameId: string; // Guid from C# backend
 }
+
+// Game SignalR Events (matching backend GameBroadcaster)
+export interface PlayerCardsDealtEvent {
+  gameId: string; // Guid from C# backend
+  username: string;
+  dealtCards: string[]; // List of card names as strings
+}

@@ -3,8 +3,6 @@
 import { useRef } from "react";
 import { motion } from "framer-motion";
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Download } from "lucide-react";
 import { Deck } from "./Deck";
 
 interface DeckAreaProps {
@@ -12,7 +10,6 @@ interface DeckAreaProps {
   handSize: number;
   deckCount: number;
   isDealing: boolean;
-  onDrawCards: (deckElement: HTMLElement) => void;
   onResetDeck?: () => void;
 }
 
@@ -20,18 +17,10 @@ export const DeckArea = ({
   showControls,
   handSize,
   deckCount,
-  onDrawCards,
 }: DeckAreaProps) => {
   const deckRef = useRef<HTMLDivElement>(null);
 
   if (!showControls) return null;
-
-  const handleDrawClick = () => {
-    console.log("Simple draw button clicked!", { deckRef: deckRef.current });
-    if (deckRef.current) {
-      onDrawCards(deckRef.current);
-    }
-  };
 
   return (
     <motion.div
@@ -49,7 +38,7 @@ export const DeckArea = ({
       <Card className="glass-panel p-3 backdrop-blur-xl bg-surface-dark/80 border border-glass-border w-20">
         <div className="text-center">
           <div className="text-xs text-neon-cyan mb-1">Draw</div>
-          <div ref={deckRef} className="relative">
+          <div ref={deckRef} className="relative" data-deck-element>
             <Deck
               remainingCards={deckCount}
               className=""
@@ -58,17 +47,6 @@ export const DeckArea = ({
             />
           </div>
           <div className="text-xs text-muted-foreground mt-1">{deckCount}</div>
-
-          {/* Simple Draw Button - Always Visible */}
-          <Button
-            onClick={handleDrawClick}
-            size="sm"
-            className="mt-2 w-full bg-neon-cyan/20 hover:bg-neon-cyan/40 border border-neon-cyan/50 text-neon-cyan text-xs"
-            title="Draw 9 cards"
-          >
-            <Download className="w-3 h-3 mr-1" />
-            Draw
-          </Button>
         </div>
       </Card>
 

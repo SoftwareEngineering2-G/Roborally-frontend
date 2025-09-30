@@ -3,89 +3,70 @@
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { toast } from "sonner";
-import { useSignalR } from "../../../hooks/signalr/useSignalR";
-import {
-  UserJoinedLobbyEvent,
-  UserLeftLobbyEvent,
-  GameStartedEvent,
-} from "@/types/signalr";
+import { useSignalRContext } from "@/providers/SignalRProvider";
 import { userJoinedLobby, userLeftLobby } from "@/redux/lobby/lobbySlice";
 import { AppDispatch } from "@/redux/store";
 
 export const useLobbySignalR = (gameId: string) => {
   const dispatch = useDispatch<AppDispatch>();
-  const hubUrl = "/lobbyHub";
-  const autoJoinLobby = true;
+  const { lobby: signalR } = useSignalRContext();
 
-  // Use the simple SignalR hook
-  const signalR = useSignalR(hubUrl);
-
-  // Join lobby when connected and gameId is available
+  // Join lobby when connected
   useEffect(() => {
-    if (signalR.isConnected && gameId && autoJoinLobby) {
+    if (signalR.isConnected && gameId) {
       console.log(`Joining lobby: ${gameId}`);
-      
-      signalR.joinGroup(gameId).catch((err) => {
+      signalR.send("JoinLobby", gameId).catch((err) => {
         console.error("Failed to join lobby:", err);
+        toast.error("Failed to join lobby");
       });
-
-      // Leave lobby on cleanup
-      return () => {
-        if (gameId) {
-          signalR.leaveGroup(gameId).catch((err) => {
-            console.error("Failed to leave lobby:", err);
-          });
-        }
-      };
     }
-  }, [signalR.isConnected, gameId, autoJoinLobby]);
+  }, [signalR.isConnected, gameId, signalR.send]);
 
-  // Setup event listeners with Redux integration
+  // Setup event listeners
   useEffect(() => {
     if (!signalR.isConnected) return;
 
-    signalR.on("UserJoinedLobby", (data: UserJoinedLobbyEvent) => {
-      console.log("User joined:", data);
+    const handleUserJoined = (data: any) => {
       dispatch(userJoinedLobby({ username: data.username }));
       toast.success(`${data.username} joined the lobby`);
-    });
+    };
 
-    signalR.on("UserLeftLobby", (data: UserLeftLobbyEvent) => {
-      console.log("User left:", data);
+    const handleUserLeft = (data: any) => {
       dispatch(userLeftLobby({ username: data.username }));
       toast.info(`${data.username} left the lobby`);
-    });
+    };
 
-    signalR.on("GameStarted", (data: GameStartedEvent) => {
-      console.log("Game started:", data);
+    const handleGameStarted = () => {
       toast.success("Game is starting!");
-    });
+    };
 
-    // Cleanup all listeners
+    signalR.on("UserJoinedLobby", handleUserJoined);
+    signalR.on("UserLeftLobby", handleUserLeft);
+    signalR.on("GameStarted", handleGameStarted);
+
     return () => {
       signalR.off("UserJoinedLobby");
       signalR.off("UserLeftLobby");
       signalR.off("GameStarted");
     };
-  }, [signalR.isConnected, dispatch]);
+  }, [signalR.isConnected, dispatch, signalR.on, signalR.off]);
+
+  // Leave lobby on unmount
+  useEffect(() => {
+    return () => {
+      if (gameId && signalR.isConnected) {
+        console.log(`Leaving lobby: ${gameId}`);
+        signalR.send("LeaveLobby", gameId).catch((err) => {
+          console.error("Failed to leave lobby:", err);
+        });
+      }
+    };
+  }, [gameId, signalR.isConnected, signalR.send]);
 
   return {
-    // Connection state
     isConnected: signalR.isConnected,
     isConnecting: signalR.isConnecting,
     error: signalR.error,
-
-    // Connection methods
-    connect: signalR.connect,
-    disconnect: signalR.disconnect,
-    clearError: signalR.clearError,
-
-    // Direct access to SignalR methods if needed
-    send: signalR.send,
-    joinGroup: signalR.joinGroup,
-    leaveGroup: signalR.leaveGroup,
-
-    // Raw SignalR instance for custom event handling
     on: signalR.on,
     off: signalR.off,
   };

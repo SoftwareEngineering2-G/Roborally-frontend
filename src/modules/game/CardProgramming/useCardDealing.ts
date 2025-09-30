@@ -25,65 +25,7 @@ export const useCardDealing = (initialDeckCount: number = 20) => {
     deckCount: initialDeckCount,
   });
 
-  const generateMockHand = useCallback((): ProgramCard[] => {
-    // Create one of each card type for a complete hand
-    return [
-      {
-        id: "deal-1",
-        name: "Move 1",
-        type: "move1",
-        imagePath: "/cards/move1.png",
-      },
-      {
-        id: "deal-2",
-        name: "Move 2",
-        type: "move2",
-        imagePath: "/cards/move2.png",
-      },
-      {
-        id: "deal-3",
-        name: "Move 3",
-        type: "move3",
-        imagePath: "/cards/move3.png",
-      },
-      {
-        id: "deal-4",
-        name: "Move Back",
-        type: "moveback",
-        imagePath: "/cards/moveback.png",
-      },
-      {
-        id: "deal-5",
-        name: "Power Up",
-        type: "powerup",
-        imagePath: "/cards/powerup.png",
-      },
-      {
-        id: "deal-6",
-        name: "Rotate Left",
-        type: "rotateleft",
-        imagePath: "/cards/rotateleft.png",
-      },
-      {
-        id: "deal-7",
-        name: "Rotate Right",
-        type: "rotateright",
-        imagePath: "/cards/rotateright.png",
-      },
-      {
-        id: "deal-8",
-        name: "U-Turn",
-        type: "uturn",
-        imagePath: "/cards/uturn.png",
-      },
-      {
-        id: "deal-9",
-        name: "Again",
-        type: "move1",
-        imagePath: "/cards/again.png",
-      }, // Using again.png for variety
-    ];
-  }, []);
+
 
   const calculateCardPositions = useCallback(
     (placeholderElements: (HTMLElement | null)[], deckRect: DOMRect) => {
@@ -122,18 +64,17 @@ export const useCardDealing = (initialDeckCount: number = 20) => {
     (
       deckElement: HTMLElement,
       placeholderElements: (HTMLElement | null)[],
+      cardsToAnimate: ProgramCard[],
       onComplete: (cards: ProgramCard[]) => void
     ) => {
-      if (state.isDealing || state.deckCount < 9) {
+      if (state.isDealing || cardsToAnimate.length === 0) {
         return;
       }
 
       const deckRect = deckElement.getBoundingClientRect();
-
-      const newCards = generateMockHand();
       const positions = calculateCardPositions(placeholderElements, deckRect);
 
-      const dealingCards: DealingCard[] = newCards.map((card, index) => ({
+      const dealingCards: DealingCard[] = cardsToAnimate.map((card, index) => ({
         id: `dealing-${card.id}-${Date.now()}`,
         card,
         ...positions[index],
@@ -147,18 +88,18 @@ export const useCardDealing = (initialDeckCount: number = 20) => {
       }));
 
       // Complete dealing animation after all cards are dealt
-      const totalDealTime = 9 * 150 + 500; // 9 cards * 150ms + 500ms for last card animation
+      const totalDealTime = cardsToAnimate.length * 150 + 500; // cards * 150ms + 500ms for last card animation
       setTimeout(() => {
         setState((prev) => ({
           ...prev,
           isDealing: false,
           dealingCards: [],
-          deckCount: prev.deckCount - 9,
+          deckCount: Math.max(0, prev.deckCount - cardsToAnimate.length),
         }));
-        onComplete(newCards);
+        onComplete(cardsToAnimate);
       }, totalDealTime);
     },
-    [state.isDealing, state.deckCount, generateMockHand, calculateCardPositions]
+    [state.isDealing, calculateCardPositions]
   );
 
   const markCardAsDealt = useCallback((cardId: string) => {

@@ -8,9 +8,9 @@ export default async function Page({
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
   const { gameId } = await params;
-  const { hostuser } = await searchParams;
+  const { hostUser } = await searchParams;
 
-  const isHost = hostuser === "true";
+  const isHost = hostUser === "true";
 
   return <Game gameId={gameId} isHost={isHost} />;
 }

@@ -1,163 +1,118 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import {
-  HubConnection,
-  HubConnectionBuilder,
-  LogLevel,
-} from "@microsoft/signalr";
+import { HttpTransportType, HubConnection, HubConnectionBuilder, LogLevel } from "@microsoft/signalr";
 
 export const useSignalR = (url: string) => {
-  const hubUrl = url;
-  const autoConnect = true;
-  const reconnectOnClose = true;
   const connectionRef = useRef<HubConnection | null>(null);
   const [isConnected, setIsConnected] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Initialize connection
   useEffect(() => {
+    // Don't create multiple connections for the same URL
+    if (connectionRef.current) {
+      return;
+    }
+    
+    console.log(`Initializing SignalR connection to: ${url}`);
+    
+    // Create connection
+    const backendBaseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5100";
+    const fullHubUrl = `${backendBaseUrl}${url}`;
+    
+    console.log(`Full SignalR URL: ${fullHubUrl}`);
+    
     const connection = new HubConnectionBuilder()
-      .withUrl(hubUrl)
+      .withUrl(fullHubUrl)
       .withAutomaticReconnect()
       .configureLogging(LogLevel.Information)
       .build();
 
     connectionRef.current = connection;
 
-    // Setup connection event handlers
+    // Simple event handlers
     connection.onclose((error) => {
       console.log("SignalR connection closed:", error);
       setIsConnected(false);
       setIsConnecting(false);
       if (error) {
-        setError(error.message || "Connection closed with error");
+        setError(error.message);
       }
     });
 
-    connection.onreconnecting(() => {
-      console.log("SignalR reconnecting...");
+    connection.onreconnecting((error) => {
+      console.log("SignalR reconnecting...", error);
       setIsConnecting(true);
-      setError(null);
+      setIsConnected(false);
     });
 
-    connection.onreconnected(() => {
-      console.log("SignalR reconnected");
+    connection.onreconnected((connectionId) => {
+      console.log("SignalR reconnected:", connectionId);
       setIsConnected(true);
       setIsConnecting(false);
       setError(null);
     });
 
-    // Auto connect if enabled
-    if (autoConnect) {
-      connect();
-    }
-
-    // Cleanup on unmount
-    return () => {
-      if (connection.state !== "Disconnected") {
-        connection.stop().catch(console.error);
+    // Start connection
+    const startConnection = async () => {
+      try {
+        console.log("Starting SignalR connection...");
+        setIsConnecting(true);
+        setError(null);
+        
+        await connection.start();
+        
+        console.log("SignalR connected successfully!");
+        setIsConnected(true);
+        setIsConnecting(false);
+      } catch (err) {
+        console.error("SignalR connection failed:", err);
+        setIsConnecting(false);
+        setError(err instanceof Error ? err.message : "Connection failed");
       }
     };
-  }, [hubUrl]);
 
-  const connect = async () => {
-    if (!connectionRef.current || connectionRef.current.state === "Connected") {
-      return;
-    }
+    startConnection();
 
-    try {
-      setIsConnecting(true);
-      setError(null);
-      await connectionRef.current.start();
-      setIsConnected(true);
-      setIsConnecting(false);
-      console.log("SignalR connected successfully");
-    } catch (err) {
-      setIsConnecting(false);
-      const errorMessage =
-        err instanceof Error ? err.message : "Failed to connect";
-      setError(errorMessage);
-      console.error("SignalR connection failed:", err);
-    }
-  };
-
-  const disconnect = async () => {
-    if (connectionRef.current && connectionRef.current.state === "Connected") {
-      try {
-        await connectionRef.current.stop();
-        setIsConnected(false);
-        setError(null);
-      } catch (err) {
-        console.error("Failed to disconnect:", err);
+    // Cleanup
+    return () => {
+      console.log("Cleaning up SignalR connection...");
+      
+      if (connection && connection.state !== "Disconnected") {
+        connection.stop().catch((err) => {
+          console.error("Error stopping SignalR:", err);
+        });
       }
-    }
-  };
+      
+      connectionRef.current = null;
+    };
+  }, [url]);
 
-  // Method to listen to events
+  // Event listener
   const on = (eventName: string, handler: (...args: any[]) => void) => {
-    if (connectionRef.current) {
-      connectionRef.current.on(eventName, handler);
-    }
+    connectionRef.current?.on(eventName, handler);
   };
 
-  // Method to remove event listeners
-  const off = (eventName: string, handler?: (...args: any[]) => void) => {
-    if (connectionRef.current) {
-      if (handler) {
-        connectionRef.current.off(eventName, handler);
-      } else {
-        connectionRef.current.off(eventName);
-      }
-    }
+  // Remove event listener  
+  const off = (eventName: string) => {
+    connectionRef.current?.off(eventName);
   };
 
-  // Method to send messages to the hub
+  // Send message
   const send = async (methodName: string, ...args: any[]) => {
-    if (connectionRef.current && connectionRef.current.state === "Connected") {
-      try {
-        return await connectionRef.current.invoke(methodName, ...args);
-      } catch (err) {
-        console.error(`Failed to send ${methodName}:`, err);
-        throw err;
-      }
-    } else {
-      throw new Error("SignalR connection is not established");
+    if (connectionRef.current?.state === "Connected") {
+      return await connectionRef.current.invoke(methodName, ...args);
     }
-  };
-
-  // Method to join a group (common SignalR pattern)
-  const joinGroup = async (groupName: string) => {
-    return send("JoinGroup", groupName);
-  };
-
-  // Method to leave a group
-  const leaveGroup = async (groupName: string) => {
-    return send("LeaveGroup", groupName);
+    throw new Error("Not connected");
   };
 
   return {
-    // Connection state
     isConnected,
-    isConnecting,
+    isConnecting, 
     error,
-
-    // Connection methods
-    connect,
-    disconnect,
-
-    // Event methods
     on,
     off,
-
-    // Send methods
     send,
-    joinGroup,
-    leaveGroup,
-
-    // Utility
-    clearError: () => setError(null),
-    connection: connectionRef.current,
   };
 };
