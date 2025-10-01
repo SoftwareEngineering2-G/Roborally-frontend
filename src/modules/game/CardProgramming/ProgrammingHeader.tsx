@@ -1,20 +1,14 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Button } from "@/components/ui/button";
-import { Upload } from "lucide-react";
 
 interface ProgrammingHeaderProps {
   filledCount: number;
-  programComplete: boolean;
-  onUploadProgram: () => void;
   hostControls?: React.ReactNode;
 }
 
 export const ProgrammingHeader = ({
   filledCount,
-  programComplete,
-  onUploadProgram,
   hostControls,
 }: ProgrammingHeaderProps) => {
   return (
@@ -54,20 +48,7 @@ export const ProgrammingHeader = ({
         </div>
 
         <div className="flex items-center gap-3">
-          {programComplete && (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-            >
-              <Button
-                className="bg-gradient-primary hover:shadow-glow-teal animate-neon-pulse"
-                onClick={onUploadProgram}
-              >
-                <Upload className="w-4 h-4 mr-2" />
-                Upload Program
-              </Button>
-            </motion.div>
-          )}
+          {/* Space for future header actions */}
         </div>
       </div>
     </motion.div>

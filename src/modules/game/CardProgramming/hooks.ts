@@ -1,9 +1,13 @@
 import { useState, useCallback } from "react";
+import { toast } from "sonner";
+import { useRegistersProgrammedMutation } from "@/redux/api/game/playerApi";
 import type { ProgramCard, RegisterSlot, ProgrammingPhaseState } from "./types";
 
 export const useProgrammingPhase = (
   initialHand: ProgramCard[],
-  initialRegisters: RegisterSlot[]
+  initialRegisters: RegisterSlot[],
+  gameId: string,
+  username: string
 ) => {
   const [state, setState] = useState<ProgrammingPhaseState>({
     hand: initialHand,
@@ -13,6 +17,9 @@ export const useProgrammingPhase = (
     isDragging: false,
     programComplete: false,
   });
+
+  // API mutation for submitting locked-in program
+  const [registersProgrammed, { isLoading: isSubmitting }] = useRegistersProgrammedMutation();
 
   // Card selection (mobile-friendly)
   const handleCardSelect = useCallback((card: ProgramCard) => {
@@ -129,22 +136,43 @@ export const useProgrammingPhase = (
     [state.registers]
   );
 
-  // Upload program
-  const handleUploadProgram = useCallback(() => {
+  // Lock in program
+  const handleUploadProgram = useCallback(async () => {
     const isComplete = state.registers.every((reg) => reg.card !== null);
 
-    if (isComplete) {
-      // Here you would send the program to the server
-      console.log(
-        "Uploading program:",
-        state.registers.map((r) => r.card)
-      );
-      // For now, just show an alert
-      alert("Program uploaded successfully!");
-      return true;
+    if (!isComplete) {
+      toast.error("All registers must be filled before locking in!");
+      return false;
     }
-    return false;
-  }, [state.registers]);
+
+    if (isSubmitting) {
+      return false; // Prevent multiple submissions
+    }
+
+    try {
+      // Extract card names from the registers in order
+      const lockedCardsInOrder = state.registers
+        .sort((a, b) => a.id - b.id) // Ensure correct order
+        .map((register) => register.card?.name || "")
+        .filter(Boolean); // Remove any empty slots
+
+      console.log("Locking in program:", lockedCardsInOrder);
+
+      // Send to backend
+      await registersProgrammed({
+        gameId,
+        username,
+        lockedCardsInOrder,
+      }).unwrap();
+
+      toast.success("Program locked in successfully!");
+      return true;
+    } catch (error) {
+      console.error("Failed to lock in program:", error);
+      toast.error("Failed to lock in program. Please try again.");
+      return false;
+    }
+  }, [state.registers, gameId, username, registersProgrammed, isSubmitting]);
 
   // Set hand (for dealing cards)
   const handleSetHand = useCallback((newHand: ProgramCard[]) => {
@@ -157,6 +185,7 @@ export const useProgrammingPhase = (
 
   return {
     state,
+    isSubmitting,
     handlers: {
       handleCardSelect,
       handleRegisterSelect,

@@ -1,5 +1,5 @@
 import { baseApi } from "../baseApi";
-import { StartCardDealingForAllRequest } from "./types";
+import { GetCurrentGameStateRequest, GetCurrentGameStateResponse, StartCardDealingForAllRequest, StartActivationPhaseRequest } from "./types";
 
 export const gameApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
@@ -13,7 +13,29 @@ export const gameApi = baseApi.injectEndpoints({
         body: { username },
       }),
     }),
+
+    startActivationPhase: builder.mutation<
+      void,
+      StartActivationPhaseRequest
+    >({
+      query: ({ gameId, username }) => ({
+        url: `/games/${gameId}/start-activation-phase`,
+        method: "POST",
+        body: { username },
+      }),
+    }),
+
+    getCurrentGameState: builder.query<GetCurrentGameStateResponse, GetCurrentGameStateRequest>({
+      query: ({ gameId }) => ({
+        url: `/games/${gameId}/current-state`,
+        method: "GET",
+      }),
+    }),
   }),
 });
 
-export const { useStartCardDealingForAllMutation } = gameApi;
+export const { 
+  useStartCardDealingForAllMutation, 
+  useStartActivationPhaseMutation,
+  useGetCurrentGameStateQuery 
+} = gameApi;

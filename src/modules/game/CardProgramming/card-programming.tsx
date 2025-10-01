@@ -10,18 +10,26 @@ import { useProgrammingPhase } from "./hooks";
 import { useCardDealing } from "./useCardDealing";
 import { useGameSignalR } from "./hooks/useGameSignalR";
 import { toast } from "sonner";
+import { GetCurrentGameStateResponse } from "@/redux/api/game/types";
+import { useAppDispatch } from "@/redux/hooks";
+import { playerLockedIn } from "@/redux/game/gameSlice";
 
 interface CardProgrammingProps {
   gameId: string;
   username: string;
+  gameState: GetCurrentGameStateResponse;
   hostControls?: React.ReactNode;
 }
 
-export const CardProgramming = ({ gameId, username, hostControls }: CardProgrammingProps) => {
+export const CardProgramming = ({ gameId, username, gameState, hostControls }: CardProgrammingProps) => {
   const [showProgrammingControls, setShowProgrammingControls] = useState(true);
-  const { state, handlers } = useProgrammingPhase(
+  const dispatch = useAppDispatch();
+  
+  const { state, handlers, isSubmitting } = useProgrammingPhase(
     [], // Start with empty hand
-    INITIAL_REGISTERS
+    INITIAL_REGISTERS,
+    gameId,
+    username
   );
 
   const { dealingState, startDealing, markCardAsDealt, resetDeck } =
@@ -80,6 +88,31 @@ export const CardProgramming = ({ gameId, username, hostControls }: CardProgramm
     };
   }, [signalR.isConnected, username, gameId, handlers.handleSetHand, resetDeck, startDealing]);
 
+  // Listen for PlayerLockedInRegister events
+  useEffect(() => {
+    if (!signalR.isConnected) return;
+
+    const handlePlayerLockedInRegister = (data: { username: string }) => {
+      console.log("Player locked in register:", data);
+      
+      // Update Redux state to mark player as locked in
+      dispatch(playerLockedIn({ username: data.username }));
+      
+      // Show toast notification
+      if (data.username === username) {
+        toast.success("Your program has been locked in!");
+      } else {
+        toast.info(`${data.username} has locked in their program`);
+      }
+    };
+
+    signalR.on("PlayerLockedInRegister", handlePlayerLockedInRegister);
+
+    return () => {
+      signalR.off("PlayerLockedInRegister");
+    };
+  }, [signalR.isConnected, username, dispatch]);
+
   const toggleProgrammingControls = () => {
     setShowProgrammingControls((prev) => !prev);
   };
@@ -109,16 +142,6 @@ export const CardProgramming = ({ gameId, username, hostControls }: CardProgramm
     });
   };
 
-  const handleDrawCards = (
-    deckElement: HTMLElement,
-    placeholderElements: (HTMLElement | null)[]
-  ) => {
-    const sampleCards = generateSampleCards(9);
-    startDealing(deckElement, placeholderElements, sampleCards, (newCards: ProgramCard[]) => {
-      // Replace the hand with the newly dealt cards
-      handlers.handleSetHand(newCards);
-    });
-  };
 
   const handleResetDeck = () => {
     // Clear the hand and reset deck
@@ -147,8 +170,6 @@ export const CardProgramming = ({ gameId, username, hostControls }: CardProgramm
       {/* Programming Header */}
       <ProgrammingHeader
         filledCount={filledCount}
-        programComplete={programComplete}
-        onUploadProgram={handlers.handleUploadProgram}
         hostControls={hostControls}
       />
 
@@ -160,10 +181,13 @@ export const CardProgramming = ({ gameId, username, hostControls }: CardProgramm
           showProgrammingControls={showProgrammingControls}
           onToggleProgrammingControls={toggleProgrammingControls}
           filledCount={filledCount}
+          programComplete={programComplete}
+          isSubmitting={isSubmitting}
           deckCount={dealingState.deckCount}
           isDealing={dealingState.isDealing}
-          onDrawCards={handleDrawCards}
           onResetDeck={handleResetDeck}
+          gameState={gameState}
+          currentUsername={username}
         />
       </div>
 

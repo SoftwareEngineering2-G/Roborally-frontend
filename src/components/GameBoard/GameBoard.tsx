@@ -23,10 +23,6 @@ export const GameBoard = ({ className = "" }: GameBoardProps) => {
       transition={{ duration: 0.3 }}
     >
       <div className="glass-panel p-6 rounded-lg border border-glass-border">
-        <h2 className="text-2xl font-bold neon-text mb-4 text-center">
-          RoboRally Board
-        </h2>
-
         <div className="relative mx-auto" style={{ maxWidth: "600px" }}>
           {/* Grid Container */}
           <div
