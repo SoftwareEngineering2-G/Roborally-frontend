@@ -2,53 +2,32 @@
 
 import { Button } from "@/components/ui/button";
 import { useStartCardDealingForAllMutation, useStartActivationPhaseMutation } from "@/redux/api/game/gameApi";
-import { useState, useEffect } from "react";
 import { Crown, Play, Users, CheckCircle } from "lucide-react";
-import { GetCurrentGameStateResponse } from "@/redux/api/game/types";
 import { toast } from "sonner";
-import { useGameSignalR } from "../CardProgramming/hooks/useGameSignalR";
+import type { GetCurrentGameStateResponse } from "@/redux/api/game/types";
 
 interface GameHostControlsProps {
   gameId: string;
   gameState: GetCurrentGameStateResponse;
+  cardsDealt: boolean;
+  onCardsDealt: () => void;
 }
 
-export const GameHostControls = ({ gameId, gameState }: GameHostControlsProps) => {
+export const GameHostControls = ({ gameId, gameState, cardsDealt, onCardsDealt }: GameHostControlsProps) => {
   const [startCardDealing, { isLoading: isDealingCards }] = useStartCardDealingForAllMutation();
   const [startActivationPhase, { isLoading: isStartingActivation }] = useStartActivationPhaseMutation();
-  const [username] = useState("host"); // TODO: Get from auth context later
-  const [cardsDealt, setCardsDealt] = useState(false);
 
-  // Setup SignalR connection to listen for game events
-  const signalR = useGameSignalR(gameId, username);
-
-  // Listen for card dealing events to automatically update state
-  useEffect(() => {
-    if (!signalR.isConnected) return;
-
-    const handlePlayerCardsDealt = (data: any) => {
-      console.log("Cards dealt event received:", data);
-      // Cards have been dealt to players, update our state
-      if (data.gameId === gameId) {
-        setCardsDealt(true);
-      }
-    };
-
-    signalR.on("PlayerCardsDealt", handlePlayerCardsDealt);
-
-    return () => {
-      signalR.off("PlayerCardsDealt");
-    };
-  }, [signalR.isConnected, gameId]);
+  // Get username from localStorage
+  const username = localStorage.getItem("username") || "host";
 
   // Check if all players have locked in their programs
-  const allPlayersLockedIn = gameState.players.every(player => player.hasLockedIn);
-  const lockedInCount = gameState.players.filter(player => player.hasLockedIn).length;
+  const allPlayersLockedIn = gameState.players.every((player) => player.hasLockedIn);
+  const lockedInCount = gameState.players.filter((player) => player.hasLockedIn).length;
 
   const handleStartCardDealing = async () => {
     try {
       await startCardDealing({ gameId, username }).unwrap();
-      setCardsDealt(true);
+      onCardsDealt();
       toast.success("Cards dealt to all players!");
     } catch (error) {
       toast.error("Failed to deal cards");

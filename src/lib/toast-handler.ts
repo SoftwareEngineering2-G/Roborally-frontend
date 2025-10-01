@@ -11,28 +11,35 @@ export interface BackendError {
 }
 
 // Type guard to check if error matches your backend format
-export function isBackendError(error: any): error is BackendError {
+export function isBackendError(error: unknown): error is BackendError {
+  if (!error || typeof error !== "object" || error === null) {
+    return false;
+  }
+
+  const err = error as Record<string, unknown>;
+  
+  if (typeof err.status !== "number" || !err.data || typeof err.data !== "object" || err.data === null) {
+    return false;
+  }
+
+  const data = err.data as Record<string, unknown>;
+  
   return (
-    error &&
-    typeof error === "object" &&
-    typeof error.status === "number" &&
-    error.data &&
-    typeof error.data === "object" &&
-    typeof error.data.title === "string" &&
-    typeof error.data.status === "number" &&
-    typeof error.data.detail === "string"
+    typeof data.title === "string" &&
+    typeof data.status === "number" &&
+    typeof data.detail === "string"
   );
 }
 
 // Extract error message with fallback
-export function getErrorMessage(error: any): string {
+export function getErrorMessage(error: unknown): string {
   if (isBackendError(error)) {
     return error.data.title;
   }
 
   // Fallback for other error formats
-  if (error?.message) {
-    return error.message;
+  if (error && typeof error === "object" && "message" in error && typeof (error as Record<string, unknown>).message === "string") {
+    return (error as Record<string, unknown>).message as string;
   }
 
   if (typeof error === "string") {
@@ -43,7 +50,7 @@ export function getErrorMessage(error: any): string {
 }
 
 // Extract error detail with fallback
-export function getErrorDetail(error: any): string | undefined {
+export function getErrorDetail(error: unknown): string | undefined {
   if (isBackendError(error)) {
     return error.data.detail;
   }
@@ -52,7 +59,7 @@ export function getErrorDetail(error: any): string | undefined {
 }
 
 // Get error status code
-export function getErrorStatus(error: any): number | undefined {
+export function getErrorStatus(error: unknown): number | undefined {
   if (isBackendError(error)) {
     return error.status;
   }
@@ -61,7 +68,7 @@ export function getErrorStatus(error: any): number | undefined {
 }
 
 // Comprehensive error toast handler with gaming theme
-export function showErrorToast(error: any, fallbackMessage?: string) {
+export function showErrorToast(error: unknown, fallbackMessage?: string) {
   const title = getErrorMessage(error);
   const detail = getErrorDetail(error);
   const status = getErrorStatus(error);

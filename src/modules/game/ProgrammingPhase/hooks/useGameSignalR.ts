@@ -14,7 +14,7 @@ export const useGameSignalR = (gameId: string, username: string) => {
         console.error("Failed to join game:", err);
       });
     }
-  }, [signalR.isConnected, gameId, username, signalR.send]);
+  }, [signalR.isConnected, gameId, username, signalR]);
 
   // Leave game on unmount
   useEffect(() => {
@@ -26,7 +26,7 @@ export const useGameSignalR = (gameId: string, username: string) => {
         });
       }
     };
-  }, [gameId, username, signalR.isConnected, signalR.send]);
+  }, [gameId, username, signalR]);
 
   return {
     isConnected: signalR.isConnected,

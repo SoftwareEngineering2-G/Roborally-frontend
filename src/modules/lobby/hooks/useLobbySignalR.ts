@@ -11,27 +11,29 @@ export const useLobbySignalR = (gameId: string) => {
   const dispatch = useDispatch<AppDispatch>();
   const { lobby: signalR } = useSignalRContext();
 
-  // Join lobby when connected
+  // Join lobby automatically
   useEffect(() => {
     if (signalR.isConnected && gameId) {
       console.log(`Joining lobby: ${gameId}`);
-      signalR.send("JoinLobby", gameId).catch((err) => {
-        console.error("Failed to join lobby:", err);
+      signalR.send("JoinLobby", gameId).catch(() => {
         toast.error("Failed to join lobby");
       });
     }
-  }, [signalR.isConnected, gameId, signalR.send]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [signalR.isConnected, gameId]);
 
   // Setup event listeners
   useEffect(() => {
     if (!signalR.isConnected) return;
 
-    const handleUserJoined = (data: any) => {
+    const handleUserJoined = (...args: unknown[]) => {
+      const data = args[0] as { username: string };
       dispatch(userJoinedLobby({ username: data.username }));
       toast.success(`${data.username} joined the lobby`);
     };
 
-    const handleUserLeft = (data: any) => {
+    const handleUserLeft = (...args: unknown[]) => {
+      const data = args[0] as { username: string };
       dispatch(userLeftLobby({ username: data.username }));
       toast.info(`${data.username} left the lobby`);
     };
@@ -49,7 +51,8 @@ export const useLobbySignalR = (gameId: string) => {
       signalR.off("UserLeftLobby");
       signalR.off("GameStarted");
     };
-  }, [signalR.isConnected, dispatch, signalR.on, signalR.off]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [signalR.isConnected, dispatch]);
 
   // Leave lobby on unmount
   useEffect(() => {
@@ -61,7 +64,8 @@ export const useLobbySignalR = (gameId: string) => {
         });
       }
     };
-  }, [gameId, signalR.isConnected, signalR.send]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [signalR.isConnected, gameId]);
 
   return {
     isConnected: signalR.isConnected,

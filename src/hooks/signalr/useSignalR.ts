@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { HttpTransportType, HubConnection, HubConnectionBuilder, LogLevel } from "@microsoft/signalr";
+import { HubConnection, HubConnectionBuilder, LogLevel } from "@microsoft/signalr";
 
 export const useSignalR = (url: string) => {
   const connectionRef = useRef<HubConnection | null>(null);
@@ -90,7 +90,7 @@ export const useSignalR = (url: string) => {
   }, [url]);
 
   // Event listener
-  const on = (eventName: string, handler: (...args: any[]) => void) => {
+  const on = (eventName: string, handler: (...args: unknown[]) => void) => {
     connectionRef.current?.on(eventName, handler);
   };
 
@@ -100,7 +100,7 @@ export const useSignalR = (url: string) => {
   };
 
   // Send message
-  const send = async (methodName: string, ...args: any[]) => {
+  const send = async (methodName: string, ...args: unknown[]) => {
     if (connectionRef.current?.state === "Connected") {
       return await connectionRef.current.invoke(methodName, ...args);
     }

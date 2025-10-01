@@ -14,6 +14,8 @@ export type GetCurrentGameStateRequest = {
 
 export type GetCurrentGameStateResponse = {
   gameId: string;
+  hostUsername: string;
+  name: string;
   players: Array<{
     username: string;
     robot: string;

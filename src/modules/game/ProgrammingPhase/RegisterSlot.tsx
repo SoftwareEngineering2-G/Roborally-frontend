@@ -1,4 +1,5 @@
 import React from "react";
+import Image from "next/image";
 import { cn } from "@/lib/utils";
 import type { RegisterSlot, ProgramCard } from "./types";
 import { getCardTypeClasses } from "./utils";
@@ -59,10 +60,11 @@ export const RegisterSlotComponent = ({
       {/* Card Content */}
       {register.card && (
         <div className="absolute inset-0 animate-slide-up">
-          <img
+          <Image
             src={register.card.imagePath}
             alt={register.card.name}
-            className="w-full h-full object-cover rounded-md"
+            fill
+            className="object-cover rounded-md"
             onError={(e) => {
               // Fallback to text display if image fails to load
               const target = e.target as HTMLImageElement;

@@ -1,4 +1,5 @@
 import React from "react";
+import Image from "next/image";
 import { cn } from "@/lib/utils";
 import type { ProgramCard } from "./types";
 import { getCardTypeClasses } from "./utils";
@@ -42,10 +43,11 @@ export const ProgramCardComponent = ({
     >
       {/* Card Image */}
       <div className="absolute inset-0 flex items-center justify-center">
-        <img
+        <Image
           src={card.imagePath}
           alt={card.name}
-          className="w-full h-full object-cover rounded-md"
+          fill
+          className="object-cover rounded-md"
           onError={(e) => {
             // Fallback to text display if image fails to load
             const target = e.target as HTMLImageElement;

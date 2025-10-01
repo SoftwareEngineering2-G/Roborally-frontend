@@ -2,14 +2,7 @@
 
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import {
-  Upload,
-  Settings,
-  Play,
-  ArrowRight,
-  ArrowLeft,
-  Crown,
-} from "lucide-react";
+import { Upload } from "lucide-react";
 
 type GamePhase = "programming" | "activation";
 
@@ -17,7 +10,6 @@ interface PhaseHeaderProps {
   currentPhase: GamePhase;
   filledCount: number;
   programComplete: boolean;
-  onPhaseToggle: () => void;
   onUploadProgram: () => void;
   hostControls?: React.ReactNode;
 }
@@ -26,7 +18,6 @@ export const PhaseHeader = ({
   currentPhase,
   filledCount,
   programComplete,
-  onPhaseToggle,
   onUploadProgram,
   hostControls,
 }: PhaseHeaderProps) => {

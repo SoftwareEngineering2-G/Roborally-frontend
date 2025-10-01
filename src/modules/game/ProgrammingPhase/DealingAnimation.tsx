@@ -1,6 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
+import Image from "next/image";
 import { DealingCard } from "./useCardDealing";
 
 interface DealingCardComponentProps {
@@ -79,10 +80,11 @@ export const DealingCardComponent = ({
               duration: 0.2,
             }}
           >
-            <img
+            <Image
               src={card.imagePath}
               alt={card.name}
-              className="w-full h-full object-cover"
+              fill
+              className="object-cover"
               onError={(e) => {
                 const target = e.target as HTMLImageElement;
                 target.style.display = "none";

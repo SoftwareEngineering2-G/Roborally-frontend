@@ -88,10 +88,10 @@ export const Lobby = ({ gameId }: Props) => {
     return () => {
       signalR.off("GameStarted");
     };
-  }, [signalR.isConnected, router, gameId]);
+  }, [signalR, router, gameId]);
 
   if (isLoading || !username) return <LobbyLoadingSkeleton />;
-  if (error && "status" in error && (error as any).status === 403) {
+  if (error && "status" in error && (error as { status: number }).status === 403) {
     return (
       <LobbyErrorState
         message="Access denied."

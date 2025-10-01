@@ -1,6 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
+import Image from "next/image";
 import { DealingCard } from "./useCardDealing";
 
 interface DealingCardComponentProps {
@@ -74,10 +75,11 @@ export const DealingCardComponentSimple = ({
           }}
         >
           {/* Card image with enhanced fallback */}
-          <img
+          <Image
             src={card.imagePath}
             alt={card.name}
-            className="w-full h-full object-cover"
+            fill
+            className="object-cover"
             onLoad={() => {}}
             onError={(e) => {
               console.log(

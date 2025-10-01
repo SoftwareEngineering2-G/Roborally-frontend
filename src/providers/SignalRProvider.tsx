@@ -1,25 +1,20 @@
 "use client";
 
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useContext } from "react";
 import { useSignalR } from "@/hooks/signalr/useSignalR";
 
+interface SignalRConnection {
+  isConnected: boolean;
+  isConnecting: boolean;
+  error: string | null;
+  send: (methodName: string, ...args: unknown[]) => Promise<unknown>;
+  on: (eventName: string, handler: (...args: unknown[]) => void) => void;
+  off: (eventName: string) => void;
+}
+
 interface SignalRContextType {
-  lobby: {
-    isConnected: boolean;
-    isConnecting: boolean;
-    error: string | null;
-    send: (methodName: string, ...args: any[]) => Promise<any>;
-    on: (eventName: string, handler: (...args: any[]) => void) => void;
-    off: (eventName: string) => void;
-  };
-  game: {
-    isConnected: boolean;
-    isConnecting: boolean;
-    error: string | null;
-    send: (methodName: string, ...args: any[]) => Promise<any>;
-    on: (eventName: string, handler: (...args: any[]) => void) => void;
-    off: (eventName: string) => void;
-  };
+  lobby: SignalRConnection;
+  game: SignalRConnection;
 }
 
 const SignalRContext = createContext<SignalRContextType | null>(null);

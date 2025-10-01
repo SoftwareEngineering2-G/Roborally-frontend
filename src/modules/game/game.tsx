@@ -2,42 +2,27 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { CardProgramming } from "./CardProgramming";
-import { GameHostControls } from "./GameHostControls";
-import { useGetCurrentGameStateQuery } from "@/redux/api/game/gameApi";
-import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import { setGameState, setGameLoading, setGameError } from "@/redux/game/gameSlice";
+import { useGameState } from "./hooks/useGameState";
+import { useGameSignalR } from "./ProgrammingPhase/hooks/useGameSignalR";
+
+// Phase components
+import { ProgrammingPhase } from "./ProgrammingPhase";
+import { ActivationPhase } from "./ActivationPhase";
+
+// Shared components
+import { GameHostControls } from "./components/GameHostControls";
 
 interface Props {
   gameId: string;
-  isHost: boolean;
 }
 
-export default function Game({ gameId, isHost }: Props) {
+export default function Game({ gameId }: Props) {
   const router = useRouter();
-  const dispatch = useAppDispatch();
   const [username, setUsername] = useState<string | null>(null);
+  const [cardsDealt, setCardsDealt] = useState(false);
 
-  // Get game state from Redux
-  const { currentGame, isLoading: gameStateLoading, error: gameStateError } = useAppSelector(state => state.game);
-
-  // Fetch game state from API and save to Redux
-  const { 
-    data: apiGameState, 
-    error: apiError, 
-    isLoading: isApiLoading 
-  } = useGetCurrentGameStateQuery({ gameId });
-
-  // Handle API response and save to Redux
-  useEffect(() => {
-    if (isApiLoading) {
-      dispatch(setGameLoading(true));
-    } else if (apiError) {
-      dispatch(setGameError(apiError instanceof Error ? apiError.message : "Failed to load game state"));
-    } else if (apiGameState) {
-      dispatch(setGameState(apiGameState));
-    }
-  }, [apiGameState, apiError, isApiLoading, dispatch]);
+  // Use the new unified game state hook
+  const { gameState, isLoading, error } = useGameState(gameId);
 
   // Get username from localStorage
   useEffect(() => {
@@ -49,10 +34,38 @@ export default function Game({ gameId, isHost }: Props) {
     setUsername(storedUsername);
   }, [router]);
 
+  // Determine if current user is the host
+  const isHost = gameState?.hostUsername === username;
+
+  // Setup SignalR connection for the host to listen to game events
+  const signalR = useGameSignalR(gameId, username || "");
+
+  // Listen for card dealing events to sync the cardsDealt state
+  useEffect(() => {
+    if (!signalR.isConnected || !isHost) return;
+
+    const handlePlayerCardsDealt = (...args: unknown[]) => {
+      const data = args[0] as { gameId: string };
+      console.log("Host: Cards dealt event received:", data);
+      if (data.gameId === gameId) {
+        setCardsDealt(true);
+      }
+    };
+
+    signalR.on("PlayerCardsDealt", handlePlayerCardsDealt);
+
+    return () => {
+      signalR.off("PlayerCardsDealt");
+    };
+  }, [signalR.isConnected, isHost, gameId, signalR]);
+
+  console.log("Game state:", gameState);
+  console.log("Current username:", username);
+  console.log("Host username:", gameState?.hostUsername);
   console.log("Is host:", isHost);
   
   // Don't render until we have username and game state
-  if (!username || gameStateLoading) {
+  if (!username || isLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
@@ -66,13 +79,13 @@ export default function Game({ gameId, isHost }: Props) {
   }
 
   // Handle game state error
-  if (gameStateError) {
+  if (error) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <div className="text-red-500 mb-4">Failed to load game state</div>
           <p className="text-muted-foreground">
-            {typeof gameStateError === 'string' ? gameStateError : "Unknown error occurred"}
+            {typeof error === 'string' ? error : "Unknown error occurred"}
           </p>
           <button 
             onClick={() => window.location.reload()} 
@@ -86,7 +99,7 @@ export default function Game({ gameId, isHost }: Props) {
   }
 
   // Don't render if we don't have game state
-  if (!currentGame) {
+  if (!gameState) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
@@ -97,14 +110,48 @@ export default function Game({ gameId, isHost }: Props) {
     );
   }
 
-  console.log("Game state loaded from Redux:", currentGame);
-  
+  // Render appropriate phase based on game state
+  const renderPhase = () => {
+    switch (gameState.currentPhase) {
+      case "ProgrammingPhase":
+        return (
+          <ProgrammingPhase 
+            gameId={gameId}
+            username={username}
+          />
+        );
+      case "ActivationPhase":
+        return <ActivationPhase />;
+      default:
+        return (
+          <div className="min-h-screen bg-background flex items-center justify-center">
+            <div className="text-center">
+              <div className="text-red-500 mb-4">Unknown game phase</div>
+              <p className="text-muted-foreground">
+                Phase: {gameState.currentPhase}
+              </p>
+            </div>
+          </div>
+        );
+    }
+  };
+
   return (
-    <CardProgramming 
-      gameId={gameId}
-      username={username}
-      gameState={currentGame}
-      hostControls={isHost ? <GameHostControls gameId={gameId} gameState={currentGame} /> : undefined}
-    />
+    <div className="relative min-h-screen">
+      {/* Host Controls - Always visible to host regardless of phase */}
+      {isHost && (
+        <div className="fixed top-4 right-4" style={{ zIndex: 10000 }}>
+          <GameHostControls 
+            gameId={gameId} 
+            gameState={gameState} 
+            cardsDealt={cardsDealt}
+            onCardsDealt={() => setCardsDealt(true)}
+          />
+        </div>
+      )}
+      
+      {/* Phase-specific content */}
+      {renderPhase()}
+    </div>
   );
 }

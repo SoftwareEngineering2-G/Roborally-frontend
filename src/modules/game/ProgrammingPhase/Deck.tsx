@@ -1,7 +1,7 @@
 "use client";
 
+import React from "react";
 import { Card } from "@/components/ui/card";
-import { ProgramCard } from "./types";
 
 interface DeckProps {
   remainingCards: number;

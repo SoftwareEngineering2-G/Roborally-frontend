@@ -7,7 +7,6 @@ import {
   useGetPublicLobbiesQuery,
   useJoinLobbyMutation,
 } from "@/redux/api/lobby/lobbyApi";
-import { useAppDispatch } from "@/redux/hooks";
 
 import {
   Card,
@@ -30,7 +29,6 @@ interface Props {
 
 export default function PublicLobbies({ username }: Props) {
   const router = useRouter();
-  const dispatch = useAppDispatch();
 
   const {
     data: publicLobbies = [],
@@ -39,7 +37,7 @@ export default function PublicLobbies({ username }: Props) {
     refetch,
   } = useGetPublicLobbiesQuery();
 
-  const [joinLobby, { isLoading: joining, isSuccess: joinSuccess, data }] =
+  const [joinLobby, { isLoading: joining, isSuccess: joinSuccess }] =
     useJoinLobbyMutation();
   const [joiningLobbyId, setJoiningLobbyId] = useState<string | null>(null);
   const [successfulLobby, setSuccessfulLobby] = useState<Lobby | null>(null);

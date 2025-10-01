@@ -9,12 +9,15 @@ interface Player {
 
 interface CurrentGame {
   gameId: string;
+  hostUsername: string;
+  name: string;
   players: Player[];
   currentPhase: "ProgrammingPhase" | "ActivationPhase";
 }
 
 interface Room {
-    // Empty to fix issue
+    id?: string;
+    name?: string;
 }
 
 interface GameState {

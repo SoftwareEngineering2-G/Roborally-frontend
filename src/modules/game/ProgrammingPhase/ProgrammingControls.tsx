@@ -4,11 +4,10 @@ import { forwardRef, useRef, useImperativeHandle } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Eye, EyeOff } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { Eye, EyeOff, Lock } from "lucide-react";
 import { RegisterSlotComponent } from "./RegisterSlot";
 import { ProgramCardComponent } from "./ProgramCard";
-import { ProgramCard, RegisterSlot, ProgrammingPhaseState } from "./types";
+import { ProgramCard, ProgrammingPhaseState } from "./types";
 
 export interface ProgrammingControlsRef {
   getPlaceholderElements: () => (HTMLElement | null)[];
@@ -23,16 +22,19 @@ interface ProgrammingControlsProps {
     handleCardSelect: (card: ProgramCard) => void;
     handleDragStart: (card: ProgramCard) => void;
     handleDragEnd: () => void;
+    handleUploadProgram: () => void; // Lock in the programmed registers
   };
   showControls: boolean;
   onToggleControls: () => void;
   filledCount: number;
+  programComplete: boolean;
+  isSubmitting: boolean;
 }
 
 export const ProgrammingControls = forwardRef<
   ProgrammingControlsRef,
   ProgrammingControlsProps
->(({ state, handlers, showControls, onToggleControls, filledCount }, ref) => {
+>(function ProgrammingControls({ state, handlers, showControls, onToggleControls, filledCount, programComplete, isSubmitting }, ref) {
   // Create refs for all 9 slots (both cards and placeholders)
   const slotRefs = useRef<(HTMLElement | null)[]>(new Array(9).fill(null));
 
@@ -152,6 +154,41 @@ export const ProgrammingControls = forwardRef<
                     </div>
                   ))}
                 </div>
+                
+                {/* Lock In Program Section */}
+                {programComplete && (
+                  <div className="mt-6 pt-4 border-t border-neon-teal/20">
+                    <div className="flex flex-col items-center gap-3">
+                      <div className="text-center">
+                        <p className="text-sm font-medium text-neon-teal">
+                          Program Complete!
+                        </p>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          Ready to lock in your sequence
+                        </p>
+                      </div>
+                      <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5, ease: "easeOut" }}
+                      >
+                        <Button
+                          className="relative bg-gradient-to-r from-amber-600 via-orange-600 to-red-600 hover:from-amber-500 hover:via-orange-500 hover:to-red-500 text-white font-semibold shadow-lg hover:shadow-amber-500/30 border border-amber-400/40 transition-all duration-300 hover:scale-105 hover:shadow-xl px-6 py-2.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                          onClick={handlers.handleUploadProgram}
+                          disabled={isSubmitting}
+                          size="lg"
+                        >
+                          <div className="flex items-center gap-2">
+                            <Lock className={`w-4 h-4 ${isSubmitting ? 'animate-spin' : ''}`} />
+                            <span>{isSubmitting ? 'Locking In...' : 'Lock In Program'}</span>
+                          </div>
+                          {/* Subtle glow effect */}
+                          <div className="absolute inset-0 bg-gradient-to-r from-amber-400/20 to-red-400/20 rounded-md blur-sm -z-10 animate-pulse" />
+                        </Button>
+                      </motion.div>
+                    </div>
+                  </div>
+                )}
               </Card>
 
               {/* Hand Cards - Floating panel */}
@@ -197,6 +234,7 @@ export const ProgrammingControls = forwardRef<
                               slotRefs.current[index] = el;
                             }}
                             className="w-16 h-24 rounded-lg border-2 border-dashed border-muted-foreground/20 bg-surface-dark/20 backdrop-blur-sm flex items-center justify-center"
+                            data-hand-placeholder
                           >
                             <div className="text-xs text-muted-foreground/40">
                               {index + 1}
