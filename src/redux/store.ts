@@ -1,6 +1,6 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { baseApi } from "./api/baseApi";
-import gameReducer from "./game/gameSlice";
+import gameReducer from "@/redux/api/game/gameSlice";
 import lobbyReducer from "./lobby/lobbySlice";
 
 export const store = configureStore({

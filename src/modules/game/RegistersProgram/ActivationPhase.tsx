@@ -20,7 +20,7 @@ export const ActivationPhase = ({ registers }: ActivationPhaseProps) => {
       className="flex flex-col items-center justify-center min-h-full p-4"
     >
       {/* Board takes center stage */}
-      <GameBoard className="max-w-4xl w-full" />
+      {/*<GameBoard className="max-w-4xl w-full" />*/}
 
       {/* Compact registers display at bottom */}
       <motion.div

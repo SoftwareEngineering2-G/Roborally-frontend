@@ -61,9 +61,9 @@ export const ProgrammingPhase = ({
       className="relative min-h-full"
     >
       {/* Central Board with extensive view */}
-      <div className="flex items-center justify-center min-h-[calc(100vh-5rem)] p-4">
-        <GameBoard className="max-w-5xl w-full" />
-      </div>
+      {/*<div className="flex items-center justify-center min-h-[calc(100vh-5rem)] p-4">*/}
+      {/*  <GameBoard className="max-w-5xl w-full" />*/}
+      {/*</div>*/}
       {/* Programming Controls */}
       <ProgrammingControls
         ref={programmingControlsRef}
