@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import React, { useMemo } from "react";
 import { motion } from "framer-motion";
 
 // API tile can be object { name: ... }, plain string, null, etc.
@@ -55,18 +55,17 @@ function getSpaceName(tile: GameBoardSpace): string {
 /** Normalize names to stable keys, e.g. "Spawn Point_1" -> "spawnpoint". */
 function normalize(name: string): string {
     return name
-        .normalize("NFKD")                // split accents
-        .replace(/[\u0300-\u036f]/g, "")  // remove diacritics
+        .normalize("NFKD")
+        .replace(/[\u0300-\u036f]/g, "")
         .toLowerCase()
-        .replace(/[\s_\-]+/g, "")         // remove spaces/underscores/hyphens
-        .replace(/\d+/g, "");             // strip digits (SpawnPoint1 -> spawnpoint)
+        .replace(/[\s_\-]+/g, "")
+        .replace(/\d+/g, "");
 }
 
 /** Map a normalized name to an image path (extend as you add assets). */
 function getTileImagePath(name: string): string {
     const key = normalize(name);
 
-    // Central registry. Keep it small here; expand in your project.
     const map: Record<string, string> = {
         emptyspace: "/spaces/EmptySpace.png",
         spawnpoint: "/spaces/SpawnPoint.png",
@@ -132,10 +131,15 @@ export const GameBoard = ({ gameBoard, className = "", showCoords = false }: Gam
 
                 <div className="relative mx-auto">
                     <div
+                        id="board-frame" // optional: an id for the outer frame
                         className="mx-auto bg-surface-dark p-1 md:p-2 rounded-lg border-2 border-neon-teal shadow-glow-teal"
                         style={boardStyle}
                     >
-                        <div className="grid gap-[2px] md:gap-1 w-full h-full" style={gridStyle}>
+                        <div
+                            id="board-grid" // optional: an id for the grid container
+                            className="grid gap-[2px] md:gap-1 w-full h-full"
+                            style={gridStyle}
+                        >
                             {Array.from({ length: rows }).map((_, y) =>
                                 Array.from({ length: cols }).map((__, x) => {
                                     const tile = gameBoard.space[y][x];
@@ -145,6 +149,10 @@ export const GameBoard = ({ gameBoard, className = "", showCoords = false }: Gam
                                     return (
                                         <motion.div
                                             key={`${x}-${y}`}
+                                            id={`cell-${x}-${y}`}          // 👈 unique DOM id per cell
+                                            data-x={x}                     // 👈 extra metadata
+                                            data-y={y}
+                                            data-name={spaceName}
                                             className="relative rounded-[2px] md:rounded-sm overflow-hidden"
                                         >
                                             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -153,7 +161,6 @@ export const GameBoard = ({ gameBoard, className = "", showCoords = false }: Gam
                                                 alt={spaceName}
                                                 className="w-full h-full object-cover select-none pointer-events-none"
                                                 onError={(e) => {
-                                                    // If the asset is missing, fail over to EmptySpace.
                                                     (e.currentTarget as HTMLImageElement).src = "/spaces/EmptySpace.png";
                                                 }}
                                                 loading="lazy"
@@ -161,7 +168,11 @@ export const GameBoard = ({ gameBoard, className = "", showCoords = false }: Gam
                                                 draggable={false}
                                             />
 
-
+                                            {showCoords && (
+                                                <div className="absolute inset-0 flex items-start justify-start p-1 text-[10px] md:text-xs bg-black/10 text-white/90">
+                                                    {x},{y} • {spaceName}
+                                                </div>
+                                            )}
                                         </motion.div>
                                     );
                                 })
@@ -173,3 +184,4 @@ export const GameBoard = ({ gameBoard, className = "", showCoords = false }: Gam
         </motion.div>
     );
 };
+export default GameBoard;
