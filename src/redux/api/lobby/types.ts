@@ -37,3 +37,8 @@ export interface GetLobbyInfoResponse {
   joinedUsernames: string[];
   hostUsername: string;
 }
+
+export interface StartGameRequest {
+  gameId: string;
+  username: string;
+}

@@ -1,0 +1,35 @@
+<svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="selectedStartGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FEF3C7;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#FCD34D;stop-opacity:1" />
+    </linearGradient>
+    <filter id="selectedStartShadow">
+      <feDropShadow dx="3" dy="3" stdDeviation="3" flood-color:#F59E0B" flood-opacity="0.6"/>
+    </filter>
+    <filter id="selectedPulse">
+      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+      <feMerge> 
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Main cell background -->
+  <rect width="60" height="60" x="2" y="2" fill="url(#selectedStartGradient)" stroke="#F59E0B" stroke-width="4" rx="4" filter="url(#selectedStartShadow)"/>
+  
+  <!-- Selection indicator -->
+  <circle cx="32" cy="32" r="12" fill="#F59E0B" opacity="0.3" filter="url(#selectedPulse)"/>
+  <circle cx="32" cy="32" r="8" fill="#F59E0B" opacity="0.7"/>
+  <circle cx="32" cy="32" r="4" fill="#FFFFFF"/>
+  
+  <!-- Checkmark indicator -->
+  <path d="M 26 32 L 30 36 L 38 28" stroke="#FFFFFF" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  
+  <!-- Corner selection markers -->
+  <polygon points="8,8 16,8 12,16" fill="#F59E0B"/>
+  <polygon points="56,8 48,8 52,16" fill="#F59E0B"/>
+  <polygon points="8,56 16,56 12,48" fill="#F59E0B"/>
+  <polygon points="56,56 48,56 52,48" fill="#F59E0B"/>
+</svg>

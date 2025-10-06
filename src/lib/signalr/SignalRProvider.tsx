@@ -59,12 +59,8 @@ export function SignalRProvider({
     }
   }, [initialized, autoConnect, connectionState]);
 
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      signalRConnection.cleanup();
-    };
-  }, []);
+  // Note: We don't cleanup on unmount since we want SignalR to persist
+  // across page navigation. Connection will be cleaned up when the app closes.
 
   const contextValue: SignalRContextType = {
     connectionState: connectionState.connectionState,

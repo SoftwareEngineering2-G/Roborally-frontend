@@ -2,12 +2,13 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { useGetLobbyInfoQuery } from "@/redux/api/lobby/lobbyApi";
+import { useGetLobbyInfoQuery, useStartGameMutation } from "@/redux/api/lobby/lobbyApi";
 import {
   LobbyLoadingSkeleton,
   LobbyErrorState,
 } from "@/components/lobby/lobby-skeleton";
-import { useLobbySignalR, useSignalRConnection } from "@/hooks/signalr";
+import { useLobbySignalR } from "@/hooks/signalr";
+import { useSignalRContext } from "@/lib/signalr/SignalRProvider";
 import {
   UserJoinedLobbyEvent,
   UserLeftLobbyEvent,
@@ -39,8 +40,11 @@ export const Lobby = ({ gameId }: Props) => {
   const [currentPlayerReady, setCurrentPlayerReady] = useState(true); // Default to ready
   const [realtimePlayers, setRealtimePlayers] = useState<Player[]>([]);
 
-  // SignalR connection status
-  const signalRConnection = useSignalRConnection();
+  // Get SignalR connection from context
+  const signalRConnection = useSignalRContext();
+
+  // Start game mutation
+  const [startGameMutation, { isLoading: isStartingGame }] = useStartGameMutation();
 
   // Get username from localStorage on mount
   useEffect(() => {
@@ -278,7 +282,36 @@ export const Lobby = ({ gameId }: Props) => {
       return;
     }
 
-    // TODO: Implement start game via here....
+    // Call backend API to start the game
+    try {
+      await startGameMutation({
+        gameId: gameId,
+        username: user.username
+      });
+      
+      toast.success("Battle commencing!", {
+        description: `Game started by ${user.username}`,
+      });
+      
+      // Navigation will happen via SignalR GameStartedEvent
+    } catch (error: any) {
+      console.error("Start game error:", error);
+      
+      let errorMessage = "There was an error starting the game. Please try again.";
+      
+      // Try to extract more specific error information
+      if (error?.data?.message) {
+        errorMessage = error.data.message;
+      } else if (error?.data?.title) {
+        errorMessage = error.data.title;
+      } else if (error?.message) {
+        errorMessage = error.message;
+      }
+      
+      toast.error("Failed to start game", {
+        description: errorMessage,
+      });
+    }
   };
 
   const copyRoomKey = () => {
@@ -337,6 +370,7 @@ export const Lobby = ({ gameId }: Props) => {
               allPlayersReady={allPlayersReady}
               isPrivate={isPrivate}
               gameId={lobbyData.gameId}
+              isStartingGame={isStartingGame}
               onToggleReady={handleToggleReady}
               onStartGame={handleStartGame}
               onCopyRoomKey={copyRoomKey}

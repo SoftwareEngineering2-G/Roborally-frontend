@@ -25,6 +25,7 @@ interface GameControlsProps {
   allPlayersReady: boolean;
   isPrivate: boolean;
   gameId: string;
+  isStartingGame?: boolean;
   onToggleReady: () => void;
   onStartGame: () => void;
   onCopyRoomKey: () => void;
@@ -38,6 +39,7 @@ export const GameControls = ({
   allPlayersReady,
   isPrivate,
   gameId,
+  isStartingGame = false,
   onToggleReady,
   onStartGame,
   onCopyRoomKey,
@@ -80,11 +82,11 @@ export const GameControls = ({
             <>
               <Button
                 onClick={onStartGame}
-                disabled={!canStart}
+                disabled={!canStart || isStartingGame}
                 className="w-full"
               >
                 <Play className="w-4 h-4 mr-2" />
-                Start Game
+                {isStartingGame ? "Starting Game..." : "Start Game"}
               </Button>
 
               {!allPlayersReady && players.length >= 2 && (
