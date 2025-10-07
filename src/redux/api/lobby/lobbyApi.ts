@@ -14,12 +14,14 @@ export const lobbyApi = baseApi.injectEndpoints({
     getPublicLobbies: builder.query<Lobby[], void>({
       query: () => ({ url: "/game-lobbies", method: "GET" }),
       transformResponse: (response: any) => {
-        return response.publicLobbies.map((lobby: any) => ({
-          gameId: lobby.gameId,
-          gameRoomName: lobby.name,
-          hostUsername: lobby.hostUsername,
-          currentAmountOfPlayers: lobby.joinedUsers.length,
-        }));
+        return Array.isArray(response?.publicLobbies)
+          ? response.publicLobbies.map((lobby: any) => ({
+              gameId: lobby.gameId,
+              gameRoomName: lobby.name,
+              hostUsername: lobby.hostUsername,
+              currentAmountOfPlayers: lobby.joinedUsers.length,
+            }))
+          : [];
       },
       providesTags: ["Lobby"],
     }),
