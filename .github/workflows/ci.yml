@@ -1,4 +1,4 @@
-name: RoboRally Frontend CI
+name: RoboRally-Frontend-CI-Test
 
 on:
   push:
