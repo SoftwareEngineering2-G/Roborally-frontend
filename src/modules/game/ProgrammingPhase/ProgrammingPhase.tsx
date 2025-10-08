@@ -29,7 +29,7 @@ interface ProgrammingPhaseProps {
   username: string;
 }
 
-export const ProgrammingPhase = ({ gameId, username }: ProgrammingPhaseProps) => {
+export const ProgrammingPhase = ({ gameId, username ,gameBoard}: ProgrammingPhaseProps) => {
   const [showProgrammingControls, setShowProgrammingControls] = useState(true);
   const dispatch = useAppDispatch();
   
@@ -158,7 +158,9 @@ export const ProgrammingPhase = ({ gameId, username }: ProgrammingPhaseProps) =>
       <div className="w-full min-h-[calc(100vh-5rem)] flex">
         {/* Left side - Game Board */}
         <div className="flex-1 flex items-center justify-center p-4">
-          <GameBoard className="max-w-2xl w-full" />
+          <GameBoard
+              gameBoard={gameBoard}
+              className="max-w-2xl w-full" />
         </div>
         
         {/* Right side - Player Information */}

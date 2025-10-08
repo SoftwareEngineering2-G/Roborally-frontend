@@ -118,6 +118,7 @@ export default function Game({ gameId }: Props) {
           <ProgrammingPhase 
             gameId={gameId}
             username={username}
+            gameBoard={gameState?.gameBoard}
           />
         );
       case "ActivationPhase":
