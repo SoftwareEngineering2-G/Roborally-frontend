@@ -68,7 +68,7 @@ export const GameBoard = ({ gameBoard, className }: GameBoardProps) => {
                                             onError={(e) => {
                                                 // fallback to EmptySpace if missing image
                                                 const target = e.target as HTMLImageElement;
-                                                target.src = "/tiles/EmptySpace.png";
+                                                target.src = "/spaces/EmptySpace.png";
                                             }}
                                         />
                                     </motion.div>
