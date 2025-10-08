@@ -9,7 +9,7 @@ interface Space {
 
 interface GameBoardData {
     name: string;
-    space: Space[][];
+    spaces: Space[][];
 }
 
 interface GameBoardProps {
@@ -18,7 +18,7 @@ interface GameBoardProps {
 }
 
 export const GameBoard = ({ gameBoard, className }: GameBoardProps) => {
-    if (!gameBoard || !gameBoard.space) {
+    if (!gameBoard || !gameBoard.spaces) {
         return (
             <div className="text-center text-muted-foreground py-10">
                 No game board data.
@@ -26,8 +26,8 @@ export const GameBoard = ({ gameBoard, className }: GameBoardProps) => {
         );
     }
 
-    const rows = gameBoard.space.length;
-    const cols = gameBoard.space[0]?.length ?? 0;
+    const rows = gameBoard.spaces.length;
+    const cols = gameBoard.spaces[0]?.length ?? 0;
 
     return (
         <motion.div
@@ -46,12 +46,13 @@ export const GameBoard = ({ gameBoard, className }: GameBoardProps) => {
                             aspectRatio: `${cols}/${rows}`,
                         }}
                     >
-                        {gameBoard.space.map((row, y) =>
+                        {gameBoard.spaces.map((row, y) =>
                             row.map((cell, x) => {
                                 const imageSrc = `/spaces/${cell.name}.png`; // e.g. /tiles/EmptySpace.png
 
                                 return (
                                     <motion.div
+                                        id={`space-${x}-${y}`}
                                         key={`${x}-${y}`}
                                         className="relative border border-glass-border rounded-sm overflow-hidden"
                                         // whileHover={{ scale: 1.05 }}
