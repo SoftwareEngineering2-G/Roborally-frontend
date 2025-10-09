@@ -5,6 +5,7 @@ interface Player {
   username: string;
   robot: string;
   hasLockedIn?: boolean;
+  programmedCards?: string[]; // Array of card names locked in by player
 }
 
 interface CurrentGame {
@@ -13,6 +14,7 @@ interface CurrentGame {
   name: string;
   players: Player[];
   currentPhase: "ProgrammingPhase" | "ActivationPhase";
+  currentRevealedRegister?: number; // Tracks which register is currently revealed (0-4)
 }
 
 interface Room {
@@ -61,12 +63,21 @@ const gameSlice = createSlice({
             state.error = action.payload;
             state.isLoading = false;
         },
-        playerLockedIn: (state, action: PayloadAction<{ username: string }>) => {
+        playerLockedIn: (state, action: PayloadAction<{ username: string; programmedCards?: string[] }>) => {
             if (state.currentGame) {
                 const player = state.currentGame.players.find(p => p.username === action.payload.username);
                 if (player) {
                     player.hasLockedIn = true;
+                    // Store the programmed cards if provided
+                    if (action.payload.programmedCards) {
+                        player.programmedCards = action.payload.programmedCards;
+                    }
                 }
+            }
+        },
+        setRevealedRegister: (state, action: PayloadAction<number>) => {
+            if (state.currentGame) {
+                state.currentGame.currentRevealedRegister = action.payload;
             }
         },
         resetGameState: (state) => {
@@ -83,6 +94,7 @@ export const {
     setGameLoading, 
     setGameError, 
     playerLockedIn, 
+    setRevealedRegister,
     resetGameState 
 } = gameSlice.actions;
 export default gameSlice.reducer;

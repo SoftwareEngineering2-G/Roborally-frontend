@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useGameState } from "./hooks/useGameState";
 import { useGameSignalR } from "./ProgrammingPhase/hooks/useGameSignalR";
+import { useGetCurrentGameStateQuery } from "@/redux/api/game/gameApi";
+import type { ActivationPhaseStartedEvent } from "@/types/signalr";
 
 // Phase components
 import { ProgrammingPhase } from "./ProgrammingPhase";
@@ -23,6 +25,9 @@ export default function Game({ gameId }: Props) {
 
   // Use the new unified game state hook
   const { gameState, isLoading, error } = useGameState(gameId);
+
+  // Get refetch function to manually refresh game state
+  const { refetch: refetchGameState } = useGetCurrentGameStateQuery({ gameId });
 
   // Get username from localStorage
   useEffect(() => {
@@ -58,6 +63,26 @@ export default function Game({ gameId }: Props) {
       signalR.off("PlayerCardsDealt");
     };
   }, [signalR.isConnected, isHost, gameId, signalR]);
+
+  // Listen for activation phase started event to refetch game state for all players
+  useEffect(() => {
+    if (!signalR.isConnected) return;
+
+    const handleActivationPhaseStarted = (...args: unknown[]) => {
+      const data = args[0] as ActivationPhaseStartedEvent;
+      console.log("Activation phase started event received:", data);
+      if (data.gameId === gameId) {
+        // Refetch game state to get updated currentPhase
+        refetchGameState();
+      }
+    };
+
+    signalR.on("ActivationPhaseStarted", handleActivationPhaseStarted);
+
+    return () => {
+      signalR.off("ActivationPhaseStarted");
+    };
+  }, [signalR.isConnected, gameId, signalR, refetchGameState]);
 
   console.log("Game state:", gameState);
   console.log("Current username:", username);
@@ -121,7 +146,7 @@ export default function Game({ gameId }: Props) {
           />
         );
       case "ActivationPhase":
-        return <ActivationPhase />;
+        return <ActivationPhase gameId={gameId} username={username} />;
       default:
         return (
           <div className="min-h-screen bg-background flex items-center justify-center">
