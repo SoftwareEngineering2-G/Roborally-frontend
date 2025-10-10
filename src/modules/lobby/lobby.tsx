@@ -119,7 +119,7 @@ export const Lobby = ({ gameId }: Props) => {
 
     try {
       // Only use REST API - backend will broadcast GameStarted event via SignalR
-      await startGame({ gameId: lobbyData.gameId, username });
+      await startGame({ gameId: lobbyData.gameId, username, gameBoardName: "Board With Walls" });
       toast.success("Starting game...");
     } catch (error) {
       console.error("Failed to start game:", error);

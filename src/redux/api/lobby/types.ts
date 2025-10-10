@@ -41,4 +41,5 @@ export interface GetLobbyInfoResponse {
 export interface StartGameRequest {
   gameId: string;
   username: string;
+  gameBoardName: string;
 }
