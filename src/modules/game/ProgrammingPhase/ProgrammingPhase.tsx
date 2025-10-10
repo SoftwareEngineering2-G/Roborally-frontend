@@ -43,7 +43,7 @@ export const ProgrammingPhase = ({ gameId, username ,gameBoard}: ProgrammingPhas
   const [showProgrammingControls, setShowProgrammingControls] = useState(true);
   const dispatch = useAppDispatch();
 
-  console.log(gameBoard)
+
   // Get game state from Redux
   const { currentGame } = useAppSelector(state => state.game);
   
