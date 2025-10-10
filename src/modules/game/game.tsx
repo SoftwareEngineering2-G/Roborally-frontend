@@ -122,7 +122,8 @@ export default function Game({ gameId }: Props) {
           />
         );
       case "ActivationPhase":
-        return <ActivationPhase />;
+        return <ActivationPhase
+        gameBoard={gameState?.gameBoard}/>;
       default:
         return (
           <div className="min-h-screen bg-background flex items-center justify-center">

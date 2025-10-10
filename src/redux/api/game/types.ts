@@ -22,6 +22,10 @@ export type GetCurrentGameStateResponse = {
     hasLockedIn?: boolean;
   }>;
   currentPhase: "ProgrammingPhase" | "ActivationPhase";
+    gameBoard: {
+        name: string;
+        spaces: { name: string }[][];
+    };
 };
 
 export type RegisterProgrammedRequest = {

@@ -24,15 +24,26 @@ import { useProgrammingPhase } from "./hooks";
 import { useCardDealing } from "./useCardDealing";
 import { useGameSignalR } from "./hooks/useGameSignalR";
 
+export type BoardSpace = {
+  name: string;
+};
+
+export type GameBoardModel = {
+  name: string;
+  spaces: BoardSpace[][]; // rows x cols
+};
+
 interface ProgrammingPhaseProps {
   gameId: string;
   username: string;
+  gameBoard: GameBoardModel;
 }
 
 export const ProgrammingPhase = ({ gameId, username ,gameBoard}: ProgrammingPhaseProps) => {
   const [showProgrammingControls, setShowProgrammingControls] = useState(true);
   const dispatch = useAppDispatch();
-  
+
+  console.log(gameBoard)
   // Get game state from Redux
   const { currentGame } = useAppSelector(state => state.game);
   

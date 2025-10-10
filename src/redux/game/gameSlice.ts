@@ -7,12 +7,23 @@ interface Player {
   hasLockedIn?: boolean;
 }
 
+export type BoardSpace = {
+    name: string;
+};
+
+export type GameBoardModel = {
+    name: string;
+    spaces: BoardSpace[][]; // rows x cols
+};
+
+
 interface CurrentGame {
   gameId: string;
   hostUsername: string;
   name: string;
   players: Player[];
   currentPhase: "ProgrammingPhase" | "ActivationPhase";
+  gameBoard: GameBoardModel;
 }
 
 interface Room {
