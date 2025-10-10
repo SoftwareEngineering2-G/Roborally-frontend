@@ -20,6 +20,7 @@ export type GetCurrentGameStateResponse = {
     username: string;
     robot: string;
     hasLockedIn?: boolean;
+    programmedCards?: string[]; // Array of card names locked in by player
   }>;
   currentPhase: "ProgrammingPhase" | "ActivationPhase";
     gameBoard: {
@@ -32,4 +33,17 @@ export type RegisterProgrammedRequest = {
   gameId: string;
   username: string;
   lockedCardsInOrder: string[];
+};
+
+export type RevealNextRegisterRequest = {
+  gameId: string;
+  username: string;
+};
+
+export type RevealNextRegisterResponse = {
+  registerNumber: number;
+  revealedCards: Array<{
+    username: string;
+    card: string;
+  }>;
 };

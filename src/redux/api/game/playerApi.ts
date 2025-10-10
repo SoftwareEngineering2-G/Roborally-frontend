@@ -18,4 +18,6 @@ export const playerApi = baseApi.injectEndpoints({
   }),
 });
 
-export const { useRegistersProgrammedMutation } = playerApi;
+export const { 
+  useRegistersProgrammedMutation
+} = playerApi;

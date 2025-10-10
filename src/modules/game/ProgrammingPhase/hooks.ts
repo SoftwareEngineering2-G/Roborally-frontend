@@ -1,5 +1,7 @@
 import { useState, useCallback } from "react";
 import { toast } from "sonner";
+import { useAppDispatch } from "@/redux/hooks";
+import { playerLockedIn } from "@/redux/game/gameSlice";
 import { useRegistersProgrammedMutation } from "@/redux/api/game/playerApi";
 import type { ProgramCard, RegisterSlot, ProgrammingPhaseState } from "./types";
 
@@ -9,6 +11,8 @@ export const useProgrammingPhase = (
   gameId: string,
   username: string
 ) => {
+  const dispatch = useAppDispatch();
+  
   const [state, setState] = useState<ProgrammingPhaseState>({
     hand: initialHand,
     registers: initialRegisters,
@@ -165,6 +169,12 @@ export const useProgrammingPhase = (
         lockedCardsInOrder,
       }).unwrap();
 
+      // Store locally in Redux for immediate display
+      dispatch(playerLockedIn({ 
+        username, 
+        programmedCards: lockedCardsInOrder 
+      }));
+
       toast.success("Program locked in successfully!");
       return true;
     } catch (error) {
@@ -172,7 +182,7 @@ export const useProgrammingPhase = (
       toast.error("Failed to lock in program. Please try again.");
       return false;
     }
-  }, [state.registers, gameId, username, registersProgrammed, isSubmitting]);
+  }, [state.registers, gameId, username, registersProgrammed, isSubmitting, dispatch]);
 
   // Set hand (for dealing cards)
   const handleSetHand = useCallback((newHand: ProgramCard[]) => {
