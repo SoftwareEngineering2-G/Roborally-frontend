@@ -1,4 +1,5 @@
 "use client";
+
 import { motion } from "framer-motion";
 import type { GameBoard as GameBoardType } from "@/models/gameModels";
 import Image from "next/image";
@@ -12,8 +13,7 @@ export const GameBoard = ({
   className = "",
   gameBoardData,
 }: GameBoardProps) => {
-  // Create a 10x10 grid - access the spaces array from the GameBoard type
-  const gridSize = gameBoardData.spaces.length;
+    const gridSize = gameBoardData.spaces.length;
   const cells = Array.from({ length: gridSize * gridSize }, (_, index) => ({
     id: index,
     walls:
@@ -22,6 +22,8 @@ export const GameBoard = ({
     name: gameBoardData.spaces[Math.floor(index / gridSize)][index % gridSize]
       .name,
   }));
+
+  const axisLabels = Array.from({ length: gridSize }, (_, idx) => idx);
 
   return (
     <motion.div
@@ -69,6 +71,24 @@ export const GameBoard = ({
           </div>
 
           {/* Board Labels */}
+          <div className="absolute -bottom-8 left-0 right-0 flex justify-between text-sm text-neon-teal px-2">
+              {axisLabels.map((label) => (
+                  <span key={`column-${label}`} className="w-8 text-center font-mono">
+                      {label}
+                  </span>
+              ))}
+          </div>
+
+          <div className="absolute top-0 bottom-0 -left-8 flex flex-col justify-between text-sm text-neon-teal py-2">
+              {axisLabels.map((label) => (
+                  <span
+                      key={`row-${label}`}
+                      className="h-8 flex items-center justify-center font-mono"
+                  >
+                      {label}
+                  </span>
+              ))}
+          </div>
         </div>
       </div>
     </motion.div>
