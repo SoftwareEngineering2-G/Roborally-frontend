@@ -21,3 +21,21 @@ export interface PlayerCardsDealtEvent {
   username: string;
   dealtCards: string[]; // List of card names as strings
 }
+
+export interface ActivationPhaseStartedEvent {
+  gameId: string; // Guid from C# backend
+}
+
+export interface PlayerLockedInRegisterEvent {
+  username: string;
+  lockedCardsInOrder?: string[]; // Optional array of card names
+}
+
+export interface RegisterRevealedEvent {
+  gameId: string;
+  registerNumber: number;
+  revealedCards: Array<{
+    username: string;
+    card: string;
+  }>;
+}
