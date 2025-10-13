@@ -160,7 +160,6 @@ export const useProgrammingPhase = (
         .map((register) => register.card?.name || "")
         .filter(Boolean); // Remove any empty slots
 
-      console.log("Locking in program:", lockedCardsInOrder);
 
       // Send to backend
       await registersProgrammed({

@@ -60,8 +60,6 @@ function LobbyComponent({ gameId, username }) {
   useEffect(() => {
     if (!signalR.isConnected) return;
 
-    signalR.on("UserJoinedLobby", (data) => console.log("User joined:", data));
-    signalR.on("UserLeftLobby", (data) => console.log("User left:", data));
     signalR.on("GameStarted", (data) => {
       console.log("Game started:", data);
       router.push(`/game/${data.gameId}`);

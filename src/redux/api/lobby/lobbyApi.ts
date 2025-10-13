@@ -43,11 +43,12 @@ export const lobbyApi = baseApi.injectEndpoints({
     }),
 
     startGame: builder.mutation<void, StartGameRequest>({
-      query: ({ gameId, username }) => ({
+      query: ({ gameId, username, gameBoardName }) => ({
         url: `/game-lobbies/${gameId}/start`,
         method: "POST",
         body: {
           username,
+          gameBoardName,
         },
       }),
     }),

@@ -9,7 +9,6 @@ export const useGameSignalR = (gameId: string, username: string) => {
   // Join game when connected
   useEffect(() => {
     if (signalR.isConnected && gameId && username) {
-      console.log(`Joining game: ${gameId} as ${username}`);
       signalR.send("JoinGame", username, gameId).catch((err) => {
         console.error("Failed to join game:", err);
       });
@@ -20,7 +19,6 @@ export const useGameSignalR = (gameId: string, username: string) => {
   useEffect(() => {
     return () => {
       if (gameId && username && signalR.isConnected) {
-        console.log(`Leaving game: ${gameId} as ${username}`);
         signalR.send("LeaveGame", username, gameId).catch((err) => {
           console.error("Failed to leave game:", err);
         });

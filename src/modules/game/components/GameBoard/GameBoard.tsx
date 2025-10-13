@@ -1,83 +1,76 @@
 "use client";
-
-import Image from "next/image";
 import { motion } from "framer-motion";
-
-interface Space {
-    name: string; // e.g. "EmptySpace", "SpawnPoint"
-}
-
-interface GameBoardData {
-    name: string;
-    spaces: Space[][];
-}
+import type { GameBoard as GameBoardType } from "@/models/gameModels";
+import Image from "next/image";
 
 interface GameBoardProps {
-    gameBoard: GameBoardData;
-    className?: string;
+  className?: string;
+  gameBoardData: GameBoardType;
 }
 
-export const GameBoard = ({ gameBoard, className }: GameBoardProps) => {
-    if (!gameBoard || !gameBoard.spaces) {
-        return (
-            <div className="text-center text-muted-foreground py-10">
-                No game board data.
-            </div>
-        );
-    }
+export const GameBoard = ({
+  className = "",
+  gameBoardData,
+}: GameBoardProps) => {
+  // Create a 10x10 grid - access the spaces array from the GameBoard type
+  const gridSize = gameBoardData.spaces.length;
+  const cells = Array.from({ length: gridSize * gridSize }, (_, index) => ({
+    id: index,
+    walls:
+      gameBoardData.spaces[Math.floor(index / gridSize)][index % gridSize]
+        .walls,
+    name: gameBoardData.spaces[Math.floor(index / gridSize)][index % gridSize]
+      .name,
+  }));
 
-    const rows = gameBoard.spaces.length;
-    const cols = gameBoard.spaces[0]?.length ?? 0;
+  return (
+    <motion.div
+      className={`relative ${className}`}
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.3 }}
+    >
+      <div className="glass-panel p-6 rounded-lg border border-glass-border">
+        <div className="relative mx-auto" style={{ maxWidth: "600px" }}>
+          {/* Grid Container */}
+          <div
+            className="grid gap-1 bg-surface-dark p-2 rounded-lg border-2 border-neon-teal shadow-glow-teal"
+            style={{
+              gridTemplateColumns: `repeat(${gridSize}, 1fr)`,
+              aspectRatio: "1",
+            }}
+          >
+            {cells.map((cell) => (
+              <motion.div
+                key={cell.id}
+                className="relative bg-surface-medium border border-glass-border rounded-sm hover:bg-surface-light transition-colors duration-200 cursor-pointer"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                style={{ aspectRatio: "1" }}
+              >
+                {/* Walls */}
+                {cell.walls.includes("East") && (
+                  <span className="pointer-events-none absolute right-[-3px] translate-x-1/2 top-0.5 bottom-0.5 w-[5px] rounded-[4px] bg-[linear-gradient(135deg,hsl(var(--neon-teal)),hsl(var(--neon-blue)))] shadow-[0_0_16px_hsl(var(--neon-teal)_/_0.7)]" />
+                )}
 
-    return (
-        <motion.div
-            className={`relative ${className}`}
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.3 }}
-        >
-            <div className="glass-panel p-6 rounded-lg border border-glass-border">
-                <div className="relative mx-auto" style={{ maxWidth: "800px" }}>
-                    {/* Grid Container */}
-                    <div
-                        className="grid gap-1 bg-surface-dark p-2 rounded-lg border-2 border-neon-teal shadow-glow-teal"
-                        style={{
-                            gridTemplateColumns: `repeat(${cols}, 1fr)`,
-                            aspectRatio: `${cols}/${rows}`,
-                        }}
-                    >
-                        {gameBoard.spaces.map((row, y) =>
-                            row.map((cell, x) => {
-                                const imageSrc = `/spaces/${cell.name}.png`; // e.g. /tiles/EmptySpace.png
+                {cell.walls.includes("South") && (
+                  <span className="pointer-events-none absolute left-0.5 right-0.5 bottom-[-3px] translate-y-1/2 h-[4px] rounded-[4px] bg-[linear-gradient(135deg,hsl(var(--neon-teal)),hsl(var(--neon-blue)))] shadow-[0_0_16px_hsl(var(--neon-teal)_/_0.7)]" />
+                )}
 
-                                return (
-                                    <motion.div
-                                        id={`space-${x}-${y}`}
-                                        key={`${x}-${y}`}
-                                        className="relative border border-glass-border rounded-sm overflow-hidden"
-                                        // whileHover={{ scale: 1.05 }}
-                                        // whileTap={{ scale: 0.95 }}
-                                        style={{ aspectRatio: "1" }}
-                                    >
-                                        <Image
-                                            src={imageSrc}
-                                            alt={cell.name}
-                                            fill
-                                            sizes="100%"
-                                            className="object-cover"
-                                            onError={(e) => {
-                                                // fallback to EmptySpace if missing image
-                                                const target = e.target as HTMLImageElement;
-                                                target.src = "/spaces/EmptySpace.png";
-                                            }}
-                                        />
-                                    </motion.div>
-                                );
-                            })
-                        )}
-                    </div>
-                </div>
-            </div>
-        </motion.div>
-    );
+                <Image
+                  src={`/spaces/${cell.name}.png`}
+                  alt={cell.name}
+                  fill
+                  sizes="100%"
+                  className="object-cover"
+                />
+              </motion.div>
+            ))}
+          </div>
+
+          {/* Board Labels */}
+        </div>
+      </div>
+    </motion.div>
+  );
 };

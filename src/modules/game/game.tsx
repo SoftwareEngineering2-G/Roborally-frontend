@@ -4,7 +4,8 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useGameState } from "./hooks/useGameState";
 import { useGameSignalR } from "./ProgrammingPhase/hooks/useGameSignalR";
-import { useGetCurrentGameStateQuery } from "@/redux/api/game/gameApi";
+import { setCurrentPhase } from "@/redux/game/gameSlice";
+import { useAppDispatch } from "@/redux/hooks";
 import type { ActivationPhaseStartedEvent } from "@/types/signalr";
 
 // Phase components
@@ -20,16 +21,12 @@ interface Props {
 
 export default function Game({ gameId }: Props) {
   const router = useRouter();
+  const dispatch = useAppDispatch();
   const [username, setUsername] = useState<string | null>(null);
   const [cardsDealt, setCardsDealt] = useState(false);
 
-  // Use the new unified game state hook
   const { gameState, isLoading, error } = useGameState(gameId);
 
-  // Get refetch function to manually refresh game state
-  const { refetch: refetchGameState } = useGetCurrentGameStateQuery({ gameId });
-
-  // Get username from localStorage
   useEffect(() => {
     const storedUsername = localStorage.getItem("username");
     if (!storedUsername) {
@@ -39,7 +36,6 @@ export default function Game({ gameId }: Props) {
     setUsername(storedUsername);
   }, [router]);
 
-  // Determine if current user is the host
   const isHost = gameState?.hostUsername === username;
 
   // Setup SignalR connection for the host to listen to game events
@@ -51,7 +47,6 @@ export default function Game({ gameId }: Props) {
 
     const handlePlayerCardsDealt = (...args: unknown[]) => {
       const data = args[0] as { gameId: string };
-      console.log("Host: Cards dealt event received:", data);
       if (data.gameId === gameId) {
         setCardsDealt(true);
       }
@@ -64,16 +59,15 @@ export default function Game({ gameId }: Props) {
     };
   }, [signalR.isConnected, isHost, gameId, signalR]);
 
-  // Listen for activation phase started event to refetch game state for all players
+  // Listen for activation phase started event to update Redux directly
   useEffect(() => {
     if (!signalR.isConnected) return;
 
     const handleActivationPhaseStarted = (...args: unknown[]) => {
       const data = args[0] as ActivationPhaseStartedEvent;
-      console.log("Activation phase started event received:", data);
       if (data.gameId === gameId) {
-        // Refetch game state to get updated currentPhase
-        refetchGameState();
+        // Update Redux state directly instead of refetching
+        dispatch(setCurrentPhase("ActivationPhase"));
       }
     };
 
@@ -82,12 +76,7 @@ export default function Game({ gameId }: Props) {
     return () => {
       signalR.off("ActivationPhaseStarted");
     };
-  }, [signalR.isConnected, gameId, signalR, refetchGameState]);
-
-  console.log("Game state:", gameState);
-  console.log("Current username:", username);
-  console.log("Host username:", gameState?.hostUsername);
-  console.log("Is host:", isHost);
+  }, [signalR.isConnected, gameId, signalR, dispatch]);
   
   // Don't render until we have username and game state
   if (!username || isLoading) {
@@ -143,14 +132,14 @@ export default function Game({ gameId }: Props) {
           <ProgrammingPhase 
             gameId={gameId}
             username={username}
-            gameBoard={gameState?.gameBoard}
+            gameBoard={gameState.gameBoard}
           />
         );
       case "ActivationPhase":
         return <ActivationPhase
             gameId={gameId}
             username={username}
-            gameBoard={gameState?.gameBoard}
+            gameBoard={gameState.gameBoard}
         />;
       default:
         return (

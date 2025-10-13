@@ -1,47 +1,13 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-import { GetCurrentGameStateResponse } from '@/redux/api/game/types';
-
-interface Player {
-  username: string;
-  robot: string;
-  hasLockedIn?: boolean;
-  programmedCards?: string[]; // Array of card names locked in by player
-}
-
-export type BoardSpace = {
-    name: string;
-};
-
-export type GameBoardModel = {
-    name: string;
-    spaces: BoardSpace[][]; // rows x cols
-};
-
-
-interface CurrentGame {
-  gameId: string;
-  hostUsername: string;
-  name: string;
-  players: Player[];
-  currentPhase: "ProgrammingPhase" | "ActivationPhase";
-  currentRevealedRegister?: number; // Tracks which register is currently revealed (0-4)
-  gameBoard: GameBoardModel;
-}
-
-interface Room {
-    id?: string;
-    name?: string;
-}
+import { Game } from '@/models/gameModels';
 
 interface GameState {
-    currentRoom: Room | null;
-    currentGame: CurrentGame | null;
+    currentGame: Game | null;
     isLoading: boolean;
     error: string | null;
 }
 
 const initialState: GameState = { 
-    currentRoom: null,
     currentGame: null,
     isLoading: false,
     error: null,
@@ -51,12 +17,9 @@ const gameSlice = createSlice({
     name: "game",
     initialState,
     reducers: {
-        setCurrentRoom: (s, a: PayloadAction<Room | null>) => {
-            s.currentRoom = a.payload;
-        },
-        setGameState: (state, action: PayloadAction<GetCurrentGameStateResponse>) => {
-            // Transform API response to include hasLockedIn status for each player
-            // Backend may not provide hasLockedIn property, so we default to false
+        setGameState: (state, action: PayloadAction<Game>) => {
+            // Set the game state directly from the API response
+            // The Game type from gameModels is our single source of truth
             state.currentGame = {
                 ...action.payload,
                 players: action.payload.players.map(player => ({
@@ -91,6 +54,11 @@ const gameSlice = createSlice({
                 state.currentGame.currentRevealedRegister = action.payload;
             }
         },
+        setCurrentPhase: (state, action: PayloadAction<"ProgrammingPhase" | "ActivationPhase">) => {
+            if (state.currentGame) {
+                state.currentGame.currentPhase = action.payload;
+            }
+        },
         resetGameState: (state) => {
             state.currentGame = null;
             state.isLoading = false;
@@ -100,12 +68,12 @@ const gameSlice = createSlice({
 });
 
 export const { 
-    setCurrentRoom, 
     setGameState, 
     setGameLoading, 
     setGameError, 
     playerLockedIn, 
     setRevealedRegister,
+    setCurrentPhase,
     resetGameState
 } = gameSlice.actions;
 export default gameSlice.reducer;

@@ -15,7 +15,6 @@ export const useSignalR = (url: string) => {
       return;
     }
     
-    console.log(`Initializing SignalR connection to: ${url}`);
     
     // Create connection
     const backendBaseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5100";

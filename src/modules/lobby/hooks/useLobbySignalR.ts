@@ -14,7 +14,6 @@ export const useLobbySignalR = (gameId: string) => {
   // Join lobby automatically
   useEffect(() => {
     if (signalR.isConnected && gameId) {
-      console.log(`Joining lobby: ${gameId}`);
       signalR.send("JoinLobby", gameId).catch(() => {
         toast.error("Failed to join lobby");
       });
@@ -29,17 +28,14 @@ export const useLobbySignalR = (gameId: string) => {
     const handleUserJoined = (...args: unknown[]) => {
       const data = args[0] as { username: string };
       dispatch(userJoinedLobby({ username: data.username }));
-      toast.success(`${data.username} joined the lobby`);
     };
 
     const handleUserLeft = (...args: unknown[]) => {
       const data = args[0] as { username: string };
       dispatch(userLeftLobby({ username: data.username }));
-      toast.info(`${data.username} left the lobby`);
     };
 
     const handleGameStarted = () => {
-      toast.success("Game is starting!");
     };
 
     signalR.on("UserJoinedLobby", handleUserJoined);
@@ -58,7 +54,6 @@ export const useLobbySignalR = (gameId: string) => {
   useEffect(() => {
     return () => {
       if (gameId && signalR.isConnected) {
-        console.log(`Leaving lobby: ${gameId}`);
         signalR.send("LeaveLobby", gameId).catch((err) => {
           console.error("Failed to leave lobby:", err);
         });
