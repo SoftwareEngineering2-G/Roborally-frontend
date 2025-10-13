@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import type { PlayerLockedInRegisterEvent } from "@/types/signalr";
 
 // Shared components
-import { GameBoard } from "../components/GameBoard";
+import { GameBoard as GameBoardComponent } from "../components/GameBoard";
 import { PlayerInfoCard } from "../components/PlayerInfoCard";
 
 // Programming phase specific components
@@ -24,20 +24,12 @@ import { getFilledRegistersCount, isProgramComplete } from "./utils";
 import { useProgrammingPhase } from "./hooks";
 import { useCardDealing } from "./useCardDealing";
 import { useGameSignalR } from "./hooks/useGameSignalR";
-
-export type BoardSpace = {
-  name: string;
-};
-
-export type GameBoardModel = {
-  name: string;
-  spaces: BoardSpace[][]; // rows x cols
-};
+import type { GameBoard } from "@/models/gameModels";
 
 interface ProgrammingPhaseProps {
   gameId: string;
   username: string;
-  gameBoard: GameBoardModel;
+  gameBoard: GameBoard;
 }
 
 export const ProgrammingPhase = ({ gameId, username ,gameBoard}: ProgrammingPhaseProps) => {
@@ -73,7 +65,6 @@ export const ProgrammingPhase = ({ gameId, username ,gameBoard}: ProgrammingPhas
     // Listen for cards dealt event
     const handlePlayerCardsDealt = (...args: unknown[]) => {
       const data = args[0] as { username: string; gameId: string; dealtCards: string[] };
-      console.log("Cards dealt received:", data);
       
       // Only process if this event is for the current player
       if (data.username === username && data.gameId === gameId) {
@@ -89,14 +80,12 @@ export const ProgrammingPhase = ({ gameId, username ,gameBoard}: ProgrammingPhas
         
         if (deckElement && handElements.length > 0) {
           // Use the dealing animation system with actual cards from SignalR
-          console.log("Triggering card dealing animation with actual cards:", dealtCards);
           startDealing(deckElement, handElements, dealtCards, (animatedCards: ProgramCard[]) => {
             // The animation completes with the actual dealt cards
             handlers.handleSetHand(animatedCards);
           });
         } else {
           // Fallback: directly set cards if animation elements not found
-          console.log("Animation elements not found, setting cards directly");
           handlers.handleSetHand(dealtCards);
         }
         
@@ -120,7 +109,6 @@ export const ProgrammingPhase = ({ gameId, username ,gameBoard}: ProgrammingPhas
 
     const handlePlayerLockedInRegister = (...args: unknown[]) => {
       const data = args[0] as PlayerLockedInRegisterEvent;
-      console.log("Player locked in register:", data);
       
       // Update Redux state to mark player as locked in with their programmed cards
       dispatch(playerLockedIn({ 
@@ -130,7 +118,6 @@ export const ProgrammingPhase = ({ gameId, username ,gameBoard}: ProgrammingPhas
       
       // Show toast notification
       if (data.username === username) {
-        toast.success("Your program has been locked in!");
       } else {
         toast.info(`${data.username} has locked in their program`);
       }
@@ -173,8 +160,8 @@ export const ProgrammingPhase = ({ gameId, username ,gameBoard}: ProgrammingPhas
       <div className="w-full min-h-[calc(100vh-5rem)] flex">
         {/* Left side - Game Board */}
         <div className="flex-1 flex items-center justify-center p-4">
-          <GameBoard
-              gameBoard={gameBoard}
+          <GameBoardComponent
+              gameBoardData={gameBoard}
               className="max-w-2xl w-full" />
         </div>
         

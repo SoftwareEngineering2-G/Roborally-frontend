@@ -120,7 +120,6 @@ export const DealingAnimationOverlay = ({
   dealingCards,
   onCardDealt,
 }: DealingAnimationOverlayProps) => {
-  console.log("DealingAnimationOverlay render:", { dealingCards });
 
   return (
     <AnimatePresence>

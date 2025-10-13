@@ -3,28 +3,21 @@
 import { useEffect } from "react";
 import { motion } from "framer-motion";
 import { useAppSelector, useAppDispatch } from "@/redux/hooks";
-import { GameBoard } from "../components/GameBoard";
+import { GameBoard as GameBoardComponent } from "../components/GameBoard";
 import { PlayerProgramDisplay } from "./PlayerProgramDisplay";
 import { useGameSignalR } from "../ProgrammingPhase/hooks/useGameSignalR";
 import { setRevealedRegister } from "@/redux/game/gameSlice";
 import type { RegisterRevealedEvent } from "@/types/signalr";
 import { toast } from "sonner";
+import type { GameBoard } from "@/models/gameModels";
 
-
-export type BoardSpace = {
-    name: string;
-};
-export type GameBoardModel = {
-    name: string;
-    spaces: BoardSpace[][]; // rows x cols
-};
 interface ActivationPhaseProps {
   gameId: string;
   username: string;
-  gameBoard:GameBoardModel;
+  gameBoard: GameBoard;
 }
 
-export const ActivationPhase = ({ gameId, username,gameBoard }: ActivationPhaseProps) => {
+export const ActivationPhase = ({ gameId, username, gameBoard }: ActivationPhaseProps) => {
   const dispatch = useAppDispatch();
 
   // Get game state from Redux (programmedCards should be populated from backend or SignalR)
@@ -39,7 +32,6 @@ export const ActivationPhase = ({ gameId, username,gameBoard }: ActivationPhaseP
 
     const handleRegisterRevealed = (...args: unknown[]) => {
       const data = args[0] as RegisterRevealedEvent;
-      console.log("Register revealed event:", data);
 
       // Only process if this event is for the current game
       if (data.gameId !== gameId) return;
@@ -96,9 +88,9 @@ export const ActivationPhase = ({ gameId, username,gameBoard }: ActivationPhaseP
       <div className="w-full min-h-[calc(100vh-5rem)] flex">
         {/* Left side - Game Board */}
         <div className="flex-1 flex items-center justify-center p-4">
-          <GameBoard
+          <GameBoardComponent
               className="max-w-2xl w-full"
-              gameBoard={gameBoard}
+              gameBoardData={gameBoard}
           />
         </div>
 

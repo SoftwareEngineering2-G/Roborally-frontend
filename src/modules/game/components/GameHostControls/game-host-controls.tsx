@@ -4,12 +4,12 @@ import { Button } from "@/components/ui/button";
 import { useStartCardDealingForAllMutation, useStartActivationPhaseMutation, useRevealNextRegisterMutation } from "@/redux/api/game/gameApi";
 import { Crown, Play, Users, CheckCircle, Eye } from "lucide-react";
 import { toast } from "sonner";
-import type { GetCurrentGameStateResponse } from "@/redux/api/game/types";
+import type { Game } from "@/models/gameModels";
 import { useAppSelector } from "@/redux/hooks";
 
 interface GameHostControlsProps {
   gameId: string;
-  gameState: GetCurrentGameStateResponse;
+  gameState: Game;
   cardsDealt: boolean;
   onCardsDealt: () => void;
 }
@@ -37,7 +37,6 @@ export const GameHostControls = ({ gameId, gameState, cardsDealt, onCardsDealt }
     try {
       await startCardDealing({ gameId, username }).unwrap();
       onCardsDealt();
-      toast.success("Cards dealt to all players!");
     } catch (error) {
       toast.error("Failed to deal cards");
       console.error("Failed to start card dealing:", error);
@@ -47,7 +46,6 @@ export const GameHostControls = ({ gameId, gameState, cardsDealt, onCardsDealt }
   const handleStartActivationPhase = async () => {
     try {
       await startActivationPhase({ gameId, username }).unwrap();
-      toast.success("Activation phase started!");
     } catch (error) {
       toast.error("Failed to start activation phase");
       console.error("Failed to start activation phase:", error);
@@ -58,7 +56,6 @@ export const GameHostControls = ({ gameId, gameState, cardsDealt, onCardsDealt }
     try {
       await revealNextRegister({ gameId, username }).unwrap();
       const registerLabel = nextRegisterToReveal === 0 ? "first" : nextRegisterToReveal === 1 ? "second" : nextRegisterToReveal === 2 ? "third" : nextRegisterToReveal === 3 ? "fourth" : "fifth";
-      toast.success(`Revealed ${registerLabel} card for all players!`);
     } catch (error) {
       toast.error("Failed to reveal next register");
       console.error("Failed to reveal next register:", error);

@@ -1,4 +1,4 @@
-import type { Direction } from "@/types/game";
+import type { Direction } from "@/models/gameModels";
 
 export const mockGameBoardWithWalls: { Name: string; Walls: Direction[] }[][] = [
     [
