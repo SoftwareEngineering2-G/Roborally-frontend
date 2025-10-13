@@ -143,10 +143,15 @@ export default function Game({ gameId }: Props) {
           <ProgrammingPhase 
             gameId={gameId}
             username={username}
+            gameBoard={gameState?.gameBoard}
           />
         );
       case "ActivationPhase":
-        return <ActivationPhase gameId={gameId} username={username} />;
+        return <ActivationPhase
+            gameId={gameId}
+            username={username}
+            gameBoard={gameState?.gameBoard}
+        />;
       default:
         return (
           <div className="min-h-screen bg-background flex items-center justify-center">

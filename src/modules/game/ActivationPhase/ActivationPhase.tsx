@@ -10,17 +10,26 @@ import { setRevealedRegister } from "@/redux/game/gameSlice";
 import type { RegisterRevealedEvent } from "@/types/signalr";
 import { toast } from "sonner";
 
+
+export type BoardSpace = {
+    name: string;
+};
+export type GameBoardModel = {
+    name: string;
+    spaces: BoardSpace[][]; // rows x cols
+};
 interface ActivationPhaseProps {
   gameId: string;
   username: string;
+  gameBoard:GameBoardModel;
 }
 
-export const ActivationPhase = ({ gameId, username }: ActivationPhaseProps) => {
+export const ActivationPhase = ({ gameId, username,gameBoard }: ActivationPhaseProps) => {
   const dispatch = useAppDispatch();
-  
+
   // Get game state from Redux (programmedCards should be populated from backend or SignalR)
   const { currentGame } = useAppSelector(state => state.game);
-  
+
   // Setup SignalR connection for game events
   const signalR = useGameSignalR(gameId, username);
 
@@ -31,13 +40,13 @@ export const ActivationPhase = ({ gameId, username }: ActivationPhaseProps) => {
     const handleRegisterRevealed = (...args: unknown[]) => {
       const data = args[0] as RegisterRevealedEvent;
       console.log("Register revealed event:", data);
-      
+
       // Only process if this event is for the current game
       if (data.gameId !== gameId) return;
-      
+
       // Update Redux state with revealed register number
       dispatch(setRevealedRegister(data.registerNumber - 1)); // Backend sends 1-5, we use 0-4
-      
+
       // Show toast notification
       const registerLabel = data.registerNumber === 1 ? "first" : data.registerNumber === 2 ? "second" : data.registerNumber === 3 ? "third" : data.registerNumber === 4 ? "fourth" : "fifth";
       toast.info(`${registerLabel.charAt(0).toUpperCase() + registerLabel.slice(1)} card revealed for all players!`);
@@ -87,9 +96,12 @@ export const ActivationPhase = ({ gameId, username }: ActivationPhaseProps) => {
       <div className="w-full min-h-[calc(100vh-5rem)] flex">
         {/* Left side - Game Board */}
         <div className="flex-1 flex items-center justify-center p-4">
-          <GameBoard className="max-w-2xl w-full" />
+          <GameBoard
+              className="max-w-2xl w-full"
+              gameBoard={gameBoard}
+          />
         </div>
-        
+
         {/* Right side - Player Programs */}
         <div className="w-96 p-6 bg-surface-dark/30 border-l border-glass-border overflow-y-auto">
           <div className="space-y-4">

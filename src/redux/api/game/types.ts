@@ -23,6 +23,10 @@ export type GetCurrentGameStateResponse = {
     programmedCards?: string[]; // Array of card names locked in by player
   }>;
   currentPhase: "ProgrammingPhase" | "ActivationPhase";
+    gameBoard: {
+        name: string;
+        spaces: { name: string }[][];
+    };
 };
 
 export type RegisterProgrammedRequest = {

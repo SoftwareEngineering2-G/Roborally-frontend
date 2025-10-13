@@ -8,6 +8,16 @@ interface Player {
   programmedCards?: string[]; // Array of card names locked in by player
 }
 
+export type BoardSpace = {
+    name: string;
+};
+
+export type GameBoardModel = {
+    name: string;
+    spaces: BoardSpace[][]; // rows x cols
+};
+
+
 interface CurrentGame {
   gameId: string;
   hostUsername: string;
@@ -15,6 +25,7 @@ interface CurrentGame {
   players: Player[];
   currentPhase: "ProgrammingPhase" | "ActivationPhase";
   currentRevealedRegister?: number; // Tracks which register is currently revealed (0-4)
+  gameBoard: GameBoardModel;
 }
 
 interface Room {
@@ -95,6 +106,6 @@ export const {
     setGameError, 
     playerLockedIn, 
     setRevealedRegister,
-    resetGameState 
+    resetGameState
 } = gameSlice.actions;
 export default gameSlice.reducer;
