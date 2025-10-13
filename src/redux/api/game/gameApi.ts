@@ -1,5 +1,5 @@
 import { baseApi } from "../baseApi";
-import { GetCurrentGameStateRequest, GetCurrentGameStateResponse, StartCardDealingForAllRequest, StartActivationPhaseRequest } from "./types";
+import { GetCurrentGameStateRequest, GetCurrentGameStateResponse, StartCardDealingForAllRequest, StartActivationPhaseRequest, RevealNextRegisterRequest, RevealNextRegisterResponse } from "./types";
 
 export const gameApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
@@ -25,6 +25,17 @@ export const gameApi = baseApi.injectEndpoints({
       }),
     }),
 
+    revealNextRegister: builder.mutation<
+      RevealNextRegisterResponse,
+      RevealNextRegisterRequest
+    >({
+      query: ({ gameId, username }) => ({
+        url: `/games/${gameId}/reveal-next-register`,
+        method: "POST",
+        body: { username },
+      }),
+    }),
+
     getCurrentGameState: builder.query<GetCurrentGameStateResponse, GetCurrentGameStateRequest>({
       query: ({ gameId }) => ({
         url: `/games/${gameId}/current-state`,
@@ -37,5 +48,6 @@ export const gameApi = baseApi.injectEndpoints({
 export const { 
   useStartCardDealingForAllMutation, 
   useStartActivationPhaseMutation,
-  useGetCurrentGameStateQuery 
+  useRevealNextRegisterMutation,
+  useGetCurrentGameStateQuery
 } = gameApi;

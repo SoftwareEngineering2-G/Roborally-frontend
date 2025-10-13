@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { playerLockedIn } from "@/redux/game/gameSlice";
 import { toast } from "sonner";
+import type { PlayerLockedInRegisterEvent } from "@/types/signalr";
 
 // Shared components
 import { GameBoard } from "../components/GameBoard";
@@ -118,11 +119,14 @@ export const ProgrammingPhase = ({ gameId, username ,gameBoard}: ProgrammingPhas
     if (!signalR.isConnected) return;
 
     const handlePlayerLockedInRegister = (...args: unknown[]) => {
-      const data = args[0] as { username: string };
+      const data = args[0] as PlayerLockedInRegisterEvent;
       console.log("Player locked in register:", data);
       
-      // Update Redux state to mark player as locked in
-      dispatch(playerLockedIn({ username: data.username }));
+      // Update Redux state to mark player as locked in with their programmed cards
+      dispatch(playerLockedIn({ 
+        username: data.username,
+        programmedCards: data.lockedCardsInOrder 
+      }));
       
       // Show toast notification
       if (data.username === username) {

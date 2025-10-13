@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle, Clock } from "lucide-react";
@@ -26,13 +26,24 @@ const robotColorMap = {
   orange: "bg-orange-500",
   pink: "bg-pink-500",
   gray: "bg-gray-500",
+  white: "bg-gray-100",
+};
+
+const robotImageMap: Record<string, string> = {
+  red: "/robots/red_robot.jpg",
+  blue: "/robots/blue_robot.jpg",
+  green: "/robots/green_robot.jpg",
+  yellow: "/robots/yellow_robot.jpg",
+  orange: "/robots/orange_robot.jpg",
+  white: "/robots/white_robot.jpg",
 };
 
 export const PlayerInfoCard = ({ 
   player, 
   isCurrentPlayer = false
 }: PlayerInfoCardProps) => {
-  const robotColor = robotColorMap[player.robot as keyof typeof robotColorMap] || "bg-gray-500";
+  const robotColor = robotColorMap[player.robot.toLowerCase() as keyof typeof robotColorMap] || "bg-gray-500";
+  const robotImage = robotImageMap[player.robot.toLowerCase()] || "/robots/red_robot.jpg"; // fallback to red
 
   return (
     <motion.div
@@ -46,12 +57,16 @@ export const PlayerInfoCard = ({
           : "hover:border-glass-border-hover"
       }`}>
         <CardContent className="p-4 flex items-center gap-3">
-          {/* Robot Avatar */}
-          <Avatar className="w-12 h-12 border-2 border-glass-border">
-            <AvatarFallback className={`${robotColor} text-white font-bold`}>
-              {player.robot.charAt(0).toUpperCase()}
-            </AvatarFallback>
-          </Avatar>
+          {/* Robot Avatar with Image */}
+          <div className="relative w-12 h-12 border-2 border-glass-border rounded-full overflow-hidden bg-surface-dark">
+            <Image
+              src={robotImage}
+              alt={`${player.robot} robot`}
+              fill
+              className="object-cover"
+              sizes="48px"
+            />
+          </div>
 
           {/* Player Info */}
           <div className="flex-1 min-w-0">
