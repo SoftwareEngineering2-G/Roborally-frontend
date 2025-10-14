@@ -1,0 +1,1 @@
+export type Direction = "North" | "East" | "South" | "West";
