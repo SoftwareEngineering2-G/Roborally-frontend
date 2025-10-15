@@ -39,3 +39,12 @@ export interface RegisterRevealedEvent {
     card: string;
   }>;
 }
+
+export interface RobotMovedEvent {
+  gameId: string;
+  username: string;
+  positionX: number;
+  positionY: number;
+  direction: string;
+  executedCard: string;
+}

@@ -5,12 +5,16 @@ interface GameState {
     currentGame: Game | null;
     isLoading: boolean;
     error: string | null;
+    currentTurnUsername: string | null; // Track whose turn it is to execute
+    executedPlayers: string[]; // Track which players have executed in current round
 }
 
 const initialState: GameState = { 
     currentGame: null,
     isLoading: false,
     error: null,
+    currentTurnUsername: null,
+    executedPlayers: [],
 };
 
 const gameSlice = createSlice({
@@ -52,6 +56,8 @@ const gameSlice = createSlice({
         setRevealedRegister: (state, action: PayloadAction<number>) => {
             if (state.currentGame) {
                 state.currentGame.currentRevealedRegister = action.payload;
+                // Reset executed players when a new card is revealed
+                state.executedPlayers = [];
             }
         },
         setCurrentPhase: (state, action: PayloadAction<"ProgrammingPhase" | "ActivationPhase">) => {
@@ -59,10 +65,30 @@ const gameSlice = createSlice({
                 state.currentGame.currentPhase = action.payload;
             }
         },
+        setCurrentTurn: (state, action: PayloadAction<string | null>) => {
+            state.currentTurnUsername = action.payload;
+        },
+        updateRobotPosition: (state, action: PayloadAction<{ username: string; positionX: number; positionY: number; direction: string }>) => {
+            if (state.currentGame) {
+                const player = state.currentGame.players.find(p => p.username === action.payload.username);
+                if (player) {
+                    player.positionX = action.payload.positionX;
+                    player.positionY = action.payload.positionY;
+                    player.direction = action.payload.direction as any;
+                }
+            }
+        },
+        markPlayerExecuted: (state, action: PayloadAction<string>) => {
+            if (!state.executedPlayers.includes(action.payload)) {
+                state.executedPlayers.push(action.payload);
+            }
+        },
         resetGameState: (state) => {
             state.currentGame = null;
             state.isLoading = false;
             state.error = null;
+            state.currentTurnUsername = null;
+            state.executedPlayers = [];
         },
     },
 });
@@ -74,6 +100,9 @@ export const {
     playerLockedIn, 
     setRevealedRegister,
     setCurrentPhase,
+    setCurrentTurn,
+    updateRobotPosition,
+    markPlayerExecuted,
     resetGameState
 } = gameSlice.actions;
 export default gameSlice.reducer;

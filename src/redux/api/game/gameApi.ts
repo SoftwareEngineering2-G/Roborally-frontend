@@ -1,5 +1,5 @@
 import { baseApi } from "../baseApi";
-import { GetCurrentGameStateRequest, GetCurrentGameStateResponse, StartCardDealingForAllRequest, StartActivationPhaseRequest, RevealNextRegisterRequest, RevealNextRegisterResponse } from "./types";
+import { GetCurrentGameStateRequest, GetCurrentGameStateResponse, StartCardDealingForAllRequest, StartActivationPhaseRequest, RevealNextRegisterRequest, RevealNextRegisterResponse, ExecuteProgrammingCardRequest, ExecuteProgrammingCardResponse } from "./types";
 
 export const gameApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
@@ -42,6 +42,17 @@ export const gameApi = baseApi.injectEndpoints({
         method: "GET",
       }),
     }),
+
+    executeProgrammingCard: builder.mutation<
+      ExecuteProgrammingCardResponse,
+      ExecuteProgrammingCardRequest
+    >({
+      query: ({ gameId, username, cardName }) => ({
+        url: `/games/${gameId}/players/${username}/execute-card`,
+        method: "POST",
+        body: { cardName },
+      }),
+    }),
   }),
 });
 
@@ -49,5 +60,6 @@ export const {
   useStartCardDealingForAllMutation, 
   useStartActivationPhaseMutation,
   useRevealNextRegisterMutation,
-  useGetCurrentGameStateQuery
+  useGetCurrentGameStateQuery,
+  useExecuteProgrammingCardMutation
 } = gameApi;

@@ -34,3 +34,15 @@ export type RevealNextRegisterResponse = {
     card: string;
   }>;
 };
+
+export type ExecuteProgrammingCardRequest = {
+  gameId: string;
+  username: string;
+  cardName: string;
+};
+
+export type ExecuteProgrammingCardResponse = {
+  positionX: number;
+  positionY: number;
+  direction: string;
+};

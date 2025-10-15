@@ -6,6 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { createCardFromBackendString } from "../ProgrammingPhase/types";
 import { cn } from "@/lib/utils";
+import { ExecuteCardButton } from "./ExecuteCardButton";
 
 interface Player {
   username: string;
@@ -43,12 +44,16 @@ interface PlayerProgramDisplayProps {
   player: Player;
   isCurrentPlayer?: boolean;
   revealedUpTo?: number; // Which register index is revealed (0-4), undefined means none
+  isCurrentTurn?: boolean; // Is it this player's turn to execute?
+  gameId?: string; // Game ID for execute button
 }
 
 export const PlayerProgramDisplay = ({ 
   player, 
   isCurrentPlayer = false,
-  revealedUpTo = -1
+  revealedUpTo = -1,
+  isCurrentTurn = false,
+  gameId = ""
 }: PlayerProgramDisplayProps) => {
   const robotColor = robotColorMap[player.robot.toLowerCase() as keyof typeof robotColorMap] || "bg-gray-500";
   const robotImage = robotImageMap[player.robot.toLowerCase()] || "/robots/red_robot.jpg"; // fallback to red
@@ -80,8 +85,9 @@ export const PlayerProgramDisplay = ({
                 src={robotImage}
                 alt={`${player.robot} robot`}
                 fill
-                className="object-cover"
+                className="object-cover mix-blend-lighten brightness-110 contrast-125"
                 sizes="48px"
+                style={{ backgroundColor: 'transparent' }}
               />
             </div>
 
@@ -202,6 +208,21 @@ export const PlayerProgramDisplay = ({
                 );
               })}
             </div>
+
+            {/* Execute Button - Show only for current turn player if they are the current user */}
+            {isCurrentTurn && isCurrentPlayer && revealedUpTo >= 0 && programmedCards[revealedUpTo] && (
+              <div className="mt-3 flex items-center justify-between">
+                <span className="text-xs text-neon-teal font-semibold animate-pulse">
+                  Your turn!
+                </span>
+                <ExecuteCardButton
+                  gameId={gameId}
+                  username={player.username}
+                  cardName={programmedCards[revealedUpTo].name}
+                  registerIndex={revealedUpTo}
+                />
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>
