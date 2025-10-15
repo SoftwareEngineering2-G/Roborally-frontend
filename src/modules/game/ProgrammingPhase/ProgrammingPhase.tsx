@@ -158,14 +158,13 @@ export const ProgrammingPhase = ({ gameId, username ,gameBoard}: ProgrammingPhas
 
       {/* Side-by-side layout: Board on left, Players on right */}
       <div className="w-full min-h-[calc(100vh-5rem)] flex">
-        {/* Left side - Game Board */}
-        <div className="flex-1 flex items-center justify-center p-4">
-          <GameBoardComponent
-              gameBoardData={gameBoard}
-              className="max-w-2xl w-full" />
-        </div>
-        
-        {/* Right side - Player Information */}
+    {/* Left side - Game Board */}
+    <div className="flex-1 flex items-center justify-center p-4">
+      <GameBoardComponent
+          gameBoardData={gameBoard}
+          players={currentGame.players}
+          className="max-w-2xl w-full" />
+    </div>        {/* Right side - Player Information */}
         <div className="w-80 p-6 bg-surface-dark/30 border-l border-glass-border">
           <div className="space-y-4">
             <h3 className="text-lg font-semibold text-foreground border-b border-glass-border pb-2">
