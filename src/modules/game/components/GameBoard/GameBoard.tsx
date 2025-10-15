@@ -131,7 +131,7 @@ export const GameBoard = ({
                               alt={`${player.robot} robot - ${player.username}`}
                               fill
                               sizes="100px"
-                              className="object-cover"
+                              className="object-contain"
                             />
                           </motion.div>
                         );
