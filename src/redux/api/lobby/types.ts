@@ -26,6 +26,11 @@ export interface JoinLobbyRequest {
   username: string;
 }
 
+export interface LeaveLobbyRequest {
+  gameId: string;
+  username: string;
+}
+
 export interface GetLobbyInfoRequest {
   gameId: string;
   username: string;

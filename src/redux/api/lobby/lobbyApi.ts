@@ -6,6 +6,7 @@ import type {
   GetLobbyInfoRequest,
   GetLobbyInfoResponse,
   JoinLobbyRequest,
+  LeaveLobbyRequest,
   StartGameRequest,
 } from "./types";
 
@@ -28,6 +29,15 @@ export const lobbyApi = baseApi.injectEndpoints({
     joinLobby: builder.mutation<void, JoinLobbyRequest>({
       query: ({ gameId, username }) => ({
         url: `/game-lobbies/${gameId}/join`,
+        method: "POST",
+        body: { username },
+      }),
+      invalidatesTags: ["Lobby"],
+    }),
+
+    leaveLobby: builder.mutation<void, LeaveLobbyRequest>({
+      query: ({ gameId, username }) => ({
+        url: `/game-lobbies/${gameId}/leave`,
         method: "POST",
         body: { username },
       }),
@@ -59,6 +69,7 @@ export const {
   useGetPublicLobbiesQuery,
   useCreateLobbyMutation,
   useJoinLobbyMutation,
+  useLeaveLobbyMutation,
   useGetLobbyInfoQuery,
   useStartGameMutation,
 } = lobbyApi;

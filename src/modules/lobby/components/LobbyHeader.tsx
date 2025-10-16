@@ -12,6 +12,7 @@ interface LobbyHeaderProps {
   playerCount: number;
   maxPlayers: number;
   isPrivate: boolean;
+  onLeaveLobby?: () => Promise<void>;
 }
 
 export const LobbyHeader = ({
@@ -20,6 +21,7 @@ export const LobbyHeader = ({
   playerCount,
   maxPlayers,
   isPrivate,
+  onLeaveLobby,
 }: LobbyHeaderProps) => {
   const router = useRouter();
 
@@ -30,13 +32,30 @@ export const LobbyHeader = ({
     });
   };
 
+  const handleBackToHome = async () => {
+    const confirmed = window.confirm(
+      "Are you sure you want to leave the lobby? You will be disconnected."
+    );
+    if (confirmed) {
+      try {
+        if (onLeaveLobby) {
+          await onLeaveLobby();
+        }
+      } catch (error) {
+        console.error("Error leaving lobby:", error);
+      } finally {
+        router.push("/");
+      }
+    }
+  };
+
   return (
     <header className="border-b bg-card/50 backdrop-blur-sm">
       <div className="container mx-auto px-4 py-4 flex items-center justify-between">
         <div className="flex items-center space-x-4">
           <Button
             variant="ghost"
-            onClick={() => router.push("/")}
+            onClick={handleBackToHome}
             className="text-muted-foreground hover:text-foreground"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
