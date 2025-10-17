@@ -77,6 +77,12 @@ export const Lobby = ({ gameId }: Props) => {
     { skip: !username }
   );
 
+  useEffect(() => {
+    if (username) {
+      refetch();
+    }
+  }, [username, refetch]);
+
   const [startGame, { isLoading: isStartingGame }] = useStartGameMutation();
   const [leaveLobby] = useLeaveLobbyMutation();
 
