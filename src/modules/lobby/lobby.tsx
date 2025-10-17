@@ -24,7 +24,6 @@ import {
 import { RootState, AppDispatch } from "@/redux/store";
 import { LobbyHeader, PlayersGrid, GameControls, GameInfo } from "./components";
 import { useLobbySignalR } from "./hooks/useLobbySignalR";
-import { useLobbyUnload } from "./hooks/useLobbyUnload";
 
 interface Props {
   gameId: string;
@@ -89,7 +88,6 @@ export const Lobby = ({ gameId }: Props) => {
   // Simple SignalR connection - Redux dispatching is handled in the hook
   const signalR = useLobbySignalR(gameId);
 
-  // Handle lobby unload (close, refresh, back button)
   const handleLeaveLobby = async () => {
     if (!username) return;
 
@@ -101,8 +99,6 @@ export const Lobby = ({ gameId }: Props) => {
       dispatch(clearLobbyState());
     }
   };
-
-  useLobbyUnload({ gameId, username, onLeave: handleLeaveLobby });
 
   // Handle game started navigation
   useEffect(() => {
