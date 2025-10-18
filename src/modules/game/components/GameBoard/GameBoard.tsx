@@ -11,15 +11,15 @@ interface GameBoardProps {
 
 // Map robot colors to image paths
 const robotImageMap: Record<string, string> = {
-  red: "/robots/red_robot.jpg",
-  blue: "/robots/blue_robot.jpg",
-  green: "/robots/green_robot.jpg",
-  yellow: "/robots/yellow_robot.jpg",
-  orange: "/robots/orange_robot.jpg",
-  white: "/robots/white_robot.jpg",
-  purple: "/robots/purple_robot.jpg",
-  pink: "/robots/pink_robot.jpg",
-  gray: "/robots/gray_robot.jpg",
+  red: "/robots/red_robot_board.png",
+  blue: "/robots/blue_robot_board.png",
+  green: "/robots/green_robot_board.png",
+  yellow: "/robots/yellow_robot_board.png",
+  orange: "/robots/orange_robot_board.png",
+  white: "/robots/white_robot_board.png",
+  purple: "/robots/purple_robot_board.png",
+  pink: "/robots/pink_robot_board.png",
+  gray: "/robots/gray_robot_board.png",
 };
 
 // Map direction to rotation degrees
