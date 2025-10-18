@@ -1,9 +1,13 @@
 export type Direction = "North" | "East" | "South" | "West";
 
-type GameBoardCell= {
+export interface GameBoardCell {
     name: string;
     walls: Direction[];
 };
+
+export interface BoardElement extends GameBoardCell {
+    direction: Direction | null;
+}
 
 export type GameBoard = {
     name: string;

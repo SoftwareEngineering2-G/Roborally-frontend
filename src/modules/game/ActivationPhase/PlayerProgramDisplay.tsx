@@ -162,7 +162,7 @@ export const PlayerProgramDisplay = ({
                             }}
                           >
                             <Image
-                              src="/card_back.png"
+                              src="/card_back.jpg"
                               alt="Card Back"
                               fill
                               className="object-cover"

@@ -17,7 +17,7 @@ export const ExecuteCardButton = ({
   gameId, 
   username, 
   cardName,
-  registerIndex 
+  // registerIndex 
 }: ExecuteCardButtonProps) => {
   const [executeCard, { isLoading }] = useExecuteProgrammingCardMutation();
   
