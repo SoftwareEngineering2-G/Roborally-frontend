@@ -13,13 +13,13 @@ import { PlayerInfoCard } from "../components/PlayerInfoCard";
 
 // Programming phase specific components
 import { ProgrammingHeader } from "./ProgrammingHeader";
-import { ProgrammingControls, ProgrammingControlsRef } from "./ProgrammingControls";
+import { ProgrammingControls, type ProgrammingControlsRef } from "./ProgrammingControls";
 import { DeckArea } from "./DeckArea";
 import { DragDropIndicator } from "./DragDropIndicator";
 import { DealingAnimationOverlaySimple } from "./DealingAnimationSimple";
 
 // Hooks and types
-import { INITIAL_REGISTERS, createCardFromBackendString, ProgramCard } from "./types";
+import { INITIAL_REGISTERS, createCardFromBackendString, type ProgramCard } from "./types";
 import { getFilledRegistersCount, isProgramComplete } from "./utils";
 import { useProgrammingPhase } from "./hooks";
 import { useCardDealing } from "./useCardDealing";
@@ -135,7 +135,7 @@ export const ProgrammingPhase = ({ gameId, username ,gameBoard}: ProgrammingPhas
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"/>
           <p className="mt-4 text-muted-foreground">Loading game state...</p>
         </div>
       </div>
@@ -163,7 +163,9 @@ export const ProgrammingPhase = ({ gameId, username ,gameBoard}: ProgrammingPhas
       <GameBoardComponent
           gameBoardData={gameBoard}
           players={currentGame.players}
-          className="max-w-2xl w-full" />
+          className="max-w-2xl w-full" 
+          currentUsername={username}
+          />
     </div>        {/* Right side - Player Information */}
         <div className="w-80 p-6 bg-surface-dark/30 border-l border-glass-border">
           <div className="space-y-4">
