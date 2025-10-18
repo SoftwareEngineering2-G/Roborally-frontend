@@ -60,6 +60,15 @@ export const lobbySlice = createSlice({
       state.players = state.players.filter((p) => p.username !== username);
     },
 
+    hostChanged: (state, action: PayloadAction<{ newHost: string }>) => {
+      state.hostUsername = action.payload.newHost;
+
+      state.players = state.players.map((p) => ({
+        ...p,
+        isHost: p.username === action.payload.newHost,
+      }));
+    },
+
     playerReadyChanged: (
       state,
       action: PayloadAction<{ username: string; isReady: boolean }>
@@ -129,6 +138,7 @@ export const lobbySlice = createSlice({
 export const {
   userJoinedLobby,
   userLeftLobby,
+  hostChanged,
   playerReadyChanged,
   setCurrentPlayerReady,
   clearLobbyState,

@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { toast } from "sonner";
 import { useSignalRContext } from "@/providers/SignalRProvider";
-import { userJoinedLobby, userLeftLobby } from "@/redux/lobby/lobbySlice";
+import { userJoinedLobby, userLeftLobby, hostChanged } from "@/redux/lobby/lobbySlice";
 import { AppDispatch } from "@/redux/store";
 
 export const useLobbySignalR = (gameId: string) => {
@@ -35,16 +35,25 @@ export const useLobbySignalR = (gameId: string) => {
       dispatch(userLeftLobby({ username: data.username }));
     };
 
+    const handleHostChanged = (...args: unknown[]) => {
+      const data = args[0] as { newHost: string };
+      console.log("🔄 Host changed to:", data.newHost);
+      dispatch(hostChanged({ newHost: data.newHost }));
+      toast.success(`${data.newHost} is now the host`);
+    };
+
     const handleGameStarted = () => {
     };
 
     signalR.on("UserJoinedLobby", handleUserJoined);
     signalR.on("UserLeftLobby", handleUserLeft);
+    signalR.on("HostChanged", handleHostChanged);
     signalR.on("GameStarted", handleGameStarted);
 
     return () => {
       signalR.off("UserJoinedLobby");
       signalR.off("UserLeftLobby");
+      signalR.off("HostChanged");
       signalR.off("GameStarted");
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps

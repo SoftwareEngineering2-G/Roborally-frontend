@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import {
   useGetLobbyInfoQuery,
   useStartGameMutation,
+  useLeaveLobbyMutation,
 } from "@/redux/api/lobby/lobbyApi";
 import {
   LobbyLoadingSkeleton,
@@ -40,6 +41,9 @@ export const Lobby = ({ gameId }: Props) => {
   const isHost = useSelector((state: RootState) =>
     username ? selectIsHost(state, username) : false
   );
+  const hostUsername = useSelector((state: RootState) => 
+    state.lobby.hostUsername
+  );
   const allPlayersReady = useSelector((state: RootState) =>
     selectAllPlayersReady(state)
   );
@@ -73,9 +77,22 @@ export const Lobby = ({ gameId }: Props) => {
   );
 
   const [startGame, { isLoading: isStartingGame }] = useStartGameMutation();
+  const [leaveLobby] = useLeaveLobbyMutation();
 
   // Simple SignalR connection - Redux dispatching is handled in the hook
   const signalR = useLobbySignalR(gameId);
+
+  const handleLeaveLobby = async () => {
+    if (!username) return;
+
+    try {
+      await leaveLobby({ gameId, username: username || "" }).unwrap();
+    } catch (error) {
+      console.error("Failed to leave lobby:", error);
+    } finally {
+      dispatch(clearLobbyState());
+    }
+  };
 
   // Handle game started navigation
   useEffect(() => {
@@ -154,6 +171,7 @@ export const Lobby = ({ gameId }: Props) => {
         playerCount={players.length}
         maxPlayers={6}
         isPrivate={true}
+        onLeaveLobby={handleLeaveLobby}
       />
       <div className="container mx-auto px-4 py-8">
         <div className="grid gap-8 lg:grid-cols-3">
@@ -161,7 +179,7 @@ export const Lobby = ({ gameId }: Props) => {
             <PlayersGrid
               players={players}
               maxPlayers={6}
-              hostUsername={lobbyData.hostUsername}
+              hostUsername={hostUsername || ""}
               currentPlayerReady={lobbyState.currentPlayerReady}
             />
           </div>
