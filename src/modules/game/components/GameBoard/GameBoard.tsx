@@ -60,7 +60,7 @@ export const GameBoard = ({
         <div className="relative mx-auto" style={{ maxWidth: "600px" }}>
           {/* Grid Container */}
           <div
-            className="grid gap-[5px] bg-surface-dark p-2 rounded-lg border-2 border-neon-teal shadow-glow-teal"
+            className="grid gap-1 bg-surface-dark p-2 rounded-lg border-2 border-neon-teal shadow-glow-teal"
             style={{
               gridTemplateColumns: `repeat(${gridSize}, 1fr)`,
               aspectRatio: "1",
@@ -75,7 +75,7 @@ export const GameBoard = ({
                 <div key={cell.id} className="relative">
                   <motion.div
                     key={cell.id}
-                    className={`bg-surface-medium border rounded-sm transition-colors duration-200 cursor-pointer ${
+                    className={`relative bg-surface-medium border rounded-sm transition-colors duration-200 cursor-pointer ${
                       cell.isCurrentPlayerPosition
                         ? "border-2 border-neon-lime" 
                         : "border-glass-border hover:bg-surface-light"
