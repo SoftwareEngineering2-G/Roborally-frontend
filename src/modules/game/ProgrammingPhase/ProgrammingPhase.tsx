@@ -13,13 +13,20 @@ import { PlayerInfoCard } from "../components/PlayerInfoCard";
 
 // Programming phase specific components
 import { ProgrammingHeader } from "./ProgrammingHeader";
-import { ProgrammingControls, ProgrammingControlsRef } from "./ProgrammingControls";
+import {
+  ProgrammingControls,
+  ProgrammingControlsRef,
+} from "./ProgrammingControls";
 import { DeckArea } from "./DeckArea";
 import { DragDropIndicator } from "./DragDropIndicator";
 import { DealingAnimationOverlaySimple } from "./DealingAnimationSimple";
 
 // Hooks and types
-import { INITIAL_REGISTERS, createCardFromBackendString, ProgramCard } from "./types";
+import {
+  INITIAL_REGISTERS,
+  createCardFromBackendString,
+  ProgramCard,
+} from "./types";
 import { getFilledRegistersCount, isProgramComplete } from "./utils";
 import { useProgrammingPhase } from "./hooks";
 import { useCardDealing } from "./useCardDealing";
@@ -32,14 +39,17 @@ interface ProgrammingPhaseProps {
   gameBoard: GameBoard;
 }
 
-export const ProgrammingPhase = ({ gameId, username ,gameBoard}: ProgrammingPhaseProps) => {
+export const ProgrammingPhase = ({
+  gameId,
+  username,
+  gameBoard,
+}: ProgrammingPhaseProps) => {
   const [showProgrammingControls, setShowProgrammingControls] = useState(true);
   const dispatch = useAppDispatch();
 
-
   // Get game state from Redux
-  const { currentGame } = useAppSelector(state => state.game);
-  
+  const { currentGame } = useAppSelector((state) => state.game);
+
   const { state, handlers, isSubmitting } = useProgrammingPhase(
     [], // Start with empty hand
     INITIAL_REGISTERS,
@@ -55,7 +65,7 @@ export const ProgrammingPhase = ({ gameId, username ,gameBoard}: ProgrammingPhas
 
   const filledCount = getFilledRegistersCount(state.registers);
   const programComplete = isProgramComplete(state.registers);
-  
+
   const programmingControlsRef = useRef<ProgrammingControlsRef>(null);
 
   // Handle SignalR events - only update Redux state
@@ -64,34 +74,50 @@ export const ProgrammingPhase = ({ gameId, username ,gameBoard}: ProgrammingPhas
 
     // Listen for cards dealt event
     const handlePlayerCardsDealt = (...args: unknown[]) => {
-      const data = args[0] as { username: string; gameId: string; dealtCards: string[] };
-      
+      const data = args[0] as {
+        username: string;
+        gameId: string;
+        dealtCards: string[];
+      };
+
       // Only process if this event is for the current player
       if (data.username === username && data.gameId === gameId) {
-        
         // Convert backend card names to ProgramCard objects
-        const dealtCards: ProgramCard[] = data.dealtCards.map((cardName: string, index: number) => 
-          createCardFromBackendString(cardName, `dealt-${index}-${Date.now()}`)
+        const dealtCards: ProgramCard[] = data.dealtCards.map(
+          (cardName: string, index: number) =>
+            createCardFromBackendString(
+              cardName,
+              `dealt-${index}-${Date.now()}`
+            )
         );
-        
+
         // Try to trigger dealing animation if deck is visible
-        const deckElement = document.querySelector('[data-deck-element]') as HTMLElement;
-        const handElements = Array.from(document.querySelectorAll('[data-hand-placeholder]')) as HTMLElement[];
-        
+        const deckElement = document.querySelector(
+          "[data-deck-element]"
+        ) as HTMLElement;
+        const handElements = Array.from(
+          document.querySelectorAll("[data-hand-placeholder]")
+        ) as HTMLElement[];
+
         if (deckElement && handElements.length > 0) {
           // Use the dealing animation system with actual cards from SignalR
-          startDealing(deckElement, handElements, dealtCards, (animatedCards: ProgramCard[]) => {
-            // The animation completes with the actual dealt cards
-            handlers.handleSetHand(animatedCards);
-          });
+          startDealing(
+            deckElement,
+            handElements,
+            dealtCards,
+            (animatedCards: ProgramCard[]) => {
+              // The animation completes with the actual dealt cards
+              handlers.handleSetHand(animatedCards);
+            }
+          );
         } else {
           // Fallback: directly set cards if animation elements not found
           handlers.handleSetHand(dealtCards);
         }
-        
+
         // Reset deck count (since cards are now dealt)
         resetDeck();
-        
+
         toast.info(`Received ${dealtCards.length} cards`);
       }
     };
@@ -101,7 +127,15 @@ export const ProgrammingPhase = ({ gameId, username ,gameBoard}: ProgrammingPhas
     return () => {
       signalR.off("PlayerCardsDealt");
     };
-  }, [signalR.isConnected, username, gameId, handlers, resetDeck, startDealing, signalR]);
+  }, [
+    signalR.isConnected,
+    username,
+    gameId,
+    handlers,
+    resetDeck,
+    startDealing,
+    signalR,
+  ]);
 
   // Listen for PlayerLockedInRegister events - only update Redux
   useEffect(() => {
@@ -109,13 +143,15 @@ export const ProgrammingPhase = ({ gameId, username ,gameBoard}: ProgrammingPhas
 
     const handlePlayerLockedInRegister = (...args: unknown[]) => {
       const data = args[0] as PlayerLockedInRegisterEvent;
-      
+
       // Update Redux state to mark player as locked in with their programmed cards
-      dispatch(playerLockedIn({ 
-        username: data.username,
-        programmedCards: data.lockedCardsInOrder 
-      }));
-      
+      dispatch(
+        playerLockedIn({
+          username: data.username,
+          programmedCards: data.lockedCardsInOrder,
+        })
+      );
+
       // Show toast notification
       if (data.username === username) {
       } else {
@@ -152,20 +188,20 @@ export const ProgrammingPhase = ({ gameId, username ,gameBoard}: ProgrammingPhas
       className="relative min-h-full"
     >
       {/* Header */}
-      <ProgrammingHeader 
-        filledCount={filledCount}
-      />
+      <ProgrammingHeader filledCount={filledCount} />
 
       {/* Side-by-side layout: Board on left, Players on right */}
       <div className="w-full min-h-[calc(100vh-5rem)] flex">
-    {/* Left side - Game Board */}
-    <div className="flex-1 flex items-center justify-center p-4">
-      <GameBoardComponent
-          gameBoardData={gameBoard}
-          players={currentGame.players}
-          className="max-w-2xl w-full" />
-    </div>        {/* Right side - Player Information */}
-        <div className="w-80 p-6 bg-surface-dark/30 border-l border-glass-border">
+        {/* Left side - Game Board */}
+        <div className="flex-1 flex items-center justify-center p-1 min-h-0">
+          <GameBoardComponent
+            gameBoardData={gameBoard}
+            players={currentGame.players}
+            className="w-full h-full max-h-full"
+          />
+        </div>
+        {/* Right side - Player Information */}
+        <div className="w-64 p-4 bg-surface-dark/30 border-l border-glass-border flex-shrink-0">
           <div className="space-y-4">
             <h3 className="text-lg font-semibold text-foreground border-b border-glass-border pb-2">
               Players ({currentGame.players.length})
@@ -188,19 +224,21 @@ export const ProgrammingPhase = ({ gameId, username ,gameBoard}: ProgrammingPhas
           </div>
         </div>
       </div>
-      
+
       {/* Programming Controls */}
       <ProgrammingControls
         ref={programmingControlsRef}
         state={state}
         handlers={handlers}
         showControls={showProgrammingControls}
-        onToggleControls={() => setShowProgrammingControls(!showProgrammingControls)}
+        onToggleControls={() =>
+          setShowProgrammingControls(!showProgrammingControls)
+        }
         filledCount={filledCount}
         programComplete={programComplete}
         isSubmitting={isSubmitting}
       />
-      
+
       {/* Programming and Discard Piles - Top Right */}
       <DeckArea
         showControls={showProgrammingControls}
@@ -209,7 +247,7 @@ export const ProgrammingPhase = ({ gameId, username ,gameBoard}: ProgrammingPhas
         isDealing={dealingState.isDealing}
         onResetDeck={resetDeck}
       />
-      
+
       {/* Drag Drop Zones Indicator */}
       <DragDropIndicator isDragging={state.isDragging} />
 

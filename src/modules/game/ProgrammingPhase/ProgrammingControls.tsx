@@ -34,7 +34,18 @@ interface ProgrammingControlsProps {
 export const ProgrammingControls = forwardRef<
   ProgrammingControlsRef,
   ProgrammingControlsProps
->(function ProgrammingControls({ state, handlers, showControls, onToggleControls, filledCount, programComplete, isSubmitting }, ref) {
+>(function ProgrammingControls(
+  {
+    state,
+    handlers,
+    showControls,
+    onToggleControls,
+    filledCount,
+    programComplete,
+    isSubmitting,
+  },
+  ref
+) {
   // Create refs for all 9 slots (both cards and placeholders)
   const slotRefs = useRef<(HTMLElement | null)[]>(new Array(9).fill(null));
 
@@ -110,7 +121,7 @@ export const ProgrammingControls = forwardRef<
         {showControls && (
           <motion.div
             initial={{ y: 100, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
+            animate={{ y: 0, opacity: 0.99 }}
             exit={{ y: 100, opacity: 0 }}
             transition={{
               delay: showControls ? 0.3 : 0,
@@ -154,7 +165,7 @@ export const ProgrammingControls = forwardRef<
                     </div>
                   ))}
                 </div>
-                
+
                 {/* Lock In Program Section */}
                 {programComplete && (
                   <div className="mt-6 pt-4 border-t border-neon-teal/20">
@@ -179,8 +190,16 @@ export const ProgrammingControls = forwardRef<
                           size="lg"
                         >
                           <div className="flex items-center gap-2">
-                            <Lock className={`w-4 h-4 ${isSubmitting ? 'animate-spin' : ''}`} />
-                            <span>{isSubmitting ? 'Locking In...' : 'Lock In Program'}</span>
+                            <Lock
+                              className={`w-4 h-4 ${
+                                isSubmitting ? "animate-spin" : ""
+                              }`}
+                            />
+                            <span>
+                              {isSubmitting
+                                ? "Locking In..."
+                                : "Lock In Program"}
+                            </span>
                           </div>
                           {/* Subtle glow effect */}
                           <div className="absolute inset-0 bg-gradient-to-r from-amber-400/20 to-red-400/20 rounded-md blur-sm -z-10 animate-pulse" />
@@ -252,12 +271,14 @@ export const ProgrammingControls = forwardRef<
       </AnimatePresence>
 
       {/* Subtle indicator when controls are hidden */}
-      {!showControls && (
+
+      {/*      
+      !showControls && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-30"
+          className="fixed bottom-3 left-1/2 transform -translate-x-1/2 z-30"
         >
           <Card className="glass-panel p-2 backdrop-blur-xl bg-surface-dark/60 border border-glass-border">
             <div className="flex items-center gap-2 text-xs text-muted-foreground">
@@ -266,7 +287,8 @@ export const ProgrammingControls = forwardRef<
             </div>
           </Card>
         </motion.div>
-      )}
+      )
+        */}
     </>
   );
 });
