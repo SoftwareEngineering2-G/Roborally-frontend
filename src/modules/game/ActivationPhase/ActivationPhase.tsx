@@ -130,15 +130,16 @@ export const ActivationPhase = ({ gameId, username, gameBoard }: ActivationPhase
 
       {/* Side-by-side layout: Board on left, Players on right */}
       <div className="w-full min-h-[calc(100vh-5rem)] flex">
-  {/* Left side - Game Board */}
-  <div className="flex-1 flex items-center justify-center p-4">
-    <GameBoardComponent
-        className="max-w-2xl w-full"
-        gameBoardData={gameBoard}
-        players={currentGame.players}
-    />
-  </div>        {/* Right side - Player Programs */}
-        <div className="w-96 p-6 bg-surface-dark/30 border-l border-glass-border overflow-y-auto">
+        {/* Left side - Game Board */}
+        <div className="flex-1 flex items-center justify-center p-1 min-h-0">
+          <GameBoardComponent
+            gameBoardData={gameBoard}
+            players={currentGame.players}
+            className="w-full h-full max-h-full"
+          />
+        </div>
+        {/* Right side - Player Programs */}
+        <div className="w-64 p-4 bg-surface-dark/30 border-l border-glass-border flex-shrink-0">
           <div className="space-y-4">
             <h3 className="text-lg font-semibold text-foreground border-b border-glass-border pb-2">
               Player Programs ({currentGame.players.length})

@@ -6,7 +6,7 @@ import type {
   Direction,
 } from "@/models/gameModels";
 import Image from "next/image";
-import { getSpaceImageURI } from "./spaceImageFactory";
+import { useSpaceImage } from "./spaceImageFactory";
 
 interface GameBoardProps {
   className?: string;
@@ -109,13 +109,9 @@ export const GameBoard = ({
                 )}
 
                 {/* Space background image */}
-                <Image
-                  src={getSpaceImageURI(cell.name, cell.direction)}
-                  alt={cell.name}
-                  fill
-                  sizes="100%"
-                  className="object-cover"
-                />
+                <div className="absolute inset-0">
+                  {useSpaceImage(cell.name, cell.direction)}
+                </div>
 
                 {/* Robots at this position */}
                 {robotsAtPosition.length > 0 && (
