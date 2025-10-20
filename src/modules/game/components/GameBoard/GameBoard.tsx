@@ -1,5 +1,5 @@
 "use client";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import type {
   GameBoard as GameBoardType,
   GamePlayer,
@@ -114,53 +114,91 @@ export const GameBoard = ({
                 </div>
 
                 {/* Robots at this position */}
-                {robotsAtPosition.length > 0 && (
-                  <div className="absolute inset-0 z-10">
-                    {robotsAtPosition.map((player, robotIndex) => {
-                      const robotImage =
-                        robotImageMap[player.robot.toLowerCase()] ||
-                        robotImageMap.red;
-                      const rotation = directionRotationMap[player.direction];
+                <AnimatePresence mode="popLayout">
+                  {robotsAtPosition.length > 0 && (
+                    <div className="absolute inset-0 z-10 pointer-events-none">
+                      {robotsAtPosition.map((player, robotIndex) => {
+                        const robotImage =
+                          robotImageMap[player.robot.toLowerCase()] ||
+                          robotImageMap.red;
+                        const rotation = directionRotationMap[player.direction];
 
-                      return (
-                        <motion.div
-                          key={player.username}
-                          className="absolute inset-0"
-                          initial={{ scale: 0, rotate: rotation }}
-                          animate={{ scale: 1, rotate: rotation }}
-                          transition={{
-                            type: "spring",
-                            stiffness: 260,
-                            damping: 20,
-                            delay: robotIndex * 0.1,
-                          }}
-                          style={{
-                            // If multiple robots, offset them slightly
-                            left:
-                              robotsAtPosition.length > 1
-                                ? `${robotIndex * 10}%`
-                                : 0,
-                            top:
-                              robotsAtPosition.length > 1
-                                ? `${robotIndex * 10}%`
-                                : 0,
-                            width: robotsAtPosition.length > 1 ? "90%" : "100%",
-                            height:
-                              robotsAtPosition.length > 1 ? "90%" : "100%",
-                          }}
-                        >
-                          <Image
-                            src={robotImage}
-                            alt={`${player.robot} robot - ${player.username}`}
-                            fill
-                            sizes="100px"
-                            className="object-contain"
-                          />
-                        </motion.div>
-                      );
-                    })}
-                  </div>
-                )}
+                        return (
+                          <motion.div
+                            key={player.username}
+                            layoutId={`robot-${player.username}`}
+                            className="absolute inset-0"
+                            initial={{ scale: 0.8, opacity: 0 }}
+                            animate={{ 
+                              scale: 1, 
+                              opacity: 1,
+                              rotate: rotation,
+                            }}
+                            exit={{ scale: 0.8, opacity: 0 }}
+                            transition={{
+                              layout: {
+                                type: "spring",
+                                stiffness: 300,
+                                damping: 30,
+                                duration: 0.6,
+                              },
+                              scale: {
+                                type: "spring",
+                                stiffness: 260,
+                                damping: 20,
+                              },
+                              rotate: {
+                                type: "spring",
+                                stiffness: 200,
+                                damping: 25,
+                                duration: 0.5,
+                              },
+                              opacity: {
+                                duration: 0.2,
+                              }
+                            }}
+                            style={{
+                              // If multiple robots, offset them slightly
+                              left:
+                                robotsAtPosition.length > 1
+                                  ? `${robotIndex * 10}%`
+                                  : 0,
+                              top:
+                                robotsAtPosition.length > 1
+                                  ? `${robotIndex * 10}%`
+                                  : 0,
+                              width: robotsAtPosition.length > 1 ? "90%" : "100%",
+                              height:
+                                robotsAtPosition.length > 1 ? "90%" : "100%",
+                            }}
+                          >
+                            <motion.div
+                              className="relative w-full h-full"
+                              animate={{ 
+                                scale: [1, 1.1, 1],
+                              }}
+                              transition={{
+                                scale: {
+                                  duration: 0.3,
+                                  ease: "easeInOut",
+                                  times: [0, 0.5, 1],
+                                }
+                              }}
+                            >
+                              <Image
+                                src={robotImage}
+                                alt={`${player.robot} robot - ${player.username}`}
+                                fill
+                                sizes="100px"
+                                className="object-contain drop-shadow-lg"
+                              />
+                            </motion.div>
+                          </motion.div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </AnimatePresence>
               </motion.div>
             );
           })}

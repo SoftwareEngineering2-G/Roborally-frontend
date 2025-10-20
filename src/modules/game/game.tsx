@@ -4,8 +4,6 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useGameState } from "./hooks/useGameState";
 import { useGameSignalR } from "./ProgrammingPhase/hooks/useGameSignalR";
-import { setCurrentPhase } from "@/redux/game/gameSlice";
-import { useAppDispatch } from "@/redux/hooks";
 import type { ActivationPhaseStartedEvent } from "@/types/signalr";
 
 // Phase components
@@ -21,7 +19,6 @@ interface Props {
 
 export default function Game({ gameId }: Props) {
   const router = useRouter();
-  const dispatch = useAppDispatch();
   const [username, setUsername] = useState<string | null>(null);
   const [cardsDealt, setCardsDealt] = useState(false);
 
@@ -59,15 +56,14 @@ export default function Game({ gameId }: Props) {
     };
   }, [signalR.isConnected, isHost, gameId, signalR]);
 
-  // Listen for activation phase started event to update Redux directly
+  // Listen for activation phase started event - simple refresh hack to sync all player cards
   useEffect(() => {
     if (!signalR.isConnected) return;
 
     const handleActivationPhaseStarted = (...args: unknown[]) => {
       const data = args[0] as ActivationPhaseStartedEvent;
       if (data.gameId === gameId) {
-        // Update Redux state directly instead of refetching
-        dispatch(setCurrentPhase("ActivationPhase"));
+        window.location.reload();
       }
     };
 
@@ -76,7 +72,7 @@ export default function Game({ gameId }: Props) {
     return () => {
       signalR.off("ActivationPhaseStarted");
     };
-  }, [signalR.isConnected, gameId, signalR, dispatch]);
+  }, [signalR.isConnected, gameId, signalR]);
   
   // Don't render until we have username and game state
   if (!username || isLoading) {
