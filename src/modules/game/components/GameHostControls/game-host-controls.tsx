@@ -61,7 +61,6 @@ export const GameHostControls = ({ gameId, gameState, cardsDealt, onCardsDealt }
   const handleRevealNextRegister = async () => {
     try {
       await revealNextRegister({ gameId, username }).unwrap();
-      const registerLabel = nextRegisterToReveal === 0 ? "first" : nextRegisterToReveal === 1 ? "second" : nextRegisterToReveal === 2 ? "third" : nextRegisterToReveal === 3 ? "fourth" : "fifth";
     } catch (error) {
       toast.error("Failed to reveal next register");
       console.error("Failed to reveal next register:", error);

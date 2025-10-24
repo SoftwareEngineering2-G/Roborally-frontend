@@ -1,5 +1,5 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-import { Game } from '@/models/gameModels';
+import { Direction, Game } from '@/models/gameModels';
 
 interface GameState {
     currentGame: Game | null;
@@ -74,7 +74,7 @@ const gameSlice = createSlice({
                 if (player) {
                     player.positionX = action.payload.positionX;
                     player.positionY = action.payload.positionY;
-                    player.direction = action.payload.direction as any;
+                    player.direction = action.payload.direction as Direction;
                 }
             }
         },

@@ -10,7 +10,6 @@ import { setRevealedRegister, setCurrentTurn, updateRobotPosition, markPlayerExe
 import type { RegisterRevealedEvent, RobotMovedEvent } from "@/types/signalr";
 import { toast } from "sonner";
 import type { GameBoard } from "@/models/gameModels";
-import { ExecuteCardButton } from "./ExecuteCardButton";
 
 interface ActivationPhaseProps {
   gameId: string;
@@ -22,7 +21,7 @@ export const ActivationPhase = ({ gameId, username, gameBoard }: ActivationPhase
   const dispatch = useAppDispatch();
 
   // Get game state from Redux (programmedCards should be populated from backend or SignalR)
-  const { currentGame, currentTurnUsername, executedPlayers } = useAppSelector(state => state.game);
+  const { currentGame, currentTurnUsername } = useAppSelector(state => state.game);
 
   // Setup SignalR connection for game events
   const signalR = useGameSignalR(gameId, username);

@@ -4,9 +4,22 @@ import type {
   GameBoard as GameBoardType,
   GamePlayer,
   Direction,
+  Celltype,
+  GearDirection,
 } from "@/models/gameModels";
 import Image from "next/image";
 import { useSpaceImage } from "./spaceImageFactory";
+
+// Separate component to use the hook
+const SpaceImage = ({ 
+  celltype, 
+  direction 
+}: { 
+  celltype: Celltype; 
+  direction: Direction | GearDirection | null;
+}) => {
+  return useSpaceImage(celltype, direction);
+};
 
 interface GameBoardProps {
   className?: string;
@@ -110,7 +123,7 @@ export const GameBoard = ({
 
                 {/* Space background image */}
                 <div className="absolute inset-0">
-                  {useSpaceImage(cell.name, cell.direction)}
+                  <SpaceImage celltype={cell.name} direction={cell.direction} />
                 </div>
 
                 {/* Robots at this position */}

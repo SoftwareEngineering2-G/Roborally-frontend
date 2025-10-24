@@ -1,4 +1,4 @@
-import { Direction, Game, GameBoard } from "@/models/gameModels";
+import { Game } from "@/models/gameModels";
 
 export type StartCardDealingForAllRequest = {
   gameId: string;
