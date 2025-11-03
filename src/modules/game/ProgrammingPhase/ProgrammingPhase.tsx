@@ -20,6 +20,8 @@ import {
 import { DeckArea } from "./DeckArea";
 import { DragDropIndicator } from "./DragDropIndicator";
 import { DealingAnimationOverlaySimple } from "./DealingAnimationSimple";
+import { DiscardAnimationOverlay } from "./DiscardAnimation";
+import { ProgrammingPhaseHostControls } from "./ProgrammingPhaseHostControls";
 
 // Hooks and types
 import {
@@ -30,6 +32,7 @@ import {
 import { getFilledRegistersCount, isProgramComplete } from "./utils";
 import { useProgrammingPhase } from "./hooks";
 import { useCardDealing } from "./useCardDealing";
+import { useCardDiscarding } from "./useCardDiscarding";
 import { useGameSignalR } from "./hooks/useGameSignalR";
 import type { GameBoard } from "@/models/gameModels";
 
@@ -50,7 +53,7 @@ export const ProgrammingPhase = ({
   // Get game state from Redux
   const { currentGame } = useAppSelector((state) => state.game);
 
-  const { state, handlers, isSubmitting } = useProgrammingPhase(
+  const { state, handlers, isSubmitting, isLockedIn } = useProgrammingPhase(
     [], // Start with empty hand
     INITIAL_REGISTERS,
     gameId,
@@ -60,6 +63,9 @@ export const ProgrammingPhase = ({
   const { dealingState, startDealing, markCardAsDealt, resetDeck } =
     useCardDealing(20);
 
+  const { discardingState, startDiscarding, markCardAsDiscarded } =
+    useCardDiscarding();
+
   // Setup SignalR connection for game events
   const signalR = useGameSignalR(gameId, username);
 
@@ -67,6 +73,71 @@ export const ProgrammingPhase = ({
   const programComplete = isProgramComplete(state.registers);
 
   const programmingControlsRef = useRef<ProgrammingControlsRef>(null);
+
+  // Check if current user is the host
+  const isHost = currentGame?.hostUsername === username;
+
+  // Get current player's locked-in state from Redux
+  const currentPlayer = currentGame?.players.find(
+    (p) => p.username === username
+  );
+
+  // Sync locked-in state from Redux - this keeps UI in sync with backend state
+  useEffect(() => {
+    if (!currentGame || !currentPlayer) return;
+
+    // Check if this player has locked in according to Redux/backend
+    // Player has locked in if they have programmedCards with exactly 5 cards
+    const hasLockedInProgram =
+      currentPlayer.programmedCards &&
+      currentPlayer.programmedCards.length === 5;
+
+    if (hasLockedInProgram) {
+      // Check if our local state already matches (to avoid unnecessary updates)
+      const currentRegisterCards = state.registers
+        .map((r) => r.card?.name)
+        .filter(Boolean);
+
+      const registersMatch =
+        JSON.stringify(currentRegisterCards) ===
+        JSON.stringify(currentPlayer.programmedCards);
+
+      if (!registersMatch || !isLockedIn) {
+        // Player has locked in - restore their registers
+        const restoredRegisters = currentPlayer.programmedCards!.map(
+          (cardName, index) => ({
+            id: index + 1,
+            card: createCardFromBackendString(
+              cardName,
+              `restored-${index}-${Date.now()}`
+            ),
+          })
+        );
+
+        // Update the registers with the locked-in cards
+        handlers.handleSetRegisters(restoredRegisters);
+
+        // Clear the hand (cards were discarded when locked in)
+        handlers.handleClearHand();
+
+        // Mark as locked in
+        handlers.handleSetLockedIn(true);
+
+        console.log("✅ Synced locked-in state from Redux:", {
+          username,
+          programmedCards: currentPlayer.programmedCards,
+          hasLockedInProgram: true,
+        });
+      }
+    }
+  }, [
+    currentGame,
+    currentPlayer,
+    isLockedIn,
+    state.registers,
+    username,
+    handlers,
+  ]);
 
   // Handle SignalR events - only update Redux state
   useEffect(() => {
@@ -79,6 +150,9 @@ export const ProgrammingPhase = ({
         gameId: string;
         dealtCards: string[];
       };
+
+      // Dispatch custom event for host controls to sync state
+      window.dispatchEvent(new CustomEvent("programmingPhaseCardsDealt"));
 
       // Only process if this event is for the current player
       if (data.username === username && data.gameId === gameId) {
@@ -166,6 +240,44 @@ export const ProgrammingPhase = ({
     };
   }, [signalR.isConnected, username, dispatch, signalR]);
 
+  // Wrapper for handleUploadProgram to trigger discard animation
+  const handleUploadProgramWithAnimation = async () => {
+    const result = await handlers.handleUploadProgram();
+
+    if (result.success && result.cardsToDiscard.length > 0) {
+      // Find the discard pile element
+      const discardPileElement = document.querySelector(
+        "[data-discard-pile]"
+      ) as HTMLElement;
+
+      if (discardPileElement && programmingControlsRef.current) {
+        // Get hand placeholder elements for animation start positions
+        const handElements =
+          programmingControlsRef.current.getPlaceholderElements();
+
+        // Filter to only elements with cards
+        const elementsWithCards = handElements.slice(
+          0,
+          result.cardsToDiscard.length
+        );
+
+        // Start the discard animation
+        startDiscarding(
+          discardPileElement,
+          result.cardsToDiscard,
+          elementsWithCards,
+          () => {
+            // After animation completes, clear the hand
+            handlers.handleClearHand();
+          }
+        );
+      } else {
+        // Fallback: just clear the hand without animation
+        handlers.handleClearHand();
+      }
+    }
+  };
+
   // Don't render if we don't have game state
   if (!currentGame) {
     return (
@@ -187,6 +299,15 @@ export const ProgrammingPhase = ({
       transition={{ duration: 0.5 }}
       className="relative min-h-full"
     >
+      {/* Host Controls - Only visible to host in programming phase */}
+      {isHost && (
+        <ProgrammingPhaseHostControls
+          gameId={gameId}
+          gameState={currentGame}
+          username={username}
+        />
+      )}
+
       {/* Header */}
       <ProgrammingHeader filledCount={filledCount} />
 
@@ -229,7 +350,10 @@ export const ProgrammingPhase = ({
       <ProgrammingControls
         ref={programmingControlsRef}
         state={state}
-        handlers={handlers}
+        handlers={{
+          ...handlers,
+          handleUploadProgram: handleUploadProgramWithAnimation,
+        }}
         showControls={showProgrammingControls}
         onToggleControls={() =>
           setShowProgrammingControls(!showProgrammingControls)
@@ -237,6 +361,7 @@ export const ProgrammingPhase = ({
         filledCount={filledCount}
         programComplete={programComplete}
         isSubmitting={isSubmitting}
+        isLockedIn={isLockedIn}
       />
 
       {/* Programming and Discard Piles - Top Right */}
@@ -255,6 +380,12 @@ export const ProgrammingPhase = ({
       <DealingAnimationOverlaySimple
         dealingCards={dealingState.dealingCards}
         onCardDealt={markCardAsDealt}
+      />
+
+      {/* Discard Animation Overlay */}
+      <DiscardAnimationOverlay
+        discardingCards={discardingState.discardingCards}
+        onCardDiscarded={markCardAsDiscarded}
       />
     </motion.div>
   );

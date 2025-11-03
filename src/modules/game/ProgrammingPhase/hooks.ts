@@ -12,7 +12,7 @@ export const useProgrammingPhase = (
   username: string
 ) => {
   const dispatch = useAppDispatch();
-  
+
   const [state, setState] = useState<ProgrammingPhaseState>({
     hand: initialHand,
     registers: initialRegisters,
@@ -22,8 +22,11 @@ export const useProgrammingPhase = (
     programComplete: false,
   });
 
+  const [isLockedIn, setIsLockedIn] = useState(false);
+
   // API mutation for submitting locked-in program
-  const [registersProgrammed, { isLoading: isSubmitting }] = useRegistersProgrammedMutation();
+  const [registersProgrammed, { isLoading: isSubmitting }] =
+    useRegistersProgrammedMutation();
 
   // Card selection (mobile-friendly)
   const handleCardSelect = useCallback((card: ProgramCard) => {
@@ -140,17 +143,17 @@ export const useProgrammingPhase = (
     [state.registers]
   );
 
-  // Lock in program
+  // Lock in program - returns remaining cards for discard animation
   const handleUploadProgram = useCallback(async () => {
     const isComplete = state.registers.every((reg) => reg.card !== null);
 
     if (!isComplete) {
       toast.error("All registers must be filled before locking in!");
-      return false;
+      return { success: false, cardsToDiscard: [] };
     }
 
-    if (isSubmitting) {
-      return false; // Prevent multiple submissions
+    if (isSubmitting || isLockedIn) {
+      return { success: false, cardsToDiscard: [] }; // Prevent multiple submissions
     }
 
     try {
@@ -160,6 +163,8 @@ export const useProgrammingPhase = (
         .map((register) => register.card?.name || "")
         .filter(Boolean); // Remove any empty slots
 
+      // Get remaining cards in hand for discard animation
+      const cardsToDiscard = [...state.hand];
 
       // Send to backend
       await registersProgrammed({
@@ -169,19 +174,33 @@ export const useProgrammingPhase = (
       }).unwrap();
 
       // Store locally in Redux for immediate display
-      dispatch(playerLockedIn({ 
-        username, 
-        programmedCards: lockedCardsInOrder 
-      }));
+      dispatch(
+        playerLockedIn({
+          username,
+          programmedCards: lockedCardsInOrder,
+        })
+      );
+
+      // Mark as locked in
+      setIsLockedIn(true);
 
       toast.success("Program locked in successfully!");
-      return true;
+      return { success: true, cardsToDiscard };
     } catch (error) {
       console.error("Failed to lock in program:", error);
       toast.error("Failed to lock in program. Please try again.");
-      return false;
+      return { success: false, cardsToDiscard: [] };
     }
-  }, [state.registers, gameId, username, registersProgrammed, isSubmitting, dispatch]);
+  }, [
+    state.registers,
+    state.hand,
+    gameId,
+    username,
+    registersProgrammed,
+    isSubmitting,
+    isLockedIn,
+    dispatch,
+  ]);
 
   // Set hand (for dealing cards)
   const handleSetHand = useCallback((newHand: ProgramCard[]) => {
@@ -192,9 +211,34 @@ export const useProgrammingPhase = (
     }));
   }, []);
 
+  // Clear hand after successful discard
+  const handleClearHand = useCallback(() => {
+    setState((prev) => ({
+      ...prev,
+      hand: [],
+      selectedCard: null,
+    }));
+  }, []);
+
+  // Set registers (for restoring from backend)
+  const handleSetRegisters = useCallback((registers: RegisterSlot[]) => {
+    setState((prev) => ({
+      ...prev,
+      registers,
+      selectedCard: null,
+      selectedRegister: null,
+    }));
+  }, []);
+
+  // Set locked in state (for restoring from backend)
+  const handleSetLockedIn = useCallback((locked: boolean) => {
+    setIsLockedIn(locked);
+  }, []);
+
   return {
     state,
     isSubmitting,
+    isLockedIn,
     handlers: {
       handleCardSelect,
       handleRegisterSelect,
@@ -204,6 +248,9 @@ export const useProgrammingPhase = (
       handleDrop,
       handleUploadProgram,
       handleSetHand,
+      handleClearHand,
+      handleSetRegisters,
+      handleSetLockedIn,
     },
   };
 };

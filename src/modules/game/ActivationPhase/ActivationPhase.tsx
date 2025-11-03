@@ -5,8 +5,14 @@ import { motion } from "framer-motion";
 import { useAppSelector, useAppDispatch } from "@/redux/hooks";
 import { GameBoard as GameBoardComponent } from "../components/GameBoard";
 import { PlayerProgramDisplay } from "./PlayerProgramDisplay";
+import { ActivationPhaseHostControls } from "./ActivationPhaseHostControls";
 import { useGameSignalR } from "../ProgrammingPhase/hooks/useGameSignalR";
-import { setRevealedRegister, setCurrentTurn, updateRobotPosition, markPlayerExecuted } from "@/redux/game/gameSlice";
+import {
+  setRevealedRegister,
+  setCurrentTurn,
+  updateRobotPosition,
+  markPlayerExecuted,
+} from "@/redux/game/gameSlice";
 import type { RegisterRevealedEvent, RobotMovedEvent } from "@/types/signalr";
 import { toast } from "sonner";
 import type { GameBoard } from "@/models/gameModels";
@@ -17,11 +23,20 @@ interface ActivationPhaseProps {
   gameBoard: GameBoard;
 }
 
-export const ActivationPhase = ({ gameId, username, gameBoard }: ActivationPhaseProps) => {
+export const ActivationPhase = ({
+  gameId,
+  username,
+  gameBoard,
+}: ActivationPhaseProps) => {
   const dispatch = useAppDispatch();
 
   // Get game state from Redux (programmedCards should be populated from backend or SignalR)
-  const { currentGame, currentTurnUsername } = useAppSelector(state => state.game);
+  const { currentGame, currentTurnUsername } = useAppSelector(
+    (state) => state.game
+  );
+
+  // Check if current user is the host
+  const isHost = currentGame?.hostUsername === username;
 
   // Setup SignalR connection for game events
   const signalR = useGameSignalR(gameId, username);
@@ -46,8 +61,21 @@ export const ActivationPhase = ({ gameId, username, gameBoard }: ActivationPhase
       }
 
       // Show toast notification
-      const registerLabel = data.registerNumber === 1 ? "first" : data.registerNumber === 2 ? "second" : data.registerNumber === 3 ? "third" : data.registerNumber === 4 ? "fourth" : "fifth";
-      toast.info(`${registerLabel.charAt(0).toUpperCase() + registerLabel.slice(1)} card revealed for all players!`);
+      const registerLabel =
+        data.registerNumber === 1
+          ? "first"
+          : data.registerNumber === 2
+          ? "second"
+          : data.registerNumber === 3
+          ? "third"
+          : data.registerNumber === 4
+          ? "fourth"
+          : "fifth";
+      toast.info(
+        `${
+          registerLabel.charAt(0).toUpperCase() + registerLabel.slice(1)
+        } card revealed for all players!`
+      );
     };
 
     signalR.on("RegisterRevealed", handleRegisterRevealed);
@@ -68,20 +96,25 @@ export const ActivationPhase = ({ gameId, username, gameBoard }: ActivationPhase
       if (data.gameId !== gameId) return;
 
       // Update robot position in Redux
-      dispatch(updateRobotPosition({
-        username: data.username,
-        positionX: data.positionX,
-        positionY: data.positionY,
-        direction: data.direction,
-      }));
+      dispatch(
+        updateRobotPosition({
+          username: data.username,
+          positionX: data.positionX,
+          positionY: data.positionY,
+          direction: data.direction,
+        })
+      );
 
       // Mark this player as executed
       dispatch(markPlayerExecuted(data.username));
 
       // Find the next player in turn order
-      const currentPlayerIndex = currentGame.players.findIndex(p => p.username === data.username);
+      const currentPlayerIndex = currentGame.players.findIndex(
+        (p) => p.username === data.username
+      );
       if (currentPlayerIndex !== -1) {
-        const nextPlayerIndex = (currentPlayerIndex + 1) % currentGame.players.length;
+        const nextPlayerIndex =
+          (currentPlayerIndex + 1) % currentGame.players.length;
         const nextPlayer = currentGame.players[nextPlayerIndex];
         dispatch(setCurrentTurn(nextPlayer.username));
       }
@@ -115,6 +148,15 @@ export const ActivationPhase = ({ gameId, username, gameBoard }: ActivationPhase
       transition={{ duration: 0.5 }}
       className="relative min-h-full"
     >
+      {/* Host Controls - Only visible to host in activation phase */}
+      {isHost && (
+        <ActivationPhaseHostControls
+          gameId={gameId}
+          gameState={currentGame}
+          username={username}
+        />
+      )}
+
       {/* Header */}
       <div className="h-20 border-b border-glass-border bg-surface-dark/50 backdrop-blur-sm flex items-center justify-between px-6">
         <div className="flex items-center gap-4">

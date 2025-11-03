@@ -25,7 +25,6 @@ export type GamePlayer = {
   positionY: number;
   direction: Direction;
   revealedCards?: ProgrammingCards[];
-  hasLockedIn?: boolean;
   programmedCards?: string[]; // Array of card names locked in by player
 };
 
@@ -50,4 +49,5 @@ export type Game = {
   gameBoard: GameBoard;
   currentPhase: GamePhase;
   currentRevealedRegister?: number;
+
 };

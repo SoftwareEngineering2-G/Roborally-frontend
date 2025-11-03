@@ -54,12 +54,14 @@ export const DeckArea = ({
       <Card className="glass-panel p-3 backdrop-blur-xl bg-surface-dark/80 border border-glass-border w-20">
         <div className="text-center">
           <div className="text-xs text-orange-400 mb-1">Discard</div>
-          <Deck
-            remainingCards={handSize > 5 ? handSize - 5 : 0}
-            className=""
-            size="small"
-            type="discard"
-          />
+          <div data-discard-pile>
+            <Deck
+              remainingCards={handSize > 5 ? handSize - 5 : 0}
+              className=""
+              size="small"
+              type="discard"
+            />
+          </div>
           <div className="text-xs text-muted-foreground mt-1">
             {handSize > 5 ? handSize - 5 : 0}
           </div>
