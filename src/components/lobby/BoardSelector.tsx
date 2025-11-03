@@ -11,24 +11,29 @@ interface BoardSelectorProps {
 }
 
 // Board metadata with descriptions and themes
-const boardMetadata: Record<string, { 
-  description: string; 
-  difficulty: string;
-  color: string;
-  icon: string;
-}> = {
+const boardMetadata: Record<
+  string,
+  {
+    description: string;
+    difficulty: string;
+    color: string;
+    icon: string;
+  }
+> = {
   "Starter Course": {
-    description: "Classic circuit design with dual conveyor loops - perfect for beginners",
+    description:
+      "Classic circuit design with dual conveyor loops - perfect for beginners",
     difficulty: "Easy",
     color: "from-blue-500/20 to-cyan-500/20",
-    icon: "🎯"
+    icon: "🎯",
   },
   "Castle Tour": {
-    description: "Navigate the castle's outer green loop and inner blue circuit with rotating gears",
+    description:
+      "Navigate the castle's outer green loop and inner blue circuit with rotating gears",
     difficulty: "Medium",
     color: "from-purple-500/20 to-pink-500/20",
-    icon: "🏰"
-  }
+    icon: "🏰",
+  },
 };
 
 export const BoardSelector = ({
@@ -47,7 +52,9 @@ export const BoardSelector = ({
         </div>
         <div className="flex items-center justify-center gap-2 p-8 border rounded-lg bg-muted/50">
           <Loader2 className="h-5 w-5 animate-spin text-primary" />
-          <span className="text-sm text-muted-foreground">Loading available boards...</span>
+          <span className="text-sm text-muted-foreground">
+            Loading available boards...
+          </span>
         </div>
       </div>
     );
@@ -77,18 +84,18 @@ export const BoardSelector = ({
         <h3 className="text-sm font-semibold">Select Game Board</h3>
         <Sparkles className="h-4 w-4 text-yellow-500 ml-auto" />
       </div>
-      
+
       <div className="space-y-2">
         {boards.map((board, index) => {
           const metadata = boardMetadata[board.name] || {
             description: "An exciting challenge awaits!",
             difficulty: "Unknown",
             color: "from-gray-500/20 to-slate-500/20",
-            icon: "🗺️"
+            icon: "🗺️",
           };
-          
+
           const isSelected = value === board.name;
-          
+
           return (
             <motion.button
               key={board.name}
@@ -103,16 +110,18 @@ export const BoardSelector = ({
                 "hover:shadow-lg hover:scale-[1.02]",
                 "disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100",
                 isSelected
-                  ? "border-primary bg-primary/5 shadow-md"
-                  : "border-border bg-card hover:border-primary/50"
+                  ? "border-none bg-primary/5 shadow-md"
+                  : "border-none bg-card hover:border-primary/50"
               )}
             >
               {/* Background gradient */}
-              <div className={cn(
-                "absolute inset-0 bg-gradient-to-br opacity-50",
-                metadata.color
-              )} />
-              
+              <div
+                className={cn(
+                  "absolute inset-0 bg-gradient-to-br opacity-50",
+                  metadata.color
+                )}
+              />
+
               {/* Content */}
               <div className="relative space-y-2">
                 <div className="flex items-start justify-between">
@@ -120,38 +129,47 @@ export const BoardSelector = ({
                     <span className="text-2xl">{metadata.icon}</span>
                     <div>
                       <h4 className="font-semibold text-base">{board.name}</h4>
-                      <span className={cn(
-                        "text-xs px-2 py-0.5 rounded-full",
-                        metadata.difficulty === "Easy" && "bg-green-500/20 text-green-700 dark:text-green-400",
-                        metadata.difficulty === "Medium" && "bg-yellow-500/20 text-yellow-700 dark:text-yellow-400",
-                        metadata.difficulty === "Hard" && "bg-red-500/20 text-red-700 dark:text-red-400"
-                      )}>
+                      <span
+                        className={cn(
+                          "text-xs px-2 py-0.5 rounded-full",
+                          metadata.difficulty === "Easy" &&
+                            "bg-green-500/20 text-green-700 dark:text-green-400",
+                          metadata.difficulty === "Medium" &&
+                            "bg-yellow-500/20 text-yellow-700 dark:text-yellow-400",
+                          metadata.difficulty === "Hard" &&
+                            "bg-red-500/20 text-red-700 dark:text-red-400"
+                        )}
+                      >
                         {metadata.difficulty}
                       </span>
                     </div>
                   </div>
-                  
+
                   {isSelected && (
                     <motion.div
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
-                      transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                      transition={{
+                        type: "spring",
+                        stiffness: 500,
+                        damping: 30,
+                      }}
                     >
                       <CheckCircle2 className="h-6 w-6 text-primary" />
                     </motion.div>
                   )}
                 </div>
-                
+
                 <p className="text-sm text-muted-foreground">
                   {metadata.description}
                 </p>
               </div>
-              
+
               {/* Selected indicator */}
               {isSelected && (
                 <motion.div
                   layoutId="selected-board"
-                  className="absolute inset-0 border-2 border-primary rounded-lg"
+                  className="absolute inset-0 border-2 border-accent rounded-lg"
                   transition={{ type: "spring", stiffness: 500, damping: 30 }}
                 />
               )}
