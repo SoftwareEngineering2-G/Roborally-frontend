@@ -14,7 +14,11 @@ export type GetCurrentGameStateRequest = {
   gameId: string;
 };
 
-export type GetCurrentGameStateResponse = Game;
+export type GetCurrentGameStateResponse ={
+  game: Game;
+  currentTurn?: string | null;
+  executedPlayers?: string[];
+};
 
 export type RegisterProgrammedRequest = {
   gameId: string;
@@ -46,3 +50,22 @@ export type ExecuteProgrammingCardResponse = {
   positionY: number;
   direction: string;
 };
+
+// Game History types
+export interface GetAllGamesRequest {
+  username: string;
+  isPrivate?: boolean;
+  isFinished?: boolean;
+  from?: string; // ISO date string (DateOnly)
+  to?: string; // ISO date string (DateOnly)
+  searchTag?: string; // Search by room name or host name
+}
+
+export interface GetAllGamesResponse {
+  gameId: string;
+  gameRoomName: string;
+  hostUsername: string;
+  startDate: string; // ISO date string
+  isFinished: boolean;
+  isPrivate: boolean;
+}

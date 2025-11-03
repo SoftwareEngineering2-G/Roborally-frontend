@@ -1,5 +1,6 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import { Direction, Game } from '@/models/gameModels';
+import { GetCurrentGameStateResponse } from "../api/game/types";
 
 interface GameState {
     currentGame: Game | null;
@@ -21,16 +22,18 @@ const gameSlice = createSlice({
     name: "game",
     initialState,
     reducers: {
-        setGameState: (state, action: PayloadAction<Game>) => {
+        setGameState: (state, action: PayloadAction<GetCurrentGameStateResponse>) => {
             // Set the game state directly from the API response
             // The Game type from gameModels is our single source of truth
             state.currentGame = {
-                ...action.payload,
-                players: action.payload.players.map(player => ({
+                ...action.payload.game,
+                players: action.payload.game.players.map(player => ({
                     ...player,
                     hasLockedIn: player.hasLockedIn ?? false, // Use backend value if available, otherwise default to false
                 })),
             };
+            state.currentTurnUsername = action.payload.currentTurn ?? null;
+            state.executedPlayers = action.payload.executedPlayers ?? [];
             state.isLoading = false;
             state.error = null;
         },
