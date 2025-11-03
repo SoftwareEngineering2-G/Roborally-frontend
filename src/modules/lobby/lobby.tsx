@@ -33,6 +33,7 @@ export const Lobby = ({ gameId }: Props) => {
   const router = useRouter();
   const dispatch = useDispatch<AppDispatch>();
   const [username, setUsername] = useState<string | null>(null);
+  const [selectedBoard, setSelectedBoard] = useState<string>("Starter Course");
 
   const lobbyState: LobbyState = useSelector((state: RootState) =>
     selectLobbyState(state)
@@ -132,11 +133,12 @@ export const Lobby = ({ gameId }: Props) => {
     );
 
   const handleStartGame = async () => {
-    if (!username || !isHost || isStartingGame || !lobbyData) return;
+    if (!username || !isHost || isStartingGame || !lobbyData || !selectedBoard) return;
 
     try {
       // Only use REST API - backend will broadcast GameStarted event via SignalR
-      await startGame({ gameId: lobbyData.gameId, username, gameBoardName: "Starter Course" });
+      await startGame({ gameId: lobbyData.gameId, username, gameBoardName: selectedBoard });
+      toast.success(`Starting game with ${selectedBoard}!`);
     } catch (error) {
       console.error("Failed to start game:", error);
       toast.error("Failed to start game");
@@ -192,6 +194,8 @@ export const Lobby = ({ gameId }: Props) => {
               allPlayersReady={allPlayersReady}
               isPrivate={true}
               gameId={lobbyData.gameId}
+              selectedBoard={selectedBoard}
+              onBoardChange={setSelectedBoard}
               onStartGame={handleStartGame}
               onCopyGameId={copyGameId}
             />
