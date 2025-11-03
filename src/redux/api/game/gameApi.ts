@@ -68,9 +68,10 @@ export const gameApi = baseApi.injectEndpoints({
       GetCurrentGameStateResponse,
       GetCurrentGameStateRequest
     >({
-      query: ({ gameId }) => ({
+      query: ({ gameId, username }) => ({
         url: `/games/${gameId}/current-state`,
         method: "GET",
+        params: { username },
       }),
     }),
 

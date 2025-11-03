@@ -53,7 +53,7 @@ export const ProgrammingPhase = ({
   // Get game state from Redux
   const { currentGame } = useAppSelector((state) => state.game);
 
-  const { state, handlers, isSubmitting, isLockedIn } = useProgrammingPhase(
+  const { state, handlers, isSubmitting } = useProgrammingPhase(
     [], // Start with empty hand
     INITIAL_REGISTERS,
     gameId,
@@ -77,22 +77,20 @@ export const ProgrammingPhase = ({
   // Check if current user is the host
   const isHost = currentGame?.hostUsername === username;
 
-  // Get current player's locked-in state from Redux
-  const currentPlayer = currentGame?.players.find(
-    (p) => p.username === username
+  // Derive locked-in state from Redux personalState (source of truth)
+  const isLockedInFromBackend = Boolean(
+    currentGame?.personalState.lockedInCards &&
+      currentGame.personalState.lockedInCards.length > 0
   );
 
-  // Sync locked-in state from Redux - this keeps UI in sync with backend state
+  // Sync state from Redux personalState - this keeps UI in sync with backend state
   useEffect(() => {
-    if (!currentGame || !currentPlayer) return;
+    if (!currentGame) return;
 
-    // Check if this player has locked in according to Redux/backend
-    // Player has locked in if they have programmedCards with exactly 5 cards
-    const hasLockedInProgram =
-      currentPlayer.programmedCards &&
-      currentPlayer.programmedCards.length === 5;
+    const personalState = currentGame.personalState;
 
-    if (hasLockedInProgram) {
+    // Restore locked-in state
+    if (personalState.lockedInCards && personalState.lockedInCards.length > 0) {
       // Check if our local state already matches (to avoid unnecessary updates)
       const currentRegisterCards = state.registers
         .map((r) => r.card?.name)
@@ -100,11 +98,11 @@ export const ProgrammingPhase = ({
 
       const registersMatch =
         JSON.stringify(currentRegisterCards) ===
-        JSON.stringify(currentPlayer.programmedCards);
+        JSON.stringify(personalState.lockedInCards);
 
-      if (!registersMatch || !isLockedIn) {
+      if (!registersMatch) {
         // Player has locked in - restore their registers
-        const restoredRegisters = currentPlayer.programmedCards!.map(
+        const restoredRegisters = personalState.lockedInCards.map(
           (cardName, index) => ({
             id: index + 1,
             card: createCardFromBackendString(
@@ -120,24 +118,33 @@ export const ProgrammingPhase = ({
         // Clear the hand (cards were discarded when locked in)
         handlers.handleClearHand();
 
-        // Mark as locked in
-        handlers.handleSetLockedIn(true);
-
         console.log("✅ Synced locked-in state from Redux:", {
           username,
-          programmedCards: currentPlayer.programmedCards,
-          hasLockedInProgram: true,
+          lockedInCards: personalState.lockedInCards,
         });
       }
     }
-  }, [
-    currentGame,
-    currentPlayer,
-    isLockedIn,
-    state.registers,
-    username,
-    handlers,
-  ]);
+    // Restore dealt cards (if player hasn't locked in yet but has dealt cards)
+    else if (personalState.dealtCards && personalState.dealtCards.length > 0) {
+      // Only restore if we don't already have cards in hand
+      if (state.hand.length === 0) {
+        const restoredHand: ProgramCard[] = personalState.dealtCards.map(
+          (cardName: string, index: number) =>
+            createCardFromBackendString(
+              cardName,
+              `restored-${index}-${Date.now()}`
+            )
+        );
+
+        handlers.handleSetHand(restoredHand);
+
+        console.log("✅ Synced dealt cards from Redux:", {
+          username,
+          dealtCards: personalState.dealtCards,
+        });
+      }
+    }
+  }, [currentGame, state.registers, state.hand.length, username, handlers]);
 
   // Handle SignalR events - only update Redux state
   useEffect(() => {
@@ -218,17 +225,25 @@ export const ProgrammingPhase = ({
     const handlePlayerLockedInRegister = (...args: unknown[]) => {
       const data = args[0] as PlayerLockedInRegisterEvent;
 
-      // Update Redux state to mark player as locked in with their programmed cards
-      dispatch(
-        playerLockedIn({
-          username: data.username,
-          programmedCards: data.lockedCardsInOrder,
-        })
-      );
-
-      // Show toast notification
+      // Update Redux to mark the player as locked in
+      // For current user: also store their locked cards in personalState
       if (data.username === username) {
+        // Current user - include their locked cards
+        dispatch(
+          playerLockedIn({
+            username: data.username,
+            lockedCards: state.registers
+              .map((r) => r.card?.name)
+              .filter(Boolean) as string[],
+          })
+        );
       } else {
+        // Other player - just mark them as locked in (no cards)
+        dispatch(
+          playerLockedIn({
+            username: data.username,
+          })
+        );
         toast.info(`${data.username} has locked in their program`);
       }
     };
@@ -361,7 +376,7 @@ export const ProgrammingPhase = ({
         filledCount={filledCount}
         programComplete={programComplete}
         isSubmitting={isSubmitting}
-        isLockedIn={isLockedIn}
+        isLockedIn={isLockedInFromBackend}
       />
 
       {/* Programming and Discard Piles - Top Right */}

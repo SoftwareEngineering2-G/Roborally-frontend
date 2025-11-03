@@ -1,5 +1,5 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-import { Direction, Game } from "@/models/gameModels";
+import { Direction, Game, ProgrammingCards } from "@/models/gameModels";
 import { GetCurrentGameStateResponse } from "../api/game/types";
 
 interface GameState {
@@ -26,11 +26,45 @@ const gameSlice = createSlice({
       state,
       action: PayloadAction<GetCurrentGameStateResponse>
     ) => {
-      // Set the game state directly from the API response
-      // The Game type from gameModels is our single source of truth
-      state.currentGame = action.payload.game;
-      state.currentTurnUsername = action.payload.currentTurn ?? null;
-      state.executedPlayers = action.payload.executedPlayers ?? [];
+      // Transform the API response to match the Game type
+      const response = action.payload;
+      state.currentGame = {
+        gameId: response.gameId,
+        hostUsername: response.hostUsername,
+        name: response.name,
+        players: response.players.map((p) => ({
+          username: p.username,
+          robot: p.robot,
+          positionX: p.positionX,
+          positionY: p.positionY,
+          direction: p.direction as Direction,
+          hasLockedInRegisters: p.hasLockedInRegisters,
+          revealedCardsInOrder: p.revealedCardsInOrder as ProgrammingCards[],
+        })),
+        gameBoard: {
+          name: response.gameBoard.name,
+          spaces: response.gameBoard.spaces.map((row) =>
+            row.map((cell) => ({
+              name: cell.name as any, // Cast to Celltype
+              walls: cell.walls as Direction[],
+              direction: cell.direction as Direction | null,
+            }))
+          ),
+        },
+        currentPhase: response.currentPhase as
+          | "ProgrammingPhase"
+          | "ActivationPhase",
+        currentRevealedRegister: response.currentRevealedRegister,
+        personalState: {
+          hasLockedInRegisters: response.personalState.hasLockedInRegisters,
+          lockedInCards: response.personalState.lockedInCards as
+            | ProgrammingCards[]
+            | null,
+          dealtCards: response.personalState.dealtCards as
+            | ProgrammingCards[]
+            | null,
+        },
+      };
       state.isLoading = false;
       state.error = null;
     },
@@ -43,17 +77,22 @@ const gameSlice = createSlice({
     },
     playerLockedIn: (
       state,
-      action: PayloadAction<{ username: string; programmedCards?: string[] }>
+      action: PayloadAction<{ username: string; lockedCards?: string[] }>
     ) => {
       if (state.currentGame) {
+        // Find the player and update their hasLockedInRegisters flag
         const player = state.currentGame.players.find(
           (p) => p.username === action.payload.username
         );
         if (player) {
-          // Store the programmed cards if provided
-          if (action.payload.programmedCards) {
-            player.programmedCards = action.payload.programmedCards;
-          }
+          player.hasLockedInRegisters = true;
+        }
+
+        // If lockedCards are provided (for current user), update personalState
+        if (action.payload.lockedCards) {
+          state.currentGame.personalState.hasLockedInRegisters = true;
+          state.currentGame.personalState.lockedInCards = action.payload
+            .lockedCards as ProgrammingCards[];
         }
       }
     },

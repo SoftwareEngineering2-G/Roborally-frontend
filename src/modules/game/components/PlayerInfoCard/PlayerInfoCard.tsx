@@ -9,7 +9,7 @@ import { CheckCircle, Clock } from "lucide-react";
 interface Player {
   username: string;
   robot: string;
-  programmedCards?: string[];
+  hasLockedInRegisters: boolean; // Now available for all players
 }
 
 interface PlayerInfoCardProps {
@@ -99,7 +99,7 @@ export const PlayerInfoCard = ({
 
             {/* Lock-in status */}
             <div className="flex items-center gap-2 mt-2">
-              {player.programmedCards && player.programmedCards.length === 5 ? (
+              {player.hasLockedInRegisters ? (
                 <>
                   <CheckCircle className="w-4 h-4 text-neon-teal" />
                   <span className="text-xs text-neon-teal font-medium">

@@ -16,9 +16,7 @@ interface Props {
 
 export default function Game({ gameId }: Props) {
   const router = useRouter();
-  const [username, setUsername] = useState<string | null>(null);
-
-  const { gameState, isLoading, error } = useGameState(gameId);
+  const [username, setUsername] = useState<string>("");
 
   useEffect(() => {
     const storedUsername = localStorage.getItem("username");
@@ -28,6 +26,8 @@ export default function Game({ gameId }: Props) {
     }
     setUsername(storedUsername);
   }, [router]);
+
+  const { gameState, isLoading, error } = useGameState(gameId, username);
 
   // Setup SignalR connection for the host to listen to game events
   const signalR = useGameSignalR(gameId, username || "");

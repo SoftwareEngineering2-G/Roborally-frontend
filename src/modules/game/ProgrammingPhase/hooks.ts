@@ -22,8 +22,6 @@ export const useProgrammingPhase = (
     programComplete: false,
   });
 
-  const [isLockedIn, setIsLockedIn] = useState(false);
-
   // API mutation for submitting locked-in program
   const [registersProgrammed, { isLoading: isSubmitting }] =
     useRegistersProgrammedMutation();
@@ -152,7 +150,7 @@ export const useProgrammingPhase = (
       return { success: false, cardsToDiscard: [] };
     }
 
-    if (isSubmitting || isLockedIn) {
+    if (isSubmitting) {
       return { success: false, cardsToDiscard: [] }; // Prevent multiple submissions
     }
 
@@ -173,16 +171,13 @@ export const useProgrammingPhase = (
         lockedCardsInOrder,
       }).unwrap();
 
-      // Store locally in Redux for immediate display
+      // Update Redux for immediate display
       dispatch(
         playerLockedIn({
           username,
-          programmedCards: lockedCardsInOrder,
+          lockedCards: lockedCardsInOrder,
         })
       );
-
-      // Mark as locked in
-      setIsLockedIn(true);
 
       toast.success("Program locked in successfully!");
       return { success: true, cardsToDiscard };
@@ -198,7 +193,6 @@ export const useProgrammingPhase = (
     username,
     registersProgrammed,
     isSubmitting,
-    isLockedIn,
     dispatch,
   ]);
 
@@ -230,15 +224,9 @@ export const useProgrammingPhase = (
     }));
   }, []);
 
-  // Set locked in state (for restoring from backend)
-  const handleSetLockedIn = useCallback((locked: boolean) => {
-    setIsLockedIn(locked);
-  }, []);
-
   return {
     state,
     isSubmitting,
-    isLockedIn,
     handlers: {
       handleCardSelect,
       handleRegisterSelect,
@@ -250,7 +238,6 @@ export const useProgrammingPhase = (
       handleSetHand,
       handleClearHand,
       handleSetRegisters,
-      handleSetLockedIn,
     },
   };
 };

@@ -28,12 +28,11 @@ export const ProgrammingPhaseHostControls = ({
     useStartActivationPhaseMutation();
 
   // Check if all players have locked in their programs
-  // A player has locked in if they have programmedCards with exactly 5 cards
   const allPlayersLockedIn = gameState.players.every(
-    (player) => player.programmedCards && player.programmedCards.length === 5
+    (player) => player.hasLockedInRegisters
   );
   const lockedInCount = gameState.players.filter(
-    (player) => player.programmedCards && player.programmedCards.length === 5
+    (player) => player.hasLockedInRegisters
   ).length;
 
   const handleStartCardDealing = async () => {
