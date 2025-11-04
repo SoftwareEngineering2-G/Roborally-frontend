@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Eye, EyeOff, Lock } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { RegisterSlotComponent } from "./RegisterSlot";
 import { ProgramCardComponent } from "./ProgramCard";
 import { ProgramCard, ProgrammingPhaseState } from "./types";
@@ -29,6 +30,7 @@ interface ProgrammingControlsProps {
   filledCount: number;
   programComplete: boolean;
   isSubmitting: boolean;
+  isLockedIn: boolean;
 }
 
 export const ProgrammingControls = forwardRef<
@@ -43,6 +45,7 @@ export const ProgrammingControls = forwardRef<
     filledCount,
     programComplete,
     isSubmitting,
+    isLockedIn,
   },
   ref
 ) {
@@ -147,19 +150,29 @@ export const ProgrammingControls = forwardRef<
                       <RegisterSlotComponent
                         register={register}
                         onCardDrop={(card) =>
-                          handlers.handleDrop(register.id, card)
+                          !isLockedIn && handlers.handleDrop(register.id, card)
                         }
                         onCardRemove={() =>
-                          handlers.handleCardRemove(register.id)
+                          !isLockedIn && handlers.handleCardRemove(register.id)
                         }
-                        selected={state.selectedRegister === register.id}
+                        selected={
+                          !isLockedIn && state.selectedRegister === register.id
+                        }
                         onClick={() =>
+                          !isLockedIn &&
                           handlers.handleRegisterSelect(register.id)
                         }
-                        isDragTarget={state.isDragging}
+                        isDragTarget={!isLockedIn && state.isDragging}
+                        isLocked={isLockedIn}
                       />
                       {/* Fixed sequence number positioning */}
-                      <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 text-xs text-neon-teal bg-surface-dark/80 px-2 py-1 rounded border border-neon-teal/30">
+                      <div
+                        className={`absolute -bottom-6 left-1/2 transform -translate-x-1/2 text-xs px-2 py-1 rounded border ${
+                          isLockedIn
+                            ? "text-green-400 bg-green-500/20 border-green-500/40"
+                            : "text-neon-teal bg-surface-dark/80 border-neon-teal/30"
+                        }`}
+                      >
                         {register.id}
                       </div>
                     </div>
@@ -167,7 +180,7 @@ export const ProgrammingControls = forwardRef<
                 </div>
 
                 {/* Lock In Program Section */}
-                {programComplete && (
+                {programComplete && !isLockedIn && (
                   <div className="mt-6 pt-4 border-t border-neon-teal/20">
                     <div className="flex flex-col items-center gap-3">
                       <div className="text-center">
@@ -208,13 +221,50 @@ export const ProgrammingControls = forwardRef<
                     </div>
                   </div>
                 )}
+
+                {/* Locked In Status */}
+                {isLockedIn && (
+                  <div className="mt-6 pt-4 border-t border-green-500/20">
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ duration: 0.5, ease: "easeOut" }}
+                      className="flex flex-col items-center gap-3"
+                    >
+                      <div className="relative flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-green-500/20 to-emerald-500/20 border-2 border-green-500/40">
+                        <Lock className="w-8 h-8 text-green-400" />
+                        <div className="absolute inset-0 rounded-full bg-green-400/10 animate-pulse" />
+                      </div>
+                      <div className="text-center">
+                        <p className="text-sm font-semibold text-green-400">
+                          Program Locked In!
+                        </p>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          Waiting for other players...
+                        </p>
+                      </div>
+                    </motion.div>
+                  </div>
+                )}
               </Card>
 
               {/* Hand Cards - Floating panel */}
-              <Card className="glass-panel p-4 backdrop-blur-xl bg-surface-dark/90 border-2 border-neon-magenta/30 shadow-glow-magenta">
+              <Card
+                className={cn(
+                  "glass-panel p-4 backdrop-blur-xl border-2 shadow-glow-magenta transition-all duration-300",
+                  isLockedIn
+                    ? "bg-surface-dark/50 border-gray-500/30 opacity-50"
+                    : "bg-surface-dark/90 border-neon-magenta/30"
+                )}
+              >
                 <div className="flex items-center justify-between mb-3">
-                  <h3 className="text-lg font-semibold text-neon-magenta">
-                    Hand
+                  <h3
+                    className={cn(
+                      "text-lg font-semibold transition-colors duration-300",
+                      isLockedIn ? "text-gray-400" : "text-neon-magenta"
+                    )}
+                  >
+                    Hand {isLockedIn && "(Locked)"}
                   </h3>
                   <div className="text-sm text-muted-foreground">
                     {state.hand.length} cards
@@ -240,11 +290,18 @@ export const ProgrammingControls = forwardRef<
                           >
                             <ProgramCardComponent
                               card={card}
-                              selected={state.selectedCard?.id === card.id}
-                              onClick={() => handlers.handleCardSelect(card)}
-                              onDragStart={() => handlers.handleDragStart(card)}
+                              selected={
+                                !isLockedIn &&
+                                state.selectedCard?.id === card.id
+                              }
+                              onClick={() =>
+                                !isLockedIn && handlers.handleCardSelect(card)
+                              }
+                              onDragStart={() =>
+                                !isLockedIn && handlers.handleDragStart(card)
+                              }
                               onDragEnd={handlers.handleDragEnd}
-                              isDragging={state.isDragging}
+                              isDragging={!isLockedIn && state.isDragging}
                             />
                           </div>
                         ) : (

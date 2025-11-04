@@ -12,12 +12,42 @@ export type StartActivationPhaseRequest = {
 
 export type GetCurrentGameStateRequest = {
   gameId: string;
+  username: string;
 };
 
-export type GetCurrentGameStateResponse ={
-  game: Game;
-  currentTurn?: string | null;
-  executedPlayers?: string[];
+export type GetCurrentGameStateResponse = {
+  gameId: string;
+  players: Array<{
+    username: string;
+    robot: string;
+    positionX: number;
+    positionY: number;
+    direction: string;
+    hasLockedInRegisters: boolean;
+    revealedCardsInOrder: string[];
+    currentExecutingRegister: number | null;
+  }>;
+  currentPhase: string;
+  hostUsername: string;
+  name: string;
+  gameBoard: {
+    name: string;
+    spaces: Array<
+      Array<{
+        name: string;
+        walls: string[];
+        direction?: string | null;
+      }>
+    >;
+  };
+  currentRevealedRegister: number | null;
+  currentTurnUsername: string | null;
+  currentExecutingRegister: number | null;
+  personalState: {
+    hasLockedInRegisters: boolean;
+    lockedInCards: string[] | null;
+    dealtCards: string[] | null;
+  };
 };
 
 export type RegisterProgrammedRequest = {

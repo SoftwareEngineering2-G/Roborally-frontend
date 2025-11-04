@@ -15,16 +15,16 @@ export const useGameSignalR = (gameId: string, username: string) => {
     }
   }, [signalR.isConnected, gameId, username, signalR]);
 
-  // Leave game on unmount
-  useEffect(() => {
-    return () => {
-      if (gameId && username && signalR.isConnected) {
-        signalR.send("LeaveGame", username, gameId).catch((err) => {
-          console.error("Failed to leave game:", err);
-        });
-      }
-    };
-  }, [gameId, username, signalR]);
+  // // Leave game on unmount
+  // useEffect(() => {
+  //   return () => {
+  //     if (gameId && username && signalR.isConnected) {
+  //       signalR.send("LeaveGame", username, gameId).catch((err) => {
+  //         console.error("Failed to leave game:", err);
+  //       });
+  //     }
+  //   };
+  // }, [gameId, username, signalR]);
 
   return {
     isConnected: signalR.isConnected,

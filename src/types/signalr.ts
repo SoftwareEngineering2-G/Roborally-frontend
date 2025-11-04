@@ -28,7 +28,7 @@ export interface ActivationPhaseStartedEvent {
 
 export interface PlayerLockedInRegisterEvent {
   username: string;
-  lockedCardsInOrder?: string[]; // Optional array of card names
+  // Note: Backend only sends username, not the cards (security)
 }
 
 export interface RegisterRevealedEvent {
@@ -47,4 +47,9 @@ export interface RobotMovedEvent {
   positionY: number;
   direction: string;
   executedCard: string;
+}
+
+export interface NextPlayerInTurnEvent {
+  gameId: string;
+  nextPlayerUsername: string;
 }

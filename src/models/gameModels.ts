@@ -24,9 +24,16 @@ export type GamePlayer = {
   positionX: number;
   positionY: number;
   direction: Direction;
-  revealedCards?: ProgrammingCards[];
-  hasLockedIn?: boolean;
-  programmedCards?: string[]; // Array of card names locked in by player
+  hasLockedInRegisters: boolean;
+  revealedCardsInOrder: ProgrammingCards[]; // Cards revealed during activation phase in order
+  currentExecutingRegister: number | null;
+
+};
+
+export type MyState = {
+  hasLockedInRegisters: boolean;
+  lockedInCards: ProgrammingCards[] | null; // Player's own locked in cards (5 cards when locked)
+  dealtCards: ProgrammingCards[] | null; // Player's dealt hand (9 cards when dealt)
 };
 
 export type GamePhase = "ProgrammingPhase" | "ActivationPhase";
@@ -49,5 +56,9 @@ export type Game = {
   players: GamePlayer[];
   gameBoard: GameBoard;
   currentPhase: GamePhase;
-  currentRevealedRegister?: number;
+  currentRevealedRegister: number | null;
+  personalState: MyState; // Player's own state information
+  currentTurnUsername: string | null;
+  currentExecutingRegister: number | null;
 };
+

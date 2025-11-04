@@ -66,7 +66,7 @@ export default function Home() {
       </header>
 
       <div className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 xl:grid-cols-2 3xl:grid-cols-3 gap-8">
           {/* Left side - Quick Actions */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -106,7 +106,6 @@ export default function Home() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.4 }}
-            className="lg:-mt-20"
           >
             <MyGames username={username} />
           </motion.div>
