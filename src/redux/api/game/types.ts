@@ -25,6 +25,7 @@ export type GetCurrentGameStateResponse = {
     direction: string;
     hasLockedInRegisters: boolean;
     revealedCardsInOrder: string[];
+    currentExecutingRegister: number | null;
   }>;
   currentPhase: string;
   hostUsername: string;
@@ -40,6 +41,8 @@ export type GetCurrentGameStateResponse = {
     >;
   };
   currentRevealedRegister: number | null;
+  currentTurnUsername: string | null;
+  currentExecutingRegister: number | null;
   personalState: {
     hasLockedInRegisters: boolean;
     lockedInCards: string[] | null;

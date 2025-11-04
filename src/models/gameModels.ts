@@ -26,6 +26,8 @@ export type GamePlayer = {
   direction: Direction;
   hasLockedInRegisters: boolean;
   revealedCardsInOrder: ProgrammingCards[]; // Cards revealed during activation phase in order
+  currentExecutingRegister: number | null;
+
 };
 
 export type MyState = {
@@ -56,4 +58,7 @@ export type Game = {
   currentPhase: GamePhase;
   currentRevealedRegister: number | null;
   personalState: MyState; // Player's own state information
+  currentTurnUsername: string | null;
+  currentExecutingRegister: number | null;
 };
+

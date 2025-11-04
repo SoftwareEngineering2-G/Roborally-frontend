@@ -21,7 +21,13 @@ export const ProgrammingPhaseHostControls = ({
   gameState,
   username,
 }: ProgrammingPhaseHostControlsProps) => {
-  const [cardsDealt, setCardsDealt] = useState(false);
+  // Initialize cardsDealt based on whether the player has dealt cards or locked in cards
+  const [cardsDealt, setCardsDealt] = useState(() => {
+    return Boolean(
+      gameState.personalState.dealtCards ||
+        gameState.personalState.lockedInCards
+    );
+  });
   const [startCardDealing, { isLoading: isDealingCards }] =
     useStartCardDealingForAllMutation();
   const [startActivationPhase, { isLoading: isStartingActivation }] =
@@ -53,6 +59,19 @@ export const ProgrammingPhaseHostControls = ({
       console.error("Failed to start activation phase:", error);
     }
   };
+
+  // Sync cardsDealt state with gameState
+  useEffect(() => {
+    if (
+      gameState.personalState.dealtCards ||
+      gameState.personalState.lockedInCards
+    ) {
+      setCardsDealt(true);
+    }
+  }, [
+    gameState.personalState.dealtCards,
+    gameState.personalState.lockedInCards,
+  ]);
 
   // Listen for card dealing events to update cardsDealt state
   useEffect(() => {

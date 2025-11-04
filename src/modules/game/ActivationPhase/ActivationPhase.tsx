@@ -8,12 +8,16 @@ import { PlayerProgramDisplay } from "./PlayerProgramDisplay";
 import { ActivationPhaseHostControls } from "./ActivationPhaseHostControls";
 import { useGameSignalR } from "../ProgrammingPhase/hooks/useGameSignalR";
 import {
-  setRevealedRegister,
+  updateRevealedCards,
   setCurrentTurn,
   updateRobotPosition,
   markPlayerExecuted,
 } from "@/redux/game/gameSlice";
-import type { RegisterRevealedEvent, RobotMovedEvent } from "@/types/signalr";
+import type {
+  RegisterRevealedEvent,
+  RobotMovedEvent,
+  NextPlayerInTurnEvent,
+} from "@/types/signalr";
 import { toast } from "sonner";
 import type { GameBoard } from "@/models/gameModels";
 
@@ -51,8 +55,13 @@ export const ActivationPhase = ({
       // Only process if this event is for the current game
       if (data.gameId !== gameId) return;
 
-      // Update Redux state with revealed register number
-      dispatch(setRevealedRegister(data.registerNumber - 1)); // Backend sends 1-5, we use 0-4
+      // Update Redux state with revealed cards and register number
+      dispatch(
+        updateRevealedCards({
+          registerNumber: data.registerNumber,
+          revealedCards: data.revealedCards,
+        })
+      );
 
       // Set the first player's turn (host goes first)
       if (currentGame.players.length > 0) {
@@ -107,17 +116,6 @@ export const ActivationPhase = ({
 
       // Mark this player as executed
       dispatch(markPlayerExecuted(data.username));
-
-      // Find the next player in turn order
-      const currentPlayerIndex = currentGame.players.findIndex(
-        (p) => p.username === data.username
-      );
-      if (currentPlayerIndex !== -1) {
-        const nextPlayerIndex =
-          (currentPlayerIndex + 1) % currentGame.players.length;
-        const nextPlayer = currentGame.players[nextPlayerIndex];
-        dispatch(setCurrentTurn(nextPlayer.username));
-      }
     };
 
     signalR.on("RobotMoved", handleRobotMoved);
@@ -126,6 +124,34 @@ export const ActivationPhase = ({
       signalR.off("RobotMoved");
     };
   }, [signalR.isConnected, gameId, dispatch, signalR, currentGame]);
+
+  // Listen for next player in turn events
+  useEffect(() => {
+    if (!signalR.isConnected || !currentGame) return;
+
+    const handleNextPlayerInTurn = (...args: unknown[]) => {
+      const data = args[0] as NextPlayerInTurnEvent;
+
+      // Only process if this event is for the current game
+      if (data.gameId !== gameId) return;
+
+      // Update the current turn username
+      dispatch(setCurrentTurn(data.nextPlayerUsername));
+
+      // Show toast notification if it's the current user's turn
+      if (data.nextPlayerUsername === username) {
+        toast.info("It's your turn to execute your card!");
+      } else {
+        toast.info(`It's ${data.nextPlayerUsername}'s turn to execute!`);
+      }
+    };
+
+    signalR.on("NextPlayerInTurn", handleNextPlayerInTurn);
+
+    return () => {
+      signalR.off("NextPlayerInTurn");
+    };
+  }, [signalR.isConnected, gameId, dispatch, signalR, currentGame, username]);
 
   // Don't render if we don't have game state
   if (!currentGame) {

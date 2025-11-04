@@ -53,10 +53,7 @@ export const gameApi = baseApi.injectEndpoints({
       }),
     }),
 
-    revealNextRegister: builder.mutation<
-      RevealNextRegisterResponse,
-      RevealNextRegisterRequest
-    >({
+    revealNextRegister: builder.mutation<void, RevealNextRegisterRequest>({
       query: ({ gameId, username }) => ({
         url: `/games/${gameId}/reveal-next-register`,
         method: "POST",

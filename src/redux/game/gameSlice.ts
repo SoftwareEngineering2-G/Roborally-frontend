@@ -40,6 +40,7 @@ const gameSlice = createSlice({
           direction: p.direction as Direction,
           hasLockedInRegisters: p.hasLockedInRegisters,
           revealedCardsInOrder: p.revealedCardsInOrder as ProgrammingCards[],
+          currentExecutingRegister: p.currentExecutingRegister,
         })),
         gameBoard: {
           name: response.gameBoard.name,
@@ -55,6 +56,8 @@ const gameSlice = createSlice({
           | "ProgrammingPhase"
           | "ActivationPhase",
         currentRevealedRegister: response.currentRevealedRegister,
+        currentTurnUsername: response.currentTurnUsername,
+        currentExecutingRegister: response.currentExecutingRegister,
         personalState: {
           hasLockedInRegisters: response.personalState.hasLockedInRegisters,
           lockedInCards: response.personalState.lockedInCards as
@@ -67,6 +70,8 @@ const gameSlice = createSlice({
       };
       state.isLoading = false;
       state.error = null;
+      // Sync Redux state with backend state
+      state.currentTurnUsername = response.currentTurnUsername;
     },
     setGameLoading: (state, action: PayloadAction<boolean>) => {
       state.isLoading = action.payload;
@@ -99,6 +104,36 @@ const gameSlice = createSlice({
     setRevealedRegister: (state, action: PayloadAction<number>) => {
       if (state.currentGame) {
         state.currentGame.currentRevealedRegister = action.payload;
+        // Reset executed players when a new card is revealed
+        state.executedPlayers = [];
+      }
+    },
+    updateRevealedCards: (
+      state,
+      action: PayloadAction<{
+        registerNumber: number;
+        revealedCards: Array<{ username: string; card: string }>;
+      }>
+    ) => {
+      if (state.currentGame) {
+        // Update the current revealed register
+        state.currentGame.currentRevealedRegister =
+          action.payload.registerNumber - 1; // Backend sends 1-5, we use 0-4
+
+        // Update each player's revealedCardsInOrder array
+        action.payload.revealedCards.forEach(({ username, card }) => {
+          const player = state.currentGame!.players.find(
+            (p) => p.username === username
+          );
+          if (player) {
+            // Add the card to the player's revealed cards in order
+            player.revealedCardsInOrder = [
+              ...player.revealedCardsInOrder,
+              card as ProgrammingCards,
+            ];
+          }
+        });
+
         // Reset executed players when a new card is revealed
         state.executedPlayers = [];
       }
@@ -155,6 +190,7 @@ export const {
   setGameError,
   playerLockedIn,
   setRevealedRegister,
+  updateRevealedCards,
   setCurrentPhase,
   setCurrentTurn,
   updateRobotPosition,

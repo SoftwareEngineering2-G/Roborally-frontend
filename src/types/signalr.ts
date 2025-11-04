@@ -48,3 +48,8 @@ export interface RobotMovedEvent {
   direction: string;
   executedCard: string;
 }
+
+export interface NextPlayerInTurnEvent {
+  gameId: string;
+  nextPlayerUsername: string;
+}

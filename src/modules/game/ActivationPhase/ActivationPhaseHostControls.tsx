@@ -21,9 +21,12 @@ export const ActivationPhaseHostControls = ({
   const [revealNextRegister, { isLoading: isRevealingRegister }] =
     useRevealNextRegisterMutation();
 
-  // Get current revealed register and executed players from Redux
+  // Get current revealed register, current turn, and executed players from Redux
   const currentRevealedRegister = useAppSelector(
     (state) => state.game.currentGame?.currentRevealedRegister
+  );
+  const currentTurnUsername = useAppSelector(
+    (state) => state.game.currentGame?.currentTurnUsername
   );
   const executedPlayers = useAppSelector((state) => state.game.executedPlayers);
 
@@ -31,11 +34,11 @@ export const ActivationPhaseHostControls = ({
   const nextRegisterToReveal = (currentRevealedRegister ?? -1) + 1;
   const allRegistersRevealed = nextRegisterToReveal >= 5;
 
-  // Check if all players have executed their current card
-  const allPlayersExecuted =
-    currentRevealedRegister !== undefined && currentRevealedRegister >= 0
-      ? executedPlayers.length === gameState.players.length
-      : true; // If no card revealed yet, allow revealing
+  // If currentTurnUsername is null, that means a new register must be revealed
+  // Otherwise, the respective player must execute their card
+  const shouldRevealNextRegister = currentTurnUsername === null;
+  const canRevealNextRegister =
+    shouldRevealNextRegister && !allRegistersRevealed;
 
   const handleRevealNextRegister = async () => {
     try {
@@ -54,26 +57,31 @@ export const ActivationPhaseHostControls = ({
       </div>
 
       <div className="flex items-center gap-2">
+        {/* Show current turn information */}
+        {currentTurnUsername && (
+          <div className="flex items-center gap-1 text-xs text-muted-foreground bg-surface-dark/30 px-2 py-1 rounded border border-glass-border">
+            <Users className="w-3 h-3" />
+            <span>Waiting for {currentTurnUsername} to execute</span>
+          </div>
+        )}
+
         {/* Show execution progress if card is revealed */}
-        {currentRevealedRegister !== undefined &&
-          currentRevealedRegister >= 0 && (
-            <div className="flex items-center gap-1 text-xs text-muted-foreground bg-surface-dark/30 px-2 py-1 rounded border border-glass-border">
-              <Users className="w-3 h-3" />
-              <span>
-                {executedPlayers.length}/{gameState.players.length} Executed
-              </span>
-            </div>
-          )}
+        {currentRevealedRegister != null && currentRevealedRegister >= 0 && (
+          <div className="flex items-center gap-1 text-xs text-muted-foreground bg-surface-dark/30 px-2 py-1 rounded border border-glass-border">
+            <Users className="w-3 h-3" />
+            <span>
+              {executedPlayers.length}/{gameState.players.length} Executed
+            </span>
+          </div>
+        )}
 
         <Button
           onClick={handleRevealNextRegister}
-          disabled={
-            allRegistersRevealed || isRevealingRegister || !allPlayersExecuted
-          }
+          disabled={!canRevealNextRegister || isRevealingRegister}
           size="sm"
           variant="outline"
           className={`h-7 text-xs ${
-            !allRegistersRevealed && allPlayersExecuted
+            canRevealNextRegister
               ? "bg-purple-500/10 border-purple-500/30 text-purple-400 hover:bg-purple-500/20 hover:border-purple-500/50"
               : "bg-gray-500/10 border-gray-500/30 text-gray-400 cursor-not-allowed"
           }`}
@@ -83,7 +91,7 @@ export const ActivationPhaseHostControls = ({
             ? "Revealing..."
             : allRegistersRevealed
             ? "All Cards Revealed"
-            : !allPlayersExecuted
+            : !shouldRevealNextRegister
             ? "Waiting for players..."
             : `Reveal ${nextRegisterToReveal === 0 ? "First" : "Next"} Card`}
         </Button>
