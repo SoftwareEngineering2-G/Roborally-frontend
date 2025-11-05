@@ -10,6 +10,7 @@ import {
   ExecuteProgrammingCardResponse,
   GetAllGamesRequest,
   GetAllGamesResponse,
+  ActivateNextBoardElementRequest,
 } from "./types";
 
 export const gameApi = baseApi.injectEndpoints({
@@ -82,6 +83,17 @@ export const gameApi = baseApi.injectEndpoints({
         body: { cardName },
       }),
     }),
+
+    activateNextBoardElement: builder.mutation<
+      void,
+      ActivateNextBoardElementRequest
+    >({
+      query: ({ gameId }) => ({
+        url: `/games/${gameId}/activate-next-board-element`,
+        method: "POST",
+        body: { gameId },
+      }),
+    }),
   }),
 });
 
@@ -95,4 +107,5 @@ export const {
   useRevealNextRegisterMutation,
   useGetCurrentGameStateQuery,
   useExecuteProgrammingCardMutation,
+  useActivateNextBoardElementMutation,
 } = gameApi;

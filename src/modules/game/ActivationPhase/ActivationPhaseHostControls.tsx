@@ -1,11 +1,12 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { useRevealNextRegisterMutation } from "@/redux/api/game/gameApi";
+import { useRevealNextRegisterMutation, useActivateNextBoardElementMutation } from "@/redux/api/game/gameApi";
 import { Crown, Users, Eye } from "lucide-react";
 import { toast } from "sonner";
 import type { Game } from "@/models/gameModels";
 import { useAppSelector } from "@/redux/hooks";
+import { useEffect, useRef } from "react";
 
 interface ActivationPhaseHostControlsProps {
   gameId: string;
@@ -20,6 +21,8 @@ export const ActivationPhaseHostControls = ({
 }: ActivationPhaseHostControlsProps) => {
   const [revealNextRegister, { isLoading: isRevealingRegister }] =
     useRevealNextRegisterMutation();
+  const [activateNextBoardElement, { isLoading: isActivatingBoardElement }] =
+    useActivateNextBoardElementMutation();
 
   // Get current revealed register, current turn, and executed players from Redux
   const currentRevealedRegister = useAppSelector(
@@ -48,6 +51,59 @@ export const ActivationPhaseHostControls = ({
       console.error("Failed to reveal next register:", error);
     }
   };
+
+  // Track if we've already activated board elements for this register
+  const hasActivatedForRegister = useRef<number>(-1);
+
+  // Check if all players have executed their cards for the current register
+  const allPlayersExecuted = executedPlayers.length === gameState.players.length;
+
+  // Automatically activate board elements when all players have executed
+  useEffect(() => {
+    const activateBoardElements = async () => {
+      // Only activate if:
+      // 1. All players have executed their cards
+      // 2. We haven't already activated for this register
+      // 3. There is a current revealed register
+      if (
+        allPlayersExecuted &&
+        currentRevealedRegister !== null &&
+        currentRevealedRegister !== undefined &&
+        currentRevealedRegister >= 0 &&
+        hasActivatedForRegister.current !== currentRevealedRegister
+      ) {
+        hasActivatedForRegister.current = currentRevealedRegister;
+
+        try {
+          // Call the activation endpoint 3 times to activate all board elements
+          // 1st: Blue Conveyor Belts
+          await activateNextBoardElement({ gameId, username }).unwrap();
+          toast.success("Blue conveyor belts activated!");
+
+          // 2nd: Green Conveyor Belts
+          await activateNextBoardElement({ gameId, username }).unwrap();
+          toast.success("Green conveyor belts activated!");
+
+          // 3rd: Gears
+          await activateNextBoardElement({ gameId, username }).unwrap();
+          toast.success("Gears activated!");
+
+          toast.info("All board elements activated! Ready for next register.");
+        } catch (error) {
+          toast.error("Failed to activate board elements");
+          console.error("Failed to activate board elements:", error);
+        }
+      }
+    };
+
+    activateBoardElements();
+  }, [
+    allPlayersExecuted,
+    currentRevealedRegister,
+    activateNextBoardElement,
+    gameId,
+    username,
+  ]);
 
   return (
     <div className="fixed top-4 right-4 z-[10000] flex items-center gap-2">

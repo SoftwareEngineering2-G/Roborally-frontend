@@ -57,8 +57,6 @@ export const GameBoard = ({
   const boardHeight = gameBoardData.spaces.length; // Number of rows
   const boardWidth = gameBoardData.spaces[0]?.length || 0; // Number of columns
 
-  console.log("Board Dimensions:", boardWidth, "x", boardHeight);
-
   // Create cells array based on actual board dimensions
   const cells = Array.from({ length: boardHeight * boardWidth }, (_, index) => {
     const row = Math.floor(index / boardWidth);
@@ -113,12 +111,20 @@ export const GameBoard = ({
                 style={{ aspectRatio: "1" }}
               >
                 {/* Walls */}
+                {cell.walls.includes("North") && (
+                  <span className="pointer-events-none absolute left-0.5 right-0.5 top-[-3px] -translate-y-1/2 h-[4px] rounded-[4px] bg-[linear-gradient(135deg,hsl(var(--neon-teal)),hsl(var(--neon-blue)))] shadow-[0_0_16px_hsl(var(--neon-teal)_/_0.7)]" />
+                )}
+
                 {cell.walls.includes("East") && (
                   <span className="pointer-events-none absolute right-[-3px] translate-x-1/2 top-0.5 bottom-0.5 w-[5px] rounded-[4px] bg-[linear-gradient(135deg,hsl(var(--neon-teal)),hsl(var(--neon-blue)))] shadow-[0_0_16px_hsl(var(--neon-teal)_/_0.7)]" />
                 )}
 
                 {cell.walls.includes("South") && (
                   <span className="pointer-events-none absolute left-0.5 right-0.5 bottom-[-3px] translate-y-1/2 h-[4px] rounded-[4px] bg-[linear-gradient(135deg,hsl(var(--neon-teal)),hsl(var(--neon-blue)))] shadow-[0_0_16px_hsl(var(--neon-teal)_/_0.7)]" />
+                )}
+
+                {cell.walls.includes("West") && (
+                  <span className="pointer-events-none absolute left-[-3px] -translate-x-1/2 top-0.5 bottom-0.5 w-[5px] rounded-[4px] bg-[linear-gradient(135deg,hsl(var(--neon-teal)),hsl(var(--neon-blue)))] shadow-[0_0_16px_hsl(var(--neon-teal)_/_0.7)]" />
                 )}
 
                 {/* Space background image */}

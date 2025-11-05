@@ -75,11 +75,20 @@ export type ExecuteProgrammingCardRequest = {
   cardName: string;
 };
 
-export type ExecuteProgrammingCardResponse = {
-  positionX: number;
-  positionY: number;
-  direction: string;
-};
+export interface ExecuteProgrammingCardResponse {
+  message: string;
+  playerState: {
+    positionX: number;
+    positionY: number;
+    direction: string;
+  };
+}
+
+// Activate board element types
+export interface ActivateNextBoardElementRequest {
+  gameId: string;
+  username: string;
+}
 
 // Game History types
 export interface GetAllGamesRequest {
