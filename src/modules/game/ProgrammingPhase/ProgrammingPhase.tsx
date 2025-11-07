@@ -15,7 +15,7 @@ import { PlayerInfoCard } from "../components/PlayerInfoCard";
 import { ProgrammingHeader } from "./ProgrammingHeader";
 import {
   ProgrammingControls,
-  ProgrammingControlsRef,
+  type ProgrammingControlsRef,
 } from "./ProgrammingControls";
 import { DeckArea } from "./DeckArea";
 import { DragDropIndicator } from "./DragDropIndicator";
@@ -27,7 +27,7 @@ import { ProgrammingPhaseHostControls } from "./ProgrammingPhaseHostControls";
 import {
   INITIAL_REGISTERS,
   createCardFromBackendString,
-  ProgramCard,
+  type ProgramCard,
 } from "./types";
 import { getFilledRegistersCount, isProgramComplete } from "./utils";
 import { useProgrammingPhase } from "./hooks";

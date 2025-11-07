@@ -1,6 +1,6 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-import { Direction, Game, ProgrammingCards } from "@/models/gameModels";
-import { GetCurrentGameStateResponse } from "../api/game/types";
+import type { GetCurrentGameStateResponse } from "../api/game/types";
+import type { Direction, Game, ProgrammingCards } from "@/models/gameModels";
 
 interface GameState {
   currentGame: Game | null;
@@ -22,16 +22,14 @@ const gameSlice = createSlice({
   name: "game",
   initialState,
   reducers: {
-    setGameState: (
-      state,
-      action: PayloadAction<GetCurrentGameStateResponse>
-    ) => {
+    setGameState: (state, action: PayloadAction<GetCurrentGameStateResponse>) => {
       // Transform the API response to match the Game type
       const response = action.payload;
       state.currentGame = {
         gameId: response.gameId,
         hostUsername: response.hostUsername,
         name: response.name,
+        isPrivate: response.isPrivate,
         players: response.players.map((p) => ({
           username: p.username,
           robot: p.robot,
@@ -52,20 +50,14 @@ const gameSlice = createSlice({
             }))
           ),
         },
-        currentPhase: response.currentPhase as
-          | "ProgrammingPhase"
-          | "ActivationPhase",
+        currentPhase: response.currentPhase as "ProgrammingPhase" | "ActivationPhase",
         currentRevealedRegister: response.currentRevealedRegister,
         currentTurnUsername: response.currentTurnUsername,
         currentExecutingRegister: response.currentExecutingRegister,
         personalState: {
           hasLockedInRegisters: response.personalState.hasLockedInRegisters,
-          lockedInCards: response.personalState.lockedInCards as
-            | ProgrammingCards[]
-            | null,
-          dealtCards: response.personalState.dealtCards as
-            | ProgrammingCards[]
-            | null,
+          lockedInCards: response.personalState.lockedInCards as ProgrammingCards[] | null,
+          dealtCards: response.personalState.dealtCards as ProgrammingCards[] | null,
         },
       };
       state.isLoading = false;
@@ -117,14 +109,11 @@ const gameSlice = createSlice({
     ) => {
       if (state.currentGame) {
         // Update the current revealed register
-        state.currentGame.currentRevealedRegister =
-          action.payload.registerNumber - 1; // Backend sends 1-5, we use 0-4
+        state.currentGame.currentRevealedRegister = action.payload.registerNumber - 1; // Backend sends 1-5, we use 0-4
 
         // Update each player's revealedCardsInOrder array
         action.payload.revealedCards.forEach(({ username, card }) => {
-          const player = state.currentGame!.players.find(
-            (p) => p.username === username
-          );
+          const player = state.currentGame!.players.find((p) => p.username === username);
           if (player) {
             // Add the card to the player's revealed cards in order
             player.revealedCardsInOrder = [
@@ -138,10 +127,7 @@ const gameSlice = createSlice({
         state.executedPlayers = [];
       }
     },
-    setCurrentPhase: (
-      state,
-      action: PayloadAction<"ProgrammingPhase" | "ActivationPhase">
-    ) => {
+    setCurrentPhase: (state, action: PayloadAction<"ProgrammingPhase" | "ActivationPhase">) => {
       if (state.currentGame) {
         state.currentGame.currentPhase = action.payload;
       }
