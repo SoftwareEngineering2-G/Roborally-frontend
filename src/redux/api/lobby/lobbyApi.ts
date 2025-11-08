@@ -62,6 +62,15 @@ export const lobbyApi = baseApi.injectEndpoints({
         },
       }),
     }),
+
+    joinContinueGameLobby: builder.mutation<void, JoinLobbyRequest>({
+      query: ({ gameId, username }) => ({
+        url: `/game-lobbies/${gameId}/continue`,
+        method: "POST",
+        body: { username },
+      }),
+      invalidatesTags: ["Lobby"],
+    }),
   }),
 });
 
@@ -72,4 +81,5 @@ export const {
   useLeaveLobbyMutation,
   useGetLobbyInfoQuery,
   useStartGameMutation,
+  useJoinContinueGameLobbyMutation,
 } = lobbyApi;

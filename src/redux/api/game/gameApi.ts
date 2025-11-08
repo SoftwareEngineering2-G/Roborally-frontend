@@ -12,6 +12,8 @@ import type {
   ActivateNextBoardElementRequest,
   RequestGamePauseRequest,
   RespondToGamePauseRequest,
+  GetPausedGamesRequest,
+  GetPausedGameResponse,
 } from "./types";
 
 export const gameApi = baseApi.injectEndpoints({
@@ -101,6 +103,14 @@ export const gameApi = baseApi.injectEndpoints({
         body: { username, approved },
       }),
     }),
+
+    getPausedGames: builder.query<GetPausedGameResponse[], GetPausedGamesRequest>({
+      query: ({ username }) => ({
+        url: "/games/paused",
+        method: "GET",
+        params: { username },
+      }),
+    }),
   }),
 });
 
@@ -117,4 +127,5 @@ export const {
   useActivateNextBoardElementMutation,
   useRequestGamePauseMutation,
   useRespondToGamePauseMutation,
+  useGetPausedGamesQuery,
 } = gameApi;

@@ -118,3 +118,15 @@ export type RespondToGamePauseRequest = {
   username: string;
   approved: boolean;
 };
+
+// Paused Games
+export type GetPausedGameResponse = {
+  gameId: string;
+  gameRoomName: string;
+  hostUsername: string;
+  playerUsernames: string[];
+};
+
+export type GetPausedGamesRequest = {
+  username: string;
+};

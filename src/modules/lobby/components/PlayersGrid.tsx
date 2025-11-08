@@ -22,6 +22,7 @@ interface PlayersGridProps {
   maxPlayers: number;
   hostUsername: string;
   currentPlayerReady: boolean;
+  requiredPlayers?: string[] | null;
 }
 
 export const PlayersGrid = ({
@@ -29,7 +30,19 @@ export const PlayersGrid = ({
   maxPlayers,
   hostUsername,
   currentPlayerReady,
+  requiredPlayers = null,
 }: PlayersGridProps) => {
+  const isPausedGame = requiredPlayers !== null && requiredPlayers.length > 0;
+  const currentPlayerUsernames = players.map((p) => p.username);
+  
+  // For paused games, show missing required players
+  const missingRequiredPlayers = isPausedGame
+    ? requiredPlayers.filter((username) => !currentPlayerUsernames.includes(username))
+    : [];
+
+  console.log("PlayersGrid - isPausedGame:", isPausedGame);
+  console.log("PlayersGrid - missingRequiredPlayers:", missingRequiredPlayers); 
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -96,20 +109,58 @@ export const PlayersGrid = ({
               );
             })}
 
-            {/* Empty slots */}
-            {Array.from({
-              length: maxPlayers - players.length,
-            }).map((_, index) => (
-              <div
-                key={`empty-${index}`}
-                className="p-4 rounded-lg border-2 border-dashed border-muted-foreground/30 bg-muted/50"
-              >
-                <div className="flex items-center justify-center h-16 text-muted-foreground">
-                  <Users className="w-6 h-6 mr-2" />
-                  Waiting for player...
+            {/* Empty slots - only show if NOT a paused game */}
+            {!isPausedGame &&
+              Array.from({
+                length: maxPlayers - players.length,
+              }).map((_, index) => (
+                <div
+                  key={`empty-slot-${maxPlayers}-${index}`}
+                  className="p-4 rounded-lg border-2 border-dashed border-muted-foreground/30 bg-muted/50"
+                >
+                  <div className="flex items-center justify-center h-16 text-muted-foreground">
+                    <Users className="w-6 h-6 mr-2" />
+                    Waiting for player...
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+
+            {/* Missing required players - show for paused games */}
+            {isPausedGame &&
+              missingRequiredPlayers.map((username, index) => (
+                <motion.div
+                  key={username}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 0.5, scale: 1 }}
+                  transition={{ delay: (players.length + index) * 0.1 }}
+                  className="p-4 rounded-lg border border-yellow-500/30 bg-yellow-500/10 opacity-50"
+                >
+                  <div className="flex items-center space-x-3">
+                    <Avatar className="h-12 w-12">
+                      <AvatarFallback>🤖</AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1">
+                      <div className="flex items-center space-x-2">
+                        <span className="font-semibold">{username}</span>
+                        {
+                          username === hostUsername && (
+                            <Crown className="w-4 h-4 text-yellow-500" />
+                          )
+                        }
+                      </div>
+                      <div className="flex items-center space-x-2 mt-1">
+                        <Badge
+                          variant="secondary"
+                          className="bg-yellow-500/20 text-yellow-600 dark:text-yellow-400 border-yellow-500/30"
+                        >
+                          <Users className="w-3 h-3 mr-1" />
+                          Not Joined
+                        </Badge>
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
           </div>
         </CardContent>
       </Card>

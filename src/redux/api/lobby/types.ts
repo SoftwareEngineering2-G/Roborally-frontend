@@ -41,6 +41,8 @@ export interface GetLobbyInfoResponse {
   lobbyname: string;
   joinedUsernames: string[];
   hostUsername: string;
+  requiredUsernames: string[] | null; // For paused games
+  pausedGameBoardName: string | null; // For paused games
 }
 
 export interface StartGameRequest {

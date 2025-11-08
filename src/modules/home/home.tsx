@@ -4,19 +4,14 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { JoinLobbyDialog } from "@/components/JoinLobbyDialog/join-lobby-dialog";
 import { CreateLobbyDialog } from "@/components/CreateLobbyDialog/create-lobby-dialog";
 import PublicLobbies from "@/components/lobby/public-lobbies";
 import MyGames from "@/components/games/my-games";
+import PausedGames from "@/components/home/paused-games";
 import { LogOut } from "lucide-react";
 
 export default function Home() {
@@ -45,10 +40,7 @@ export default function Home() {
       <header className="border-b border-neon-teal/20 bg-surface-dark/50 backdrop-blur-sm">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <h1 className="text-2xl font-bold neon-text">RoboRally Lobby</h1>
-          <Badge
-            variant="secondary"
-            className="bg-neon-teal/20 text-neon-teal border-neon-teal/30"
-          >
+          <Badge variant="secondary" className="bg-neon-teal/20 text-neon-teal border-neon-teal/30">
             Pilot: {username}
           </Badge>
           <Button
@@ -67,20 +59,18 @@ export default function Home() {
 
       <div className="container mx-auto px-4 py-8">
         <div className="grid grid-cols-1 xl:grid-cols-2 3xl:grid-cols-3 gap-8">
-          {/* Left side - Quick Actions */}
+          {/* Left side - Quick Actions & Paused Games */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
+            className="space-y-8"
           >
+            {/* Quick Actions */}
             <Card className="glass-panel">
               <CardHeader>
-                <CardTitle className="text-xl text-neon-teal">
-                  Quick Actions
-                </CardTitle>
-                <CardDescription>
-                  Start your RoboRally adventure
-                </CardDescription>
+                <CardTitle className="text-xl text-neon-teal">Quick Actions</CardTitle>
+                <CardDescription>Start your RoboRally adventure</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 {/* Create Room */}
@@ -90,6 +80,9 @@ export default function Home() {
                 <JoinLobbyDialog username={username} />
               </CardContent>
             </Card>
+
+            {/* Paused Games */}
+            <PausedGames username={username} />
           </motion.div>
 
           {/* Middle - Public Lobbies */}
