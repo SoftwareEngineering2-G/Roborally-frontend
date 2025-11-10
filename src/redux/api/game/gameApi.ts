@@ -35,6 +35,7 @@ export const gameApi = baseApi.injectEndpoints({
           params,
         };
       },
+      providesTags: ["Game"],
     }),
 
     // Game actions endpoints
@@ -44,6 +45,7 @@ export const gameApi = baseApi.injectEndpoints({
         method: "POST",
         body: { username },
       }),
+      invalidatesTags: (_result, _error, { gameId }) => [{ type: "Game", id: gameId }],
     }),
 
     startActivationPhase: builder.mutation<void, StartActivationPhaseRequest>({
@@ -52,6 +54,7 @@ export const gameApi = baseApi.injectEndpoints({
         method: "POST",
         body: { username },
       }),
+      invalidatesTags: (_result, _error, { gameId }) => [{ type: "Game", id: gameId }],
     }),
 
     revealNextRegister: builder.mutation<void, RevealNextRegisterRequest>({
@@ -60,6 +63,7 @@ export const gameApi = baseApi.injectEndpoints({
         method: "POST",
         body: { username },
       }),
+      invalidatesTags: (_result, _error, { gameId }) => [{ type: "Game", id: gameId }],
     }),
 
     getCurrentGameState: builder.query<GetCurrentGameStateResponse, GetCurrentGameStateRequest>({
@@ -68,6 +72,7 @@ export const gameApi = baseApi.injectEndpoints({
         method: "GET",
         params: { username },
       }),
+      providesTags: (_result, _error, { gameId }) => [{ type: "Game", id: gameId }],
     }),
 
     executeProgrammingCard: builder.mutation<
@@ -79,6 +84,7 @@ export const gameApi = baseApi.injectEndpoints({
         method: "POST",
         body: { cardName },
       }),
+      invalidatesTags: (_result, _error, { gameId }) => [{ type: "Game", id: gameId }],
     }),
 
     activateNextBoardElement: builder.mutation<void, ActivateNextBoardElementRequest>({
@@ -87,6 +93,7 @@ export const gameApi = baseApi.injectEndpoints({
         method: "POST",
         body: { gameId },
       }),
+      invalidatesTags: (_result, _error, { gameId }) => [{ type: "Game", id: gameId }],
     }),
     requestGamePause: builder.mutation<void, RequestGamePauseRequest>({
       query: ({ gameId, username }) => ({
@@ -110,6 +117,7 @@ export const gameApi = baseApi.injectEndpoints({
         method: "GET",
         params: { username },
       }),
+      providesTags: ["Game"],
     }),
   }),
 });

@@ -50,3 +50,8 @@ export interface StartGameRequest {
   username: string;
   gameBoardName: string;
 }
+
+export interface ContinueGameRequest {
+  gameId: string;
+  username: string;
+}

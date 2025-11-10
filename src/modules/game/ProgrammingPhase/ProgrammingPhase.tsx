@@ -13,10 +13,7 @@ import { PlayerInfoCard } from "../components/PlayerInfoCard";
 
 // Programming phase specific components
 import { ProgrammingHeader } from "./ProgrammingHeader";
-import {
-  ProgrammingControls,
-  type ProgrammingControlsRef,
-} from "./ProgrammingControls";
+import { ProgrammingControls, type ProgrammingControlsRef } from "./ProgrammingControls";
 import { DeckArea } from "./DeckArea";
 import { DragDropIndicator } from "./DragDropIndicator";
 import { DealingAnimationOverlaySimple } from "./DealingAnimationSimple";
@@ -24,11 +21,7 @@ import { DiscardAnimationOverlay } from "./DiscardAnimation";
 import { ProgrammingPhaseHostControls } from "./ProgrammingPhaseHostControls";
 
 // Hooks and types
-import {
-  INITIAL_REGISTERS,
-  createCardFromBackendString,
-  type ProgramCard,
-} from "./types";
+import { INITIAL_REGISTERS, createCardFromBackendString, type ProgramCard } from "./types";
 import { getFilledRegistersCount, isProgramComplete } from "./utils";
 import { useProgrammingPhase } from "./hooks";
 import { useCardDealing } from "./useCardDealing";
@@ -42,11 +35,7 @@ interface ProgrammingPhaseProps {
   gameBoard: GameBoard;
 }
 
-export const ProgrammingPhase = ({
-  gameId,
-  username,
-  gameBoard,
-}: ProgrammingPhaseProps) => {
+export const ProgrammingPhase = ({ gameId, username, gameBoard }: ProgrammingPhaseProps) => {
   const [showProgrammingControls, setShowProgrammingControls] = useState(true);
   const dispatch = useAppDispatch();
 
@@ -60,11 +49,9 @@ export const ProgrammingPhase = ({
     username
   );
 
-  const { dealingState, startDealing, markCardAsDealt, resetDeck } =
-    useCardDealing(20);
+  const { dealingState, startDealing, markCardAsDealt, resetDeck } = useCardDealing(20);
 
-  const { discardingState, startDiscarding, markCardAsDiscarded } =
-    useCardDiscarding();
+  const { discardingState, startDiscarding, markCardAsDiscarded } = useCardDiscarding();
 
   // Setup SignalR connection for game events
   const signalR = useGameSignalR(gameId, username);
@@ -79,8 +66,7 @@ export const ProgrammingPhase = ({
 
   // Derive locked-in state from Redux personalState (source of truth)
   const isLockedInFromBackend = Boolean(
-    currentGame?.personalState.lockedInCards &&
-      currentGame.personalState.lockedInCards.length > 0
+    currentGame?.personalState.lockedInCards && currentGame.personalState.lockedInCards.length > 0
   );
 
   // Sync state from Redux personalState - this keeps UI in sync with backend state
@@ -92,25 +78,17 @@ export const ProgrammingPhase = ({
     // Restore locked-in state
     if (personalState.lockedInCards && personalState.lockedInCards.length > 0) {
       // Check if our local state already matches (to avoid unnecessary updates)
-      const currentRegisterCards = state.registers
-        .map((r) => r.card?.name)
-        .filter(Boolean);
+      const currentRegisterCards = state.registers.map((r) => r.card?.name).filter(Boolean);
 
       const registersMatch =
-        JSON.stringify(currentRegisterCards) ===
-        JSON.stringify(personalState.lockedInCards);
+        JSON.stringify(currentRegisterCards) === JSON.stringify(personalState.lockedInCards);
 
       if (!registersMatch) {
         // Player has locked in - restore their registers
-        const restoredRegisters = personalState.lockedInCards.map(
-          (cardName, index) => ({
-            id: index + 1,
-            card: createCardFromBackendString(
-              cardName,
-              `restored-${index}-${Date.now()}`
-            ),
-          })
-        );
+        const restoredRegisters = personalState.lockedInCards.map((cardName, index) => ({
+          id: index + 1,
+          card: createCardFromBackendString(cardName, `restored-${index}-${Date.now()}`),
+        }));
 
         // Update the registers with the locked-in cards
         handlers.handleSetRegisters(restoredRegisters);
@@ -130,10 +108,7 @@ export const ProgrammingPhase = ({
       if (state.hand.length === 0) {
         const restoredHand: ProgramCard[] = personalState.dealtCards.map(
           (cardName: string, index: number) =>
-            createCardFromBackendString(
-              cardName,
-              `restored-${index}-${Date.now()}`
-            )
+            createCardFromBackendString(cardName, `restored-${index}-${Date.now()}`)
         );
 
         handlers.handleSetHand(restoredHand);
@@ -164,33 +139,22 @@ export const ProgrammingPhase = ({
       // Only process if this event is for the current player
       if (data.username === username && data.gameId === gameId) {
         // Convert backend card names to ProgramCard objects
-        const dealtCards: ProgramCard[] = data.dealtCards.map(
-          (cardName: string, index: number) =>
-            createCardFromBackendString(
-              cardName,
-              `dealt-${index}-${Date.now()}`
-            )
+        const dealtCards: ProgramCard[] = data.dealtCards.map((cardName: string, index: number) =>
+          createCardFromBackendString(cardName, `dealt-${index}-${Date.now()}`)
         );
 
         // Try to trigger dealing animation if deck is visible
-        const deckElement = document.querySelector(
-          "[data-deck-element]"
-        ) as HTMLElement;
+        const deckElement = document.querySelector("[data-deck-element]") as HTMLElement;
         const handElements = Array.from(
           document.querySelectorAll("[data-hand-placeholder]")
         ) as HTMLElement[];
 
         if (deckElement && handElements.length > 0) {
           // Use the dealing animation system with actual cards from SignalR
-          startDealing(
-            deckElement,
-            handElements,
-            dealtCards,
-            (animatedCards: ProgramCard[]) => {
-              // The animation completes with the actual dealt cards
-              handlers.handleSetHand(animatedCards);
-            }
-          );
+          startDealing(deckElement, handElements, dealtCards, (animatedCards: ProgramCard[]) => {
+            // The animation completes with the actual dealt cards
+            handlers.handleSetHand(animatedCards);
+          });
         } else {
           // Fallback: directly set cards if animation elements not found
           handlers.handleSetHand(dealtCards);
@@ -208,15 +172,7 @@ export const ProgrammingPhase = ({
     return () => {
       signalR.off("PlayerCardsDealt");
     };
-  }, [
-    signalR.isConnected,
-    username,
-    gameId,
-    handlers,
-    resetDeck,
-    startDealing,
-    signalR,
-  ]);
+  }, [signalR.isConnected, username, gameId, handlers, resetDeck, startDealing, signalR]);
 
   // Listen for PlayerLockedInRegister events - only update Redux
   useEffect(() => {
@@ -232,9 +188,7 @@ export const ProgrammingPhase = ({
         dispatch(
           playerLockedIn({
             username: data.username,
-            lockedCards: state.registers
-              .map((r) => r.card?.name)
-              .filter(Boolean) as string[],
+            lockedCards: state.registers.map((r) => r.card?.name).filter(Boolean) as string[],
           })
         );
       } else {
@@ -261,31 +215,20 @@ export const ProgrammingPhase = ({
 
     if (result.success && result.cardsToDiscard.length > 0) {
       // Find the discard pile element
-      const discardPileElement = document.querySelector(
-        "[data-discard-pile]"
-      ) as HTMLElement;
+      const discardPileElement = document.querySelector("[data-discard-pile]") as HTMLElement;
 
       if (discardPileElement && programmingControlsRef.current) {
         // Get hand placeholder elements for animation start positions
-        const handElements =
-          programmingControlsRef.current.getPlaceholderElements();
+        const handElements = programmingControlsRef.current.getPlaceholderElements();
 
         // Filter to only elements with cards
-        const elementsWithCards = handElements.slice(
-          0,
-          result.cardsToDiscard.length
-        );
+        const elementsWithCards = handElements.slice(0, result.cardsToDiscard.length);
 
         // Start the discard animation
-        startDiscarding(
-          discardPileElement,
-          result.cardsToDiscard,
-          elementsWithCards,
-          () => {
-            // After animation completes, clear the hand
-            handlers.handleClearHand();
-          }
-        );
+        startDiscarding(discardPileElement, result.cardsToDiscard, elementsWithCards, () => {
+          // After animation completes, clear the hand
+          handlers.handleClearHand();
+        });
       } else {
         // Fallback: just clear the hand without animation
         handlers.handleClearHand();
@@ -298,7 +241,7 @@ export const ProgrammingPhase = ({
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto" />
           <p className="mt-4 text-muted-foreground">Loading game state...</p>
         </div>
       </div>
@@ -316,11 +259,7 @@ export const ProgrammingPhase = ({
     >
       {/* Host Controls - Only visible to host in programming phase */}
       {isHost && (
-        <ProgrammingPhaseHostControls
-          gameId={gameId}
-          gameState={currentGame}
-          username={username}
-        />
+        <ProgrammingPhaseHostControls gameId={gameId} gameState={currentGame} username={username} />
       )}
 
       {/* Header */}
@@ -370,9 +309,7 @@ export const ProgrammingPhase = ({
           handleUploadProgram: handleUploadProgramWithAnimation,
         }}
         showControls={showProgrammingControls}
-        onToggleControls={() =>
-          setShowProgrammingControls(!showProgrammingControls)
-        }
+        onToggleControls={() => setShowProgrammingControls(!showProgrammingControls)}
         filledCount={filledCount}
         programComplete={programComplete}
         isSubmitting={isSubmitting}

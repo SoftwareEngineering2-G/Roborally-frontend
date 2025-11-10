@@ -7,6 +7,7 @@ import {
   useGetLobbyInfoQuery,
   useStartGameMutation,
   useLeaveLobbyMutation,
+  useContinueGameMutation,
 } from "@/redux/api/lobby/lobbyApi";
 import { LobbyLoadingSkeleton, LobbyErrorState } from "@/components/lobby/lobby-skeleton";
 import {
@@ -30,9 +31,12 @@ interface Props {
 }
 
 export const Lobby = ({ gameId }: Props) => {
+  console.log("[Lobby] Rendered with gameId:", gameId);
   const router = useRouter();
   const dispatch = useDispatch<AppDispatch>();
   const [username, setUsername] = useState<string | null>(null);
+
+  console.log("[Lobby] Current username state:", username);
 
   const lobbyState: LobbyState = useSelector((state: RootState) => selectLobbyState(state));
   const players = useSelector((state: RootState) => selectLobbyPlayers(state));
@@ -65,16 +69,23 @@ export const Lobby = ({ gameId }: Props) => {
     return () => {
       dispatch(clearLobbyState());
     };
-  }, [dispatch, gameId]);
+  }, [dispatch]);
 
   const {
     data: lobbyData,
     error,
     isLoading,
     refetch,
-  } = useGetLobbyInfoQuery({ gameId, username: username || "" }, { skip: !username });
+  } = useGetLobbyInfoQuery(
+    { gameId, username: username || "" },
+    {
+      skip: !username || !gameId,
+      refetchOnMountOrArgChange: true,
+    }
+  );
 
   const [startGame, { isLoading: isStartingGame }] = useStartGameMutation();
+  const [continueGame, { isLoading: isContinuingGame }] = useContinueGameMutation();
   const [leaveLobby] = useLeaveLobbyMutation();
 
   // Simple SignalR connection - Redux dispatching is handled in the hook
@@ -100,8 +111,13 @@ export const Lobby = ({ gameId }: Props) => {
       router.push(`/game/${gameId}`);
     });
 
+    signalR.on("GameContinued", () => {
+      router.push(`/game/${gameId}`);
+    });
+
     return () => {
       signalR.off("GameStarted");
+      signalR.off("GameContinued");
     };
   }, [signalR, router, gameId]);
 
@@ -127,11 +143,12 @@ export const Lobby = ({ gameId }: Props) => {
   };
 
   const handleContinueGame = async () => {
-    if (!username || !isHost || isStartingGame || !lobbyData) return;
+    if (!username || !isHost || isContinuingGame || !lobbyData) return;
 
     try {
-      // Only use REST API - backend will broadcast GameStarted event via SignalR
-      alert("Continue game functionality is not yet implemented.");
+      // Only use REST API - backend will broadcast GameContinued event via SignalR
+      await continueGame({ gameId: lobbyData.gameId, username }).unwrap();
+      toast.success("Continuing game...");
     } catch (error) {
       console.error("Failed to continue game:", error);
       toast.error("Failed to continue game");

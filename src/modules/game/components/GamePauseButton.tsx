@@ -2,12 +2,7 @@
 
 import { Pause } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface GamePauseButtonProps {
   onRequestPause: () => void;
@@ -29,9 +24,9 @@ export const GamePauseButton = ({
             size="sm"
             onClick={onRequestPause}
             disabled={disabled || isLoading}
-            className="glass-panel border-neon-teal/30 hover:border-neon-teal hover:glow-teal transition-all"
+            className="glass-panel border-white! hover:border-neon-teal hover:glow-teal transition-all"
           >
-            <Pause className={`h-4 w-4 mr-2 ${isLoading ? 'animate-pulse' : ''}`} />
+            <Pause className={`h-4 w-4 mr-2 ${isLoading ? "animate-pulse" : ""}`} />
             {isLoading ? "Requesting..." : "Pause Game"}
           </Button>
         </TooltipTrigger>

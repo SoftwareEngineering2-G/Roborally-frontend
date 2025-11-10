@@ -1,13 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Crown, Users, Check, X } from "lucide-react";
@@ -34,14 +28,11 @@ export const PlayersGrid = ({
 }: PlayersGridProps) => {
   const isPausedGame = requiredPlayers !== null && requiredPlayers.length > 0;
   const currentPlayerUsernames = players.map((p) => p.username);
-  
+
   // For paused games, show missing required players
   const missingRequiredPlayers = isPausedGame
     ? requiredPlayers.filter((username) => !currentPlayerUsernames.includes(username))
     : [];
-
-  console.log("PlayersGrid - isPausedGame:", isPausedGame);
-  console.log("PlayersGrid - missingRequiredPlayers:", missingRequiredPlayers); 
 
   return (
     <motion.div
@@ -61,9 +52,7 @@ export const PlayersGrid = ({
           <div className="grid gap-4 sm:grid-cols-2">
             {players.map((player, index) => {
               const isPlayerReady =
-                player.username === hostUsername
-                  ? currentPlayerReady
-                  : player.isReady;
+                player.username === hostUsername ? currentPlayerReady : player.isReady;
               return (
                 <motion.div
                   key={player.username}
@@ -71,9 +60,7 @@ export const PlayersGrid = ({
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: index * 0.1 }}
                   className={`p-4 rounded-lg border transition-colors ${
-                    isPlayerReady
-                      ? "bg-primary/10 border-primary/30"
-                      : "bg-muted border-border"
+                    isPlayerReady ? "bg-primary/10 border-primary/30" : "bg-muted border-border"
                   }`}
                 >
                   <div className="flex items-center space-x-3">
@@ -142,11 +129,7 @@ export const PlayersGrid = ({
                     <div className="flex-1">
                       <div className="flex items-center space-x-2">
                         <span className="font-semibold">{username}</span>
-                        {
-                          username === hostUsername && (
-                            <Crown className="w-4 h-4 text-yellow-500" />
-                          )
-                        }
+                        {username === hostUsername && <Crown className="w-4 h-4 text-yellow-500" />}
                       </div>
                       <div className="flex items-center space-x-2 mt-1">
                         <Badge

@@ -12,7 +12,7 @@ import { ProgrammingPhase } from "./ProgrammingPhase";
 import { ActivationPhase } from "./ActivationPhase";
 
 // Shared components
-import { GameHostControls } from "./components/GameHostControls";
+// import { GameHostControls } from "./components/GameHostControls";
 import { GamePauseButton } from "./components/GamePauseButton";
 import { GamePauseDialog } from "./components/GamePauseDialog";
 import { GamePauseResultDialog } from "./components/GamePauseResultDialog";
@@ -54,24 +54,6 @@ export default function Game({ gameId }: Props) {
     isRequestingPause,
     isResponding,
   } = useGamePause({ gameId, username: username || "" });
-
-  // Listen for card dealing events to sync the cardsDealt state
-  useEffect(() => {
-    if (!signalR.isConnected || !isHost) return;
-
-    const handlePlayerCardsDealt = (...args: unknown[]) => {
-      const data = args[0] as { gameId: string };
-      if (data.gameId === gameId) {
-        setCardsDealt(true);
-      }
-    };
-
-    signalR.on("PlayerCardsDealt", handlePlayerCardsDealt);
-
-    return () => {
-      signalR.off("PlayerCardsDealt");
-    };
-  }, [signalR.isConnected, isHost, gameId, signalR]);
 
   // Listen for activation phase started event - simple refresh hack to sync all player cards
   useEffect(() => {
@@ -163,23 +145,13 @@ export default function Game({ gameId }: Props) {
 
   return (
     <div className="relative min-h-screen">
-      <div className="fixed top-4 right-4 flex flex-row gap-5" style={{ zIndex: 10000 }}>
+      <div className="fixed top-4 left-150 flex flex-row gap-5" style={{ zIndex: 10000 }}>
         {/* Pause Button - Visible to all players in header in private game */}
         {gameState.isPrivate && (
           <GamePauseButton
             onRequestPause={handleRequestPause}
             disabled={pauseRequest?.isActive}
             isLoading={isRequestingPause}
-          />
-        )}
-
-        {/* Host Controls - Always visible to host regardless of phase */}
-        {isHost && (
-          <GameHostControls
-            gameId={gameId}
-            gameState={gameState}
-            cardsDealt={cardsDealt}
-            onCardsDealt={() => setCardsDealt(true)}
           />
         )}
       </div>

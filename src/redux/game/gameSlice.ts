@@ -1,6 +1,6 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import type { GetCurrentGameStateResponse } from "../api/game/types";
-import type { Direction, Game, ProgrammingCards } from "@/models/gameModels";
+import type { Celltype, Direction, Game, ProgrammingCards } from "@/models/gameModels";
 
 interface GameState {
   currentGame: Game | null;
@@ -44,7 +44,7 @@ const gameSlice = createSlice({
           name: response.gameBoard.name,
           spaces: response.gameBoard.spaces.map((row) =>
             row.map((cell) => ({
-              name: cell.name as any, // Cast to Celltype
+              name: cell.name as Celltype, // Cast to Celltype
               walls: cell.walls as Direction[],
               direction: cell.direction as Direction | null,
             }))

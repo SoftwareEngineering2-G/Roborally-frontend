@@ -1,4 +1,4 @@
-import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
+import { createSlice, createSelector, type PayloadAction } from "@reduxjs/toolkit";
 import { lobbyApi } from "../api/lobby/lobbyApi";
 
 // Types for lobby state
@@ -171,14 +171,18 @@ export const selectCanStartGame = (state: { lobby: LobbyState }, username: strin
   return isHost && allReady && minPlayers && hasRequiredPlayers;
 };
 
-export const selectMissingRequiredPlayers = (state: { lobby: LobbyState }) => {
-  if (!state.lobby.requiredPlayers) return [];
+export const selectMissingRequiredPlayers = createSelector(
+  [
+    (state: { lobby: LobbyState }) => state.lobby.requiredPlayers,
+    (state: { lobby: LobbyState }) => state.lobby.players,
+  ],
+  (requiredPlayers, players) => {
+    if (!requiredPlayers) return [];
 
-  const currentPlayers = state.lobby.players.map((p) => p.username);
-  return state.lobby.requiredPlayers.filter(
-    (requiredUsername) => !currentPlayers.includes(requiredUsername)
-  );
-};
+    const currentPlayers = players.map((p) => p.username);
+    return requiredPlayers.filter((requiredUsername) => !currentPlayers.includes(requiredUsername));
+  }
+);
 
 export const selectIsPausedGame = (state: { lobby: LobbyState }) => {
   return state.lobby.requiredPlayers !== null && state.lobby.requiredPlayers.length > 0;
