@@ -25,9 +25,15 @@ interface ActivationPhaseProps {
   gameId: string;
   username: string;
   gameBoard: GameBoard;
+  pauseButton?: React.ReactNode;
 }
 
-export const ActivationPhase = ({ gameId, username, gameBoard }: ActivationPhaseProps) => {
+export const ActivationPhase = ({
+  gameId,
+  username,
+  gameBoard,
+  pauseButton,
+}: ActivationPhaseProps) => {
   const dispatch = useAppDispatch();
 
   // Get game state from Redux (programmedCards should be populated from backend or SignalR)
@@ -146,7 +152,7 @@ export const ActivationPhase = ({ gameId, username, gameBoard }: ActivationPhase
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto" />
           <p className="mt-4 text-muted-foreground">Loading game state...</p>
         </div>
       </div>
@@ -172,6 +178,7 @@ export const ActivationPhase = ({ gameId, username, gameBoard }: ActivationPhase
         <div className="flex items-center gap-4">
           <h1 className="text-2xl font-bold text-neon-teal">Activation Phase</h1>
           <p className="text-sm text-muted-foreground">Watch robots execute their programs</p>
+          {pauseButton}
         </div>
       </div>
 

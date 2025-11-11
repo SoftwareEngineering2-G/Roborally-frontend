@@ -33,9 +33,15 @@ interface ProgrammingPhaseProps {
   gameId: string;
   username: string;
   gameBoard: GameBoard;
+  pauseButton?: React.ReactNode;
 }
 
-export const ProgrammingPhase = ({ gameId, username, gameBoard }: ProgrammingPhaseProps) => {
+export const ProgrammingPhase = ({
+  gameId,
+  username,
+  gameBoard,
+  pauseButton,
+}: ProgrammingPhaseProps) => {
   const [showProgrammingControls, setShowProgrammingControls] = useState(true);
   const dispatch = useAppDispatch();
 
@@ -263,7 +269,7 @@ export const ProgrammingPhase = ({ gameId, username, gameBoard }: ProgrammingPha
       )}
 
       {/* Header */}
-      <ProgrammingHeader filledCount={filledCount} />
+      <ProgrammingHeader filledCount={filledCount} pauseButton={pauseButton} />
 
       {/* Side-by-side layout: Board on left, Players on right */}
       <div className="w-full min-h-[calc(100vh-5rem)] flex">

@@ -120,16 +120,35 @@ export default function Game({ gameId }: Props) {
     );
   }
 
+  // Prepare pause button component
+  const pauseButton = gameState?.isPrivate ? (
+    <GamePauseButton
+      onRequestPause={handleRequestPause}
+      disabled={pauseRequest?.isActive}
+      isLoading={isRequestingPause}
+    />
+  ) : null;
+
   // Render appropriate phase based on game state
   const renderPhase = () => {
     switch (gameState.currentPhase) {
       case "ProgrammingPhase":
         return (
-          <ProgrammingPhase gameId={gameId} username={username} gameBoard={gameState.gameBoard} />
+          <ProgrammingPhase
+            gameId={gameId}
+            username={username}
+            gameBoard={gameState.gameBoard}
+            pauseButton={pauseButton}
+          />
         );
       case "ActivationPhase":
         return (
-          <ActivationPhase gameId={gameId} username={username} gameBoard={gameState.gameBoard} />
+          <ActivationPhase
+            gameId={gameId}
+            username={username}
+            gameBoard={gameState.gameBoard}
+            pauseButton={pauseButton}
+          />
         );
       default:
         return (
@@ -145,17 +164,6 @@ export default function Game({ gameId }: Props) {
 
   return (
     <div className="relative min-h-screen">
-      <div className="fixed top-4 left-150 flex flex-row gap-5" style={{ zIndex: 10000 }}>
-        {/* Pause Button - Visible to all players in header in private game */}
-        {gameState.isPrivate && (
-          <GamePauseButton
-            onRequestPause={handleRequestPause}
-            disabled={pauseRequest?.isActive}
-            isLoading={isRequestingPause}
-          />
-        )}
-      </div>
-
       {/* Pause Request Dialog */}
       {pauseRequest && (
         <GamePauseDialog
