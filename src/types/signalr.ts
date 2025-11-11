@@ -53,3 +53,7 @@ export interface NextPlayerInTurnEvent {
   gameId: string;
   nextPlayerUsername: string;
 }
+export interface GameOverEvent {
+gameId: string;
+winnerUsername: string;
+}

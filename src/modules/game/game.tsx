@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useGameState } from "./hooks/useGameState";
 import { useGameSignalR } from "./ProgrammingPhase/hooks/useGameSignalR";
+import { useGameSignalRHandler } from "./hooks/useGameSignalRHandler";
 import type { ActivationPhaseStartedEvent } from "@/types/signalr";
 
 // Phase components
@@ -31,7 +32,8 @@ export default function Game({ gameId }: Props) {
 
   // Setup SignalR connection for the host to listen to game events
   const signalR = useGameSignalR(gameId, username || "");
-
+  // Listen for all backend game events (GameOver, PlayerMoved, etc.)
+  useGameSignalRHandler();
   // Listen for activation phase started event - simple refresh hack to sync all player cards
   useEffect(() => {
     if (!signalR.isConnected) return;

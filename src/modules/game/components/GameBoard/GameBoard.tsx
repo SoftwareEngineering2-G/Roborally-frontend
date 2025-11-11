@@ -9,6 +9,7 @@ import type {
 } from "@/models/gameModels";
 import Image from "next/image";
 import { useSpaceImage } from "./spaceImageFactory";
+import GameOverModal from "./GameOver";
 
 // Separate component to use the hook
 const SpaceImage = ({ 
@@ -79,6 +80,7 @@ export const GameBoard = ({
   };
 
   return (
+      <>
     <motion.div
       className={`relative ${className}`}
       initial={{ opacity: 0, scale: 0.9 }}
@@ -226,5 +228,8 @@ export const GameBoard = ({
         {/* Board Labels */}
       </div>
     </motion.div>
+
+    <GameOverModal />
+        </>
   );
 };

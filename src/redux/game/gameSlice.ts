@@ -8,6 +8,8 @@ interface GameState {
   error: string | null;
   currentTurnUsername: string | null; // Track whose turn it is to execute
   executedPlayers: string[]; // Track which players have executed in current round
+  winner: string | null;
+  isGameOver: boolean;
 }
 
 const initialState: GameState = {
@@ -16,6 +18,8 @@ const initialState: GameState = {
   error: null,
   currentTurnUsername: null,
   executedPlayers: [],
+  winner: null,
+  isGameOver: false,
 };
 
 const gameSlice = createSlice({
@@ -174,6 +178,10 @@ const gameSlice = createSlice({
         state.executedPlayers.push(action.payload);
       }
     },
+    setGameOver: (state, action: PayloadAction<{winner: String}> ) => {
+      state.isGameOver = true;
+      state.winner = action.payload.winner;
+    },
     resetGameState: (state) => {
       state.currentGame = null;
       state.isLoading = false;
@@ -195,6 +203,7 @@ export const {
   setCurrentTurn,
   updateRobotPosition,
   markPlayerExecuted,
+  setGameOver,
   resetGameState,
 } = gameSlice.actions;
 export default gameSlice.reducer;
