@@ -63,7 +63,12 @@ export const lobbyApi = baseApi.injectEndpoints({
           gameBoardName,
         },
       }),
-      invalidatesTags: (_result, _error, { gameId }) => ["Lobby", { type: "Lobby", id: gameId }],
+      invalidatesTags: (_result, _error, { gameId }) => [
+        "Lobby",
+        "Game",
+        { type: "Lobby", id: gameId },
+        { type: "Game", id: gameId },
+      ],
     }),
 
     joinContinueGameLobby: builder.mutation<void, JoinLobbyRequest>({
@@ -81,7 +86,12 @@ export const lobbyApi = baseApi.injectEndpoints({
         method: "POST",
         body: { username },
       }),
-      invalidatesTags: (_result, _error, { gameId }) => ["Lobby", { type: "Lobby", id: gameId }],
+      invalidatesTags: (_result, _error, { gameId }) => [
+        "Lobby",
+        "Game",
+        { type: "Lobby", id: gameId },
+        { type: "Game", id: gameId },
+      ],
     }),
   }),
 });

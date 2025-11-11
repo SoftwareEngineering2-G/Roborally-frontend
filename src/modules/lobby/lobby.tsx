@@ -10,6 +10,7 @@ import {
   useContinueGameMutation,
 } from "@/redux/api/lobby/lobbyApi";
 import { LobbyLoadingSkeleton, LobbyErrorState } from "@/components/lobby/lobby-skeleton";
+import { baseApi } from "@/redux/api/baseApi";
 import {
   selectLobbyState,
   selectLobbyPlayers,
@@ -35,6 +36,7 @@ export const Lobby = ({ gameId }: Props) => {
   const router = useRouter();
   const dispatch = useDispatch<AppDispatch>();
   const [username, setUsername] = useState<string | null>(null);
+  const [isNavigatingToGame, setIsNavigatingToGame] = useState(false);
 
   console.log("[Lobby] Current username state:", username);
 
@@ -108,10 +110,14 @@ export const Lobby = ({ gameId }: Props) => {
     if (!signalR.isConnected) return;
 
     signalR.on("GameStarted", () => {
+      setIsNavigatingToGame(true);
+      dispatch(baseApi.util.invalidateTags([{ type: "Game", id: gameId }]));
       router.push(`/game/${gameId}`);
     });
 
     signalR.on("GameContinued", () => {
+      setIsNavigatingToGame(true);
+      dispatch(baseApi.util.invalidateTags([{ type: "Game", id: gameId }]));
       router.push(`/game/${gameId}`);
     });
 
@@ -119,9 +125,13 @@ export const Lobby = ({ gameId }: Props) => {
       signalR.off("GameStarted");
       signalR.off("GameContinued");
     };
-  }, [signalR, router, gameId]);
+  }, [signalR, router, gameId, dispatch]);
 
   if (isLoading || !username) return <LobbyLoadingSkeleton />;
+
+  // Don't show error if we're navigating to game (player already left lobby)
+  if (isNavigatingToGame) return <LobbyLoadingSkeleton />;
+
   if (error && "status" in error && (error as { status: number }).status === 403) {
     return <LobbyErrorState message="Access denied." onRetry={() => router.push("/")} />;
   }
@@ -135,6 +145,7 @@ export const Lobby = ({ gameId }: Props) => {
     try {
       // Only use REST API - backend will broadcast GameStarted event via SignalR
       await startGame({ gameId: lobbyData.gameId, username, gameBoardName: selectedBoard });
+      setIsNavigatingToGame(true);
       toast.success(`Starting game with ${selectedBoard}!`);
     } catch (error) {
       console.error("Failed to start game:", error);
@@ -148,6 +159,7 @@ export const Lobby = ({ gameId }: Props) => {
     try {
       // Only use REST API - backend will broadcast GameContinued event via SignalR
       await continueGame({ gameId: lobbyData.gameId, username }).unwrap();
+      setIsNavigatingToGame(true);
       toast.success("Continuing game...");
     } catch (error) {
       console.error("Failed to continue game:", error);

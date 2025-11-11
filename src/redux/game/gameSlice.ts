@@ -51,7 +51,9 @@ const gameSlice = createSlice({
           ),
         },
         currentPhase: response.currentPhase as "ProgrammingPhase" | "ActivationPhase",
-        currentRevealedRegister: response.currentRevealedRegister,
+        currentRevealedRegister: response.currentRevealedRegister
+          ? response.currentRevealedRegister - 1
+          : null, // Backend is 1-5, we use 0-4
         currentTurnUsername: response.currentTurnUsername,
         currentExecutingRegister: response.currentExecutingRegister,
         personalState: {
