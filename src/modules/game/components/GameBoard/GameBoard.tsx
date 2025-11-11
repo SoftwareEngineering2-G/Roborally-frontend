@@ -9,6 +9,7 @@ import type {
 } from "@/models/gameModels";
 import Image from "next/image";
 import { useSpaceImage } from "./spaceImageFactory";
+import { useEffect, useState } from "react";
 
 // Separate component to use the hook
 const SpaceImage = ({ 
@@ -54,10 +55,45 @@ export const GameBoard = ({
   players = [],
 }: GameBoardProps) => {
   // Get dynamic board dimensions from the spaces array
-  const boardHeight = gameBoardData.spaces.length; // Number of rows
-  const boardWidth = gameBoardData.spaces[0]?.length || 0; // Number of columns
+  const boardHeight = gameBoardData.spaces.length;
+  const boardWidth = gameBoardData.spaces[0]?.length || 0;
 
-  // Create cells array based on actual board dimensions
+  // Stato reattivo per le rotazioni
+  const [rotations, setRotations] = useState<
+    Record<string, { currentRotation: number; previousRotation: number }>
+  >({});
+
+  // Calcola le rotazioni minime a ogni aggiornamento dei player
+  useEffect(() => {
+    setRotations((prevRotations) => {
+      const newRotations = { ...prevRotations };
+
+      players.forEach((player) => {
+        const prev = prevRotations[player.username];
+        const prevRotation =
+          prev?.currentRotation ?? directionRotationMap[player.direction];
+        const newRotation = directionRotationMap[player.direction];
+
+        // rotazione minima (da -180 a 180)
+        let diff = newRotation - prevRotation;
+        if (diff > 180) diff -= 360;
+        if (diff < -180) diff += 360;
+
+        newRotations[player.username] = {
+          previousRotation: prevRotation,
+          currentRotation: prevRotation + diff,
+        };
+
+        console.log(
+          `🧭 ${player.username}: ${prevRotation}° → ${prevRotation + diff}° (${player.direction})`
+        );
+      });
+
+      return newRotations;
+    });
+  }, [players]);
+
+  // Crea le celle
   const cells = Array.from({ length: boardHeight * boardWidth }, (_, index) => {
     const row = Math.floor(index / boardWidth);
     const col = index % boardWidth;
@@ -140,18 +176,32 @@ export const GameBoard = ({
                         const robotImage =
                           robotImageMap[player.robot.toLowerCase()] ||
                           robotImageMap.red;
-                        const rotation = directionRotationMap[player.direction];
+
+                        const initialRotation =
+                          rotations[player.username]?.previousRotation ??
+                          directionRotationMap[player.direction];
+                        const finalRotation =
+                          rotations[player.username]?.currentRotation ??
+                          directionRotationMap[player.direction];
+
+                        console.log(
+                          `🎥 ${player.username} rotating from ${initialRotation}° to ${finalRotation}°`
+                        );
 
                         return (
                           <motion.div
                             key={player.username}
                             layoutId={`robot-${player.username}`}
                             className="absolute inset-0"
-                            initial={{ scale: 0.8, opacity: 0 }}
-                            animate={{ 
-                              scale: 1, 
+                            initial={{
+                              scale: 0.8,
+                              opacity: 0,
+                              rotate: initialRotation,
+                            }}
+                            animate={{
+                              scale: 1,
                               opacity: 1,
-                              rotate: rotation,
+                              rotate: finalRotation,
                             }}
                             exit={{ scale: 0.8, opacity: 0 }}
                             transition={{
@@ -222,8 +272,6 @@ export const GameBoard = ({
             );
           })}
         </div>
-
-        {/* Board Labels */}
       </div>
     </motion.div>
   );
