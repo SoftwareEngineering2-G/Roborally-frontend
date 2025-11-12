@@ -5,8 +5,9 @@ import { useRevealNextRegisterMutation, useActivateNextBoardElementMutation } fr
 import { Crown, Users, Eye } from "lucide-react";
 import { toast } from "sonner";
 import type { Game } from "@/models/gameModels";
-import { useAppSelector } from "@/redux/hooks";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { useEffect, useRef } from "react";
+import { setCurrentTurn } from "@/redux/game/gameSlice";
 
 interface ActivationPhaseHostControlsProps {
   gameId: string;
@@ -19,6 +20,8 @@ export const ActivationPhaseHostControls = ({
   gameState,
   username,
 }: ActivationPhaseHostControlsProps) => {
+  const dispatch = useAppDispatch();
+
   const [revealNextRegister, { isLoading: isRevealingRegister }] =
     useRevealNextRegisterMutation();
   const [activateNextBoardElement, { isLoading: isActivatingBoardElement }] =
@@ -29,7 +32,7 @@ export const ActivationPhaseHostControls = ({
     (state) => state.game.currentGame?.currentRevealedRegister
   );
   const currentTurnUsername = useAppSelector(
-    (state) => state.game.currentGame?.currentTurnUsername
+    (state) => state.game.currentTurnUsername
   );
   const executedPlayers = useAppSelector((state) => state.game.executedPlayers);
 
@@ -89,6 +92,7 @@ export const ActivationPhaseHostControls = ({
           toast.success("Gears activated!");
 
           toast.info("All board elements activated! Ready for next register.");
+          dispatch(setCurrentTurn(null))
         } catch (error) {
           toast.error("Failed to activate board elements");
           console.error("Failed to activate board elements:", error);
@@ -103,6 +107,7 @@ export const ActivationPhaseHostControls = ({
     activateNextBoardElement,
     gameId,
     username,
+    dispatch,
   ]);
 
   return (

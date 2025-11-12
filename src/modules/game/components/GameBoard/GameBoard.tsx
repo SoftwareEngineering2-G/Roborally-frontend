@@ -83,10 +83,6 @@ export const GameBoard = ({
           previousRotation: prevRotation,
           currentRotation: prevRotation + diff,
         };
-
-        console.log(
-          `🧭 ${player.username}: ${prevRotation}° → ${prevRotation + diff}° (${player.direction})`
-        );
       });
 
       return newRotations;
@@ -183,10 +179,6 @@ export const GameBoard = ({
                         const finalRotation =
                           rotations[player.username]?.currentRotation ??
                           directionRotationMap[player.direction];
-
-                        console.log(
-                          `🎥 ${player.username} rotating from ${initialRotation}° to ${finalRotation}°`
-                        );
 
                         return (
                           <motion.div
