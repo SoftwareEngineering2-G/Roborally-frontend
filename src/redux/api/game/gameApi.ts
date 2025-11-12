@@ -1,16 +1,19 @@
 import { baseApi } from "../baseApi";
-import {
+import type {
   GetCurrentGameStateRequest,
   GetCurrentGameStateResponse,
   StartCardDealingForAllRequest,
   StartActivationPhaseRequest,
   RevealNextRegisterRequest,
-  RevealNextRegisterResponse,
   ExecuteProgrammingCardRequest,
   ExecuteProgrammingCardResponse,
   GetAllGamesRequest,
   GetAllGamesResponse,
   ActivateNextBoardElementRequest,
+  RequestGamePauseRequest,
+  RespondToGamePauseRequest,
+  GetPausedGamesRequest,
+  GetPausedGameResponse,
 } from "./types";
 
 export const gameApi = baseApi.injectEndpoints({
@@ -32,13 +35,11 @@ export const gameApi = baseApi.injectEndpoints({
           params,
         };
       },
+      providesTags: ["Game"],
     }),
 
     // Game actions endpoints
-    startCardDealingForAll: builder.mutation<
-      void,
-      StartCardDealingForAllRequest
-    >({
+    startCardDealingForAll: builder.mutation<void, StartCardDealingForAllRequest>({
       query: ({ gameId, username }) => ({
         url: `/games/${gameId}/deal-decks-to-all`,
         method: "POST",
@@ -62,15 +63,13 @@ export const gameApi = baseApi.injectEndpoints({
       }),
     }),
 
-    getCurrentGameState: builder.query<
-      GetCurrentGameStateResponse,
-      GetCurrentGameStateRequest
-    >({
+    getCurrentGameState: builder.query<GetCurrentGameStateResponse, GetCurrentGameStateRequest>({
       query: ({ gameId, username }) => ({
         url: `/games/${gameId}/current-state`,
         method: "GET",
         params: { username },
       }),
+      providesTags: (_result, _error, { gameId }) => [{ type: "Game", id: gameId }],
     }),
 
     executeProgrammingCard: builder.mutation<
@@ -84,15 +83,37 @@ export const gameApi = baseApi.injectEndpoints({
       }),
     }),
 
-    activateNextBoardElement: builder.mutation<
-      void,
-      ActivateNextBoardElementRequest
-    >({
+    activateNextBoardElement: builder.mutation<void, ActivateNextBoardElementRequest>({
       query: ({ gameId }) => ({
         url: `/games/${gameId}/activate-next-board-element`,
         method: "POST",
         body: { gameId },
       }),
+    }),
+
+    requestGamePause: builder.mutation<void, RequestGamePauseRequest>({
+      query: ({ gameId, username }) => ({
+        url: `/games/${gameId}/pause/request`,
+        method: "POST",
+        body: { username },
+      }),
+    }),
+
+    respondToGamePause: builder.mutation<void, RespondToGamePauseRequest>({
+      query: ({ gameId, username, approved }) => ({
+        url: `/games/${gameId}/pause/respond`,
+        method: "POST",
+        body: { username, approved },
+      }),
+    }),
+
+    getPausedGames: builder.query<GetPausedGameResponse[], GetPausedGamesRequest>({
+      query: ({ username }) => ({
+        url: "/games/paused",
+        method: "GET",
+        params: { username },
+      }),
+      providesTags: ["Game"],
     }),
   }),
 });
@@ -108,4 +129,7 @@ export const {
   useGetCurrentGameStateQuery,
   useExecuteProgrammingCardMutation,
   useActivateNextBoardElementMutation,
+  useRequestGamePauseMutation,
+  useRespondToGamePauseMutation,
+  useGetPausedGamesQuery,
 } = gameApi;
