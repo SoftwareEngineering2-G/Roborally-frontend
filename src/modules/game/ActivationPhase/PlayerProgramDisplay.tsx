@@ -12,6 +12,7 @@ interface Player {
   username: string;
   robot: string;
   revealedCardsInOrder: string[]; // Cards revealed during activation phase
+  currentCheckpoint: number;
 }
 
 const robotColorMap = {
@@ -50,6 +51,7 @@ export const PlayerProgramDisplay = ({
   isCurrentTurn = false,
   gameId = "",
 }: PlayerProgramDisplayProps) => {
+
   const robotColor =
     robotColorMap[player.robot.toLowerCase() as keyof typeof robotColorMap] ||
     "bg-gray-500";
@@ -118,6 +120,18 @@ export const PlayerProgramDisplay = ({
 
           {/* Program Cards - 5 Register Slots */}
           <div className="space-y-2">
+            {/* Checkpoint Counter */}
+            <div className="flex items-center justify-between mb-2 p-2 rounded-md bg-surface-dark/50 border border-glass-border">
+              <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                Checkpoint passed : 
+              </span>
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-bold text-neon-teal">
+                  {player.currentCheckpoint}
+                </span>
+              </div>
+            </div>
+
             <h4 className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
               Programmed Cards
             </h4>

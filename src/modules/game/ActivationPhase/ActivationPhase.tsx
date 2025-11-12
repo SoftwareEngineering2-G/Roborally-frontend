@@ -12,11 +12,13 @@ import {
   setCurrentTurn,
   updateRobotPosition,
   markPlayerExecuted,
+  updatePlayerCheckpoint,
 } from "@/redux/game/gameSlice";
 import type {
   RegisterRevealedEvent,
   RobotMovedEvent,
   NextPlayerInTurnEvent,
+  CheckpointReachedEvent,
 } from "@/types/signalr";
 import { toast } from "sonner";
 import type { GameBoard } from "@/models/gameModels";
@@ -44,6 +46,16 @@ export const ActivationPhase = ({
 
   // Setup SignalR connection for game events
   const signalR = useGameSignalR(gameId, username);
+
+  // Debug: Log all SignalR connection status
+  useEffect(() => {
+    console.log('🔌 SignalR Status:', {
+      isConnected: signalR.isConnected,
+      gameId,
+      username,
+      hasCurrentGame: !!currentGame
+    });
+  }, [signalR.isConnected, gameId, username, currentGame]);
 
   // Listen for register revealed events
   useEffect(() => {
@@ -146,6 +158,29 @@ export const ActivationPhase = ({
       signalR.off("NextPlayerInTurn");
     };
   }, [signalR.isConnected, gameId, dispatch, signalR, currentGame, username]);
+
+  // Listen for checkpoint reached events
+  useEffect(() => {
+    if (!signalR.isConnected || !currentGame) return;
+
+    console.log('🎯 Setting up CheckpointReached listener...');
+
+    const handleCheckpointReached = (...args: unknown[]) => {
+      
+      const payload = args[0] as CheckpointReachedEvent;
+      
+      dispatch(updatePlayerCheckpoint({
+        username: payload.username,
+        checkpointNumber: payload.checkpointNumber,
+      }));
+    };
+
+    signalR.on("CheckpointReached", handleCheckpointReached);
+
+    return () => {
+      signalR.off("CheckpointReached");
+    };
+  }, [signalR.isConnected, gameId, dispatch, signalR, currentGame]);
 
   // Don't render if we don't have game state
   if (!currentGame) {
