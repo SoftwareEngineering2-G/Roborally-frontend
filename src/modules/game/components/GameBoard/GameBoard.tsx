@@ -264,7 +264,7 @@ export const GameBoard = ({
           })}
         </div>
 
-        {/* Board Labels */}        
+        {/* Board Labels */}
       </div>
     </motion.div>
   );
