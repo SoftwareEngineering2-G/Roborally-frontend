@@ -10,7 +10,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
     <Provider store={store}>
       <SignalRProvider>
         {children}
-        <Toaster />
+        <Toaster position="top-center"/>
       </SignalRProvider>
     </Provider>
   );
