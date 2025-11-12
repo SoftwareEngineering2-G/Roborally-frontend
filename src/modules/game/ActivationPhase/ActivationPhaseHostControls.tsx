@@ -8,9 +8,8 @@ import {
 import { Crown, Users, Eye } from "lucide-react";
 import { toast } from "sonner";
 import type { Game } from "@/models/gameModels";
-import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import { useAppSelector } from "@/redux/hooks";
 import { useEffect, useRef } from "react";
-import { setCurrentTurn } from "@/redux/game/gameSlice";
 
 interface ActivationPhaseHostControlsProps {
   gameId: string;
@@ -23,8 +22,6 @@ export const ActivationPhaseHostControls = ({
   gameState,
   username,
 }: ActivationPhaseHostControlsProps) => {
-  const dispatch = useAppDispatch();
-
   const [revealNextRegister, { isLoading: isRevealingRegister }] = useRevealNextRegisterMutation();
   const [activateNextBoardElement, { isLoading: isActivatingBoardElement }] =
     useActivateNextBoardElementMutation();
@@ -33,9 +30,7 @@ export const ActivationPhaseHostControls = ({
   const currentRevealedRegister = useAppSelector(
     (state) => state.game.currentGame?.currentRevealedRegister
   );
-  const currentTurnUsername = useAppSelector(
-    (state) => state.game.currentGame?.currentTurnUsername
-  );
+  const currentTurnUsername = useAppSelector((state) => state.game.currentTurnUsername);
   const executedPlayers = useAppSelector((state) => state.game.executedPlayers);
 
   // Determine which register to reveal next (0-4)
@@ -93,7 +88,6 @@ export const ActivationPhaseHostControls = ({
           toast.success("Gears activated!");
 
           toast.info("All board elements activated! Ready for next register.");
-          dispatch(setCurrentTurn(null))
         } catch (error) {
           toast.error("Failed to activate board elements");
           console.error("Failed to activate board elements:", error);
@@ -135,19 +129,20 @@ export const ActivationPhaseHostControls = ({
           disabled={!canRevealNextRegister || isRevealingRegister}
           size="sm"
           variant="outline"
-          className={`h-7 text-xs ${canRevealNextRegister
-              ? "bg-purple-500/10 border-purple-500/30 text-purple-400 hover:bg-purple-500/20 hover:border-purple-500/50"
-              : "bg-gray-500/10 border-gray-500/30 text-gray-400 cursor-not-allowed"
-            }`}
+          className={`h-7 text-xs ${
+            canRevealNextRegister
+            ? "bg-purple-500/10 border-purple-500/30 text-purple-400 hover:bg-purple-500/20 hover:border-purple-500/50"
+            : "bg-gray-500/10 border-gray-500/30 text-gray-400 cursor-not-allowed"
+          }`}
         >
           <Eye className="w-3 h-3 mr-1" />
           {isRevealingRegister
             ? "Revealing..."
             : allRegistersRevealed
-              ? "All Cards Revealed"
-              : !shouldRevealNextRegister
-                ? "Waiting for players..."
-                : `Reveal ${nextRegisterToReveal === 0 ? "First" : "Next"} Card`}
+            ? "All Cards Revealed"
+            : !shouldRevealNextRegister
+            ? "Waiting for players..."
+            : `Reveal ${nextRegisterToReveal === 0 ? "First" : "Next"} Card`}
         </Button>
       </div>
     </div>

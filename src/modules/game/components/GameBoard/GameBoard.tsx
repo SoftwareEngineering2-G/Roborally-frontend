@@ -55,15 +55,14 @@ export const GameBoard = ({
   players = [],
 }: GameBoardProps) => {
   // Get dynamic board dimensions from the spaces array
-  const boardHeight = gameBoardData.spaces.length;
-  const boardWidth = gameBoardData.spaces[0]?.length || 0;
+  const boardHeight = gameBoardData.spaces.length; // Number of rows
+  const boardWidth = gameBoardData.spaces[0]?.length || 0; // Number of columns
 
-  // Stato reattivo per le rotazioni
   const [rotations, setRotations] = useState<
     Record<string, { currentRotation: number; previousRotation: number }>
   >({});
 
-  // Calcola le rotazioni minime a ogni aggiornamento dei player
+  // Calculate minimal rotations on each player update
   useEffect(() => {
     setRotations((prevRotations) => {
       const newRotations = { ...prevRotations };
@@ -89,7 +88,7 @@ export const GameBoard = ({
     });
   }, [players]);
 
-  // Crea le celle
+  // Create cells array based on actual board dimensions
   const cells = Array.from({ length: boardHeight * boardWidth }, (_, index) => {
     const row = Math.floor(index / boardWidth);
     const col = index % boardWidth;
@@ -264,6 +263,8 @@ export const GameBoard = ({
             );
           })}
         </div>
+
+        {/* Board Labels */}        
       </div>
     </motion.div>
   );
