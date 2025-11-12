@@ -5,33 +5,17 @@ import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { useLazyGetAllGamesQuery } from "@/redux/api/game/gameApi";
 
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  NativeSelect,
-  NativeSelectOption,
-} from "@/components/ui/native-select";
+import { NativeSelect, NativeSelectOption } from "@/components/ui/native-select";
 import { DatePicker } from "@/components/ui/date-picker";
-import {
-  History,
-  Filter,
-  ChevronLeft,
-  ChevronRight,
-  Trophy,
-  Search,
-  X,
-} from "lucide-react";
+import { History, Filter, ChevronLeft, ChevronRight, Trophy, Search, X } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { GameCard } from "@/components/games/game-card";
+import { GetAllGamesRequest } from "@/redux/api/game/types";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -52,8 +36,7 @@ export default function GamesPage() {
   const [currentPage, setCurrentPage] = useState(1);
 
   // API
-  const [trigger, { data: games = [], isLoading, error }] =
-    useLazyGetAllGamesQuery();
+  const [trigger, { data: games = [], isLoading, error }] = useLazyGetAllGamesQuery();
 
   // Load username and fetch games
   useEffect(() => {
@@ -69,7 +52,7 @@ export default function GamesPage() {
   useEffect(() => {
     if (!username) return;
 
-    const params: any = { username };
+    const params: GetAllGamesRequest = { username };
 
     if (isPrivateFilter !== "all") {
       params.isPrivate = isPrivateFilter === "private";
@@ -93,15 +76,7 @@ export default function GamesPage() {
 
     trigger(params);
     setCurrentPage(1); // Reset to first page on filter change
-  }, [
-    username,
-    isPrivateFilter,
-    isFinishedFilter,
-    fromDate,
-    toDate,
-    searchTerm,
-    trigger,
-  ]);
+  }, [username, isPrivateFilter, isFinishedFilter, fromDate, toDate, searchTerm, trigger]);
 
   // Paginate games (search is now server-side via searchTag)
   const paginatedGames = useMemo(() => {
@@ -122,11 +97,7 @@ export default function GamesPage() {
   };
 
   const hasActiveFilters =
-    isPrivateFilter !== "all" ||
-    isFinishedFilter !== "all" ||
-    fromDate ||
-    toDate ||
-    searchTerm;
+    isPrivateFilter !== "all" || isFinishedFilter !== "all" || fromDate || toDate || searchTerm;
 
   if (!username) {
     return (
@@ -155,10 +126,7 @@ export default function GamesPage() {
               Game History
             </h1>
           </div>
-          <Badge
-            variant="secondary"
-            className="bg-neon-teal/20 text-neon-teal border-neon-teal/30"
-          >
+          <Badge variant="secondary" className="bg-neon-teal/20 text-neon-teal border-neon-teal/30">
             Pilot: {username}
           </Badge>
         </div>
@@ -194,10 +162,7 @@ export default function GamesPage() {
               <CardContent className="space-y-4">
                 {/* Search */}
                 <div className="space-y-2">
-                  <Label
-                    htmlFor="search"
-                    className="text-sm font-medium text-neon-blue"
-                  >
+                  <Label htmlFor="search" className="text-sm font-medium text-neon-blue">
                     Search
                   </Label>
                   <div className="relative">
@@ -214,10 +179,7 @@ export default function GamesPage() {
 
                 {/* Privacy Filter */}
                 <div className="space-y-2">
-                  <Label
-                    htmlFor="privacy"
-                    className="text-sm font-medium text-neon-blue"
-                  >
+                  <Label htmlFor="privacy" className="text-sm font-medium text-neon-blue">
                     Privacy
                   </Label>
                   <NativeSelect
@@ -226,24 +188,15 @@ export default function GamesPage() {
                     onChange={(e) => setIsPrivateFilter(e.target.value)}
                     className="border-neon-blue/30 bg-surface-dark/50 hover:bg-surface-dark/70 hover:border-neon-blue/50 focus-visible:border-neon-blue focus-visible:ring-neon-blue/20"
                   >
-                    <NativeSelectOption value="all">
-                      All Games
-                    </NativeSelectOption>
-                    <NativeSelectOption value="public">
-                      Public Only
-                    </NativeSelectOption>
-                    <NativeSelectOption value="private">
-                      Private Only
-                    </NativeSelectOption>
+                    <NativeSelectOption value="all">All Games</NativeSelectOption>
+                    <NativeSelectOption value="public">Public Only</NativeSelectOption>
+                    <NativeSelectOption value="private">Private Only</NativeSelectOption>
                   </NativeSelect>
                 </div>
 
                 {/* Status Filter */}
                 <div className="space-y-2">
-                  <Label
-                    htmlFor="status"
-                    className="text-sm font-medium text-neon-blue"
-                  >
+                  <Label htmlFor="status" className="text-sm font-medium text-neon-blue">
                     Status
                   </Label>
                   <NativeSelect
@@ -252,24 +205,15 @@ export default function GamesPage() {
                     onChange={(e) => setIsFinishedFilter(e.target.value)}
                     className="border-neon-blue/30 bg-surface-dark/50 hover:bg-surface-dark/70 hover:border-neon-blue/50 focus-visible:border-neon-blue focus-visible:ring-neon-blue/20"
                   >
-                    <NativeSelectOption value="all">
-                      All Games
-                    </NativeSelectOption>
-                    <NativeSelectOption value="finished">
-                      Finished
-                    </NativeSelectOption>
-                    <NativeSelectOption value="ongoing">
-                      Ongoing
-                    </NativeSelectOption>
+                    <NativeSelectOption value="all">All Games</NativeSelectOption>
+                    <NativeSelectOption value="finished">Finished</NativeSelectOption>
+                    <NativeSelectOption value="ongoing">Ongoing</NativeSelectOption>
                   </NativeSelect>
                 </div>
 
                 {/* Date Range */}
                 <div className="space-y-2">
-                  <Label
-                    htmlFor="from-date"
-                    className="text-sm font-medium text-neon-blue"
-                  >
+                  <Label htmlFor="from-date" className="text-sm font-medium text-neon-blue">
                     From Date
                   </Label>
                   <DatePicker
@@ -280,10 +224,7 @@ export default function GamesPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label
-                    htmlFor="to-date"
-                    className="text-sm font-medium text-neon-blue"
-                  >
+                  <Label htmlFor="to-date" className="text-sm font-medium text-neon-blue">
                     To Date
                   </Label>
                   <DatePicker
@@ -307,12 +248,9 @@ export default function GamesPage() {
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div>
-                    <CardTitle className="text-xl text-neon-magenta">
-                      Your Games
-                    </CardTitle>
+                    <CardTitle className="text-xl text-neon-magenta">Your Games</CardTitle>
                     <CardDescription>
-                      {games.length} {games.length === 1 ? "game" : "games"}{" "}
-                      found
+                      {games.length} {games.length === 1 ? "game" : "games"} found
                     </CardDescription>
                   </div>
                 </div>
@@ -337,21 +275,14 @@ export default function GamesPage() {
                 ) : (
                   <>
                     {paginatedGames.map((game, index) => (
-                      <GameCard
-                        key={game.gameId}
-                        game={game}
-                        index={index}
-                        compact
-                      />
+                      <GameCard key={game.gameId} game={game} index={index} compact />
                     ))}
 
                     {/* Pagination */}
                     {totalPages > 1 && (
                       <div className="flex items-center justify-between pt-4 mt-4 border-t border-neon-magenta/20">
                         <Button
-                          onClick={() =>
-                            setCurrentPage((prev) => Math.max(1, prev - 1))
-                          }
+                          onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
                           disabled={currentPage === 1}
                           variant="outline"
                           size="sm"
@@ -368,11 +299,7 @@ export default function GamesPage() {
                         </div>
 
                         <Button
-                          onClick={() =>
-                            setCurrentPage((prev) =>
-                              Math.min(totalPages, prev + 1)
-                            )
-                          }
+                          onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
                           disabled={currentPage === totalPages}
                           variant="outline"
                           size="sm"
@@ -398,10 +325,7 @@ function GamesListSkeleton() {
   return (
     <>
       {[1, 2, 3, 4, 5].map((i) => (
-        <div
-          key={i}
-          className="p-4 border border-neon-magenta/20 rounded-lg bg-surface-dark/30"
-        >
+        <div key={i} className="p-4 border border-neon-magenta/20 rounded-lg bg-surface-dark/30">
           <div className="space-y-2">
             <Skeleton className="h-6 w-3/4" />
             <div className="flex gap-4">

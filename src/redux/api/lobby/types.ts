@@ -41,10 +41,17 @@ export interface GetLobbyInfoResponse {
   lobbyname: string;
   joinedUsernames: string[];
   hostUsername: string;
+  requiredUsernames: string[] | null; // For paused games
+  pausedGameBoardName: string | null; // For paused games
 }
 
 export interface StartGameRequest {
   gameId: string;
   username: string;
   gameBoardName: string;
+}
+
+export interface ContinueGameRequest {
+  gameId: string;
+  username: string;
 }

@@ -5,11 +5,13 @@ import { motion } from "framer-motion";
 interface ProgrammingHeaderProps {
   filledCount: number;
   hostControls?: React.ReactNode;
+  pauseButton?: React.ReactNode;
 }
 
 export const ProgrammingHeader = ({
   filledCount,
   hostControls,
+  pauseButton,
 }: ProgrammingHeaderProps) => {
   return (
     <motion.div
@@ -20,10 +22,7 @@ export const ProgrammingHeader = ({
     >
       <div className="max-w-7xl mx-auto flex justify-between items-center">
         <div className="flex items-center gap-4">
-          <motion.h1
-            className="text-2xl font-bold neon-text"
-            style={{ color: "#00d4ff" }}
-          >
+          <motion.h1 className="text-2xl font-bold neon-text" style={{ color: "#00d4ff" }}>
             Programming Phase
           </motion.h1>
 
@@ -34,6 +33,17 @@ export const ProgrammingHeader = ({
           >
             Registers: {filledCount}/5
           </motion.div>
+
+          {/* Pause Button */}
+          {pauseButton && (
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="flex items-center"
+            >
+              {pauseButton}
+            </motion.div>
+          )}
 
           {/* Host Controls - Subtle integration */}
           {hostControls && (
@@ -47,9 +57,7 @@ export const ProgrammingHeader = ({
           )}
         </div>
 
-        <div className="flex items-center gap-3">
-          {/* Space for future header actions */}
-        </div>
+        <div className="flex items-center gap-3">{/* Space for future header actions */}</div>
       </div>
     </motion.div>
   );

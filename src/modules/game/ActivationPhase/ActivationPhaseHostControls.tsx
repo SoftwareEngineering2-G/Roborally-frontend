@@ -1,7 +1,10 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { useRevealNextRegisterMutation, useActivateNextBoardElementMutation } from "@/redux/api/game/gameApi";
+import {
+  useRevealNextRegisterMutation,
+  useActivateNextBoardElementMutation,
+} from "@/redux/api/game/gameApi";
 import { Crown, Users, Eye } from "lucide-react";
 import { toast } from "sonner";
 import type { Game } from "@/models/gameModels";
@@ -22,8 +25,7 @@ export const ActivationPhaseHostControls = ({
 }: ActivationPhaseHostControlsProps) => {
   const dispatch = useAppDispatch();
 
-  const [revealNextRegister, { isLoading: isRevealingRegister }] =
-    useRevealNextRegisterMutation();
+  const [revealNextRegister, { isLoading: isRevealingRegister }] = useRevealNextRegisterMutation();
   const [activateNextBoardElement, { isLoading: isActivatingBoardElement }] =
     useActivateNextBoardElementMutation();
 
@@ -32,7 +34,7 @@ export const ActivationPhaseHostControls = ({
     (state) => state.game.currentGame?.currentRevealedRegister
   );
   const currentTurnUsername = useAppSelector(
-    (state) => state.game.currentTurnUsername
+    (state) => state.game.currentGame?.currentTurnUsername
   );
   const executedPlayers = useAppSelector((state) => state.game.executedPlayers);
 
@@ -43,8 +45,7 @@ export const ActivationPhaseHostControls = ({
   // If currentTurnUsername is null, that means a new register must be revealed
   // Otherwise, the respective player must execute their card
   const shouldRevealNextRegister = currentTurnUsername === null;
-  const canRevealNextRegister =
-    shouldRevealNextRegister && !allRegistersRevealed;
+  const canRevealNextRegister = shouldRevealNextRegister && !allRegistersRevealed;
 
   const handleRevealNextRegister = async () => {
     try {
@@ -101,14 +102,7 @@ export const ActivationPhaseHostControls = ({
     };
 
     activateBoardElements();
-  }, [
-    allPlayersExecuted,
-    currentRevealedRegister,
-    activateNextBoardElement,
-    gameId,
-    username,
-    dispatch,
-  ]);
+  }, [allPlayersExecuted, currentRevealedRegister, activateNextBoardElement, gameId, username]);
 
   return (
     <div className="fixed top-4 right-4 z-[10000] flex items-center gap-2">
@@ -141,20 +135,19 @@ export const ActivationPhaseHostControls = ({
           disabled={!canRevealNextRegister || isRevealingRegister}
           size="sm"
           variant="outline"
-          className={`h-7 text-xs ${
-            canRevealNextRegister
+          className={`h-7 text-xs ${canRevealNextRegister
               ? "bg-purple-500/10 border-purple-500/30 text-purple-400 hover:bg-purple-500/20 hover:border-purple-500/50"
               : "bg-gray-500/10 border-gray-500/30 text-gray-400 cursor-not-allowed"
-          }`}
+            }`}
         >
           <Eye className="w-3 h-3 mr-1" />
           {isRevealingRegister
             ? "Revealing..."
             : allRegistersRevealed
-            ? "All Cards Revealed"
-            : !shouldRevealNextRegister
-            ? "Waiting for players..."
-            : `Reveal ${nextRegisterToReveal === 0 ? "First" : "Next"} Card`}
+              ? "All Cards Revealed"
+              : !shouldRevealNextRegister
+                ? "Waiting for players..."
+                : `Reveal ${nextRegisterToReveal === 0 ? "First" : "Next"} Card`}
         </Button>
       </div>
     </div>
