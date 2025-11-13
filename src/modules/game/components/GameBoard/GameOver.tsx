@@ -52,7 +52,9 @@ const GameOverModal = () => {
         </p>
 
         <button
-          onClick={() => dispatch(resetGameState())}
+          onClick={() => {
+            dispatch(resetGameState())
+          }}
           className="mt-8 bg-cyan-500 hover:bg-cyan-600 px-5 py-2 rounded-lg transition shadow-md"
         >
           Close

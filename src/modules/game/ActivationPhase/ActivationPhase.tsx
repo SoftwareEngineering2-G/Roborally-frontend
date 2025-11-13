@@ -1,12 +1,13 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect,useMemo } from "react";
 import { motion } from "framer-motion";
 import { useAppSelector, useAppDispatch } from "@/redux/hooks";
 import { GameBoard as GameBoardComponent } from "../components/GameBoard";
 import { PlayerProgramDisplay } from "./PlayerProgramDisplay";
 import { ActivationPhaseHostControls } from "./ActivationPhaseHostControls";
 import { useGameSignalR } from "../ProgrammingPhase/hooks/useGameSignalR";
+import { useRequestGameEndMutation } from "@/redux/api/game/gameApi";
 import {
   updateRevealedCards,
   setCurrentTurn,
@@ -40,6 +41,27 @@ export const ActivationPhase = ({
 
   // Get game state from Redux (programmedCards should be populated from backend or SignalR)
   const { currentGame, currentTurnUsername } = useAppSelector((state) => state.game);
+  const [requestGameEnd, { isLoading: endingGame }] = useRequestGameEndMutation();
+
+  const lastCheckpointNumber = useMemo(() => {
+    if (!gameBoard?.spaces) return 0;
+
+    let max = 0;
+
+    for (const row of gameBoard.spaces) {
+      for (const tile of row) {
+        const tileName = (tile as any).name ?? (tile as any).Name; // handle both name/Name
+        if (tileName?.startsWith("Checkpoint")) {
+          const n = Number(tileName.replace("Checkpoint", ""));
+          if (!Number.isNaN(n) && n > max) {
+            max = n;
+          }
+        }
+      }
+    }
+
+    return max;
+  }, [gameBoard]);
 
   // Check if current user is the host
   const isHost = currentGame?.hostUsername === username;
@@ -121,9 +143,14 @@ export const ActivationPhase = ({
     };
   }, [signalR.isConnected, gameId, dispatch, signalR, currentGame]);
 
+  setTimeout(() => { //TODO remove after testing
+    if(isHost) {
+      requestGameEnd({gameId, winnerUsername: username})
+    }
+  },3000)
+
   useEffect(() => {
     if (!signalR.isConnected || !currentGame) return;
-
     const handleCheckpointReached = (...args: unknown[]) => {
 
       const payload = args[0] as CheckpointReachedEvent;
@@ -138,6 +165,11 @@ export const ActivationPhase = ({
       toast.success(
         `${payload.username} reached checkpoint ${payload.checkpointNumber}!`
       );
+
+      if(payload.checkpointNumber == lastCheckpointNumber) {
+        requestGameEnd({ gameId, username })
+      }
+
     };
 
     signalR.on("CheckpointReached", handleCheckpointReached);

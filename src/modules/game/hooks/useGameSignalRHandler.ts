@@ -50,7 +50,7 @@ useEffect(() => {
 
     // Handle Game Over event
     game.on("GameEnded", (data: GameOverEvent) => {
-      dispatch(setGameOver({ winner: data.winnerUsername }));
+      dispatch(setGameOver({ winner: data.username }));
     });
 
     // Cleanup when component unmounts or connection changes

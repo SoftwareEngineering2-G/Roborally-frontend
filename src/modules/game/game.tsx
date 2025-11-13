@@ -158,7 +158,7 @@ export default function Game({ gameId }: Props) {
       isLoading={isRequestingPause}
     />
   ) : null;
-√
+
   // Render appropriate phase based on game state
   const renderPhase = () => {
     switch (gameState.currentPhase) {

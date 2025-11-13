@@ -56,7 +56,7 @@ export interface NextPlayerInTurnEvent {
 
 export interface GameOverEvent {
 gameId: string;
-winnerUsername: string;
+username: string;
 }
 
 // Game Pause SignalR Events
