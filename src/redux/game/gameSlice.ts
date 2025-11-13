@@ -25,16 +25,6 @@ const gameSlice = createSlice({
     setGameState: (state, action: PayloadAction<GetCurrentGameStateResponse>) => {
       // Transform the API response to match the Game type
       const response = action.payload;
-      
-      // Log raw API response to debug checkpoint field
-      console.log("🔍 Raw API Response Players:", response.players.map(p => ({
-        username: p.username,
-        currentCheckpointPassed: p.currentCheckpointPassed,
-        currentCheckpointType: typeof p.currentCheckpointPassed,
-        hasCheckpointField: 'currentCheckpointPassed' in p,
-        fullPlayer: p,
-      })));
-      
       state.currentGame = {
         gameId: response.gameId,
         hostUsername: response.hostUsername,
