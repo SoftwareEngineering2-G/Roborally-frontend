@@ -42,7 +42,7 @@ export const SignalRProvider = ({ children }: { children: React.ReactNode }) => 
       error: lobbySignalR.error,
       send: lobbySignalR.send,
       on: lobbySignalR.on,
-      off: lobbySignalR.off,docker-compose up --build
+      off: lobbySignalR.off,
     },
     game: {
       isConnected: gameSignalR.isConnected,
