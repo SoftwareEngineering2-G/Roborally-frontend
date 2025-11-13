@@ -128,12 +128,6 @@ export const ActivationPhase = ({
 
       const payload = args[0] as CheckpointReachedEvent;
 
-      console.log("🎯 Checkpoint Reached Event:", {
-        username: payload.username,
-        checkpointNumber: payload.checkpointNumber,
-        gameId: payload.gameId,
-        timestamp: new Date().toISOString(),
-      });
 
       dispatch(updatePlayerCheckpoint({
         username: payload.username,
