@@ -12,11 +12,13 @@ import {
   setCurrentTurn,
   updateRobotPosition,
   markPlayerExecuted,
+  updatePlayerCheckpoint,
 } from "@/redux/game/gameSlice";
 import type {
   RegisterRevealedEvent,
   RobotMovedEvent,
   NextPlayerInTurnEvent,
+  CheckpointReachedEvent,
 } from "@/types/signalr";
 import { toast } from "sonner";
 import type { GameBoard } from "@/models/gameModels";
@@ -25,19 +27,19 @@ interface ActivationPhaseProps {
   gameId: string;
   username: string;
   gameBoard: GameBoard;
+  pauseButton?: React.ReactNode;
 }
 
 export const ActivationPhase = ({
   gameId,
   username,
   gameBoard,
+  pauseButton,
 }: ActivationPhaseProps) => {
   const dispatch = useAppDispatch();
 
   // Get game state from Redux (programmedCards should be populated from backend or SignalR)
-  const { currentGame, currentTurnUsername } = useAppSelector(
-    (state) => state.game
-  );
+  const { currentGame, currentTurnUsername } = useAppSelector((state) => state.game);
 
   // Check if current user is the host
   const isHost = currentGame?.hostUsername === username;
@@ -62,12 +64,6 @@ export const ActivationPhase = ({
           revealedCards: data.revealedCards,
         })
       );
-
-      // Set the first player's turn (host goes first)
-      if (currentGame.players.length > 0) {
-        const firstPlayer = currentGame.hostUsername; // Host goes first
-        dispatch(setCurrentTurn(firstPlayer));
-      }
 
       // Show toast notification
       const registerLabel =
@@ -125,6 +121,32 @@ export const ActivationPhase = ({
     };
   }, [signalR.isConnected, gameId, dispatch, signalR, currentGame]);
 
+  useEffect(() => {
+    if (!signalR.isConnected || !currentGame) return;
+
+    const handleCheckpointReached = (...args: unknown[]) => {
+
+      const payload = args[0] as CheckpointReachedEvent;
+
+
+      dispatch(updatePlayerCheckpoint({
+        username: payload.username,
+        checkpointNumber: payload.checkpointNumber,
+      }));
+
+      // Show toast notification
+      toast.success(
+        `${payload.username} reached checkpoint ${payload.checkpointNumber}!`
+      );
+    };
+
+    signalR.on("CheckpointReached", handleCheckpointReached);
+
+    return () => {
+      signalR.off("CheckpointReached");
+    };
+  }, [signalR.isConnected, gameId, dispatch, signalR, currentGame]);
+
   // Listen for next player in turn events
   useEffect(() => {
     if (!signalR.isConnected || !currentGame) return;
@@ -141,7 +163,7 @@ export const ActivationPhase = ({
       // Show toast notification if it's the current user's turn
       if (data.nextPlayerUsername === username) {
         toast.info("It's your turn to execute your card!");
-      } else {
+      } else if (data.nextPlayerUsername) {
         toast.info(`It's ${data.nextPlayerUsername}'s turn to execute!`);
       }
     };
@@ -158,7 +180,7 @@ export const ActivationPhase = ({
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto" />
           <p className="mt-4 text-muted-foreground">Loading game state...</p>
         </div>
       </div>
@@ -176,22 +198,15 @@ export const ActivationPhase = ({
     >
       {/* Host Controls - Only visible to host in activation phase */}
       {isHost && (
-        <ActivationPhaseHostControls
-          gameId={gameId}
-          gameState={currentGame}
-          username={username}
-        />
+        <ActivationPhaseHostControls gameId={gameId} gameState={currentGame} username={username} />
       )}
 
       {/* Header */}
       <div className="h-20 border-b border-glass-border bg-surface-dark/50 backdrop-blur-sm flex items-center justify-between px-6">
         <div className="flex items-center gap-4">
-          <h1 className="text-2xl font-bold text-neon-teal">
-            Activation Phase
-          </h1>
-          <p className="text-sm text-muted-foreground">
-            Watch robots execute their programs
-          </p>
+          <h1 className="text-2xl font-bold text-neon-teal">Activation Phase</h1>
+          <p className="text-sm text-muted-foreground">Watch robots execute their programs</p>
+          {pauseButton}
         </div>
       </div>
 

@@ -2,13 +2,7 @@
 
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Copy, Check, X, Play } from "lucide-react";
 import { BoardSelector } from "@/components/lobby/BoardSelector";
 
@@ -27,8 +21,11 @@ interface GameControlsProps {
   gameId: string;
   selectedBoard: string;
   onBoardChange: (board: string) => void;
+  isPausedGame?: boolean;
+  missingPlayers?: string[];
   onToggleReady?: () => void; // Optional since player ready is not supported yet
   onStartGame: () => void;
+  onContinueGame: () => void;
   onCopyGameId: () => void;
 }
 
@@ -42,8 +39,11 @@ export const GameControls = ({
   gameId,
   selectedBoard,
   onBoardChange,
+  isPausedGame = false,
+  missingPlayers = [],
   onToggleReady,
   onStartGame,
+  onContinueGame,
   onCopyGameId,
 }: GameControlsProps) => {
   return (
@@ -54,9 +54,7 @@ export const GameControls = ({
     >
       <Card>
         <CardHeader>
-          <CardTitle className="text-xl">
-            {isHost ? "Host Controls" : "Player Status"}
-          </CardTitle>
+          <CardTitle className="text-xl">{isHost ? "Host Controls" : "Player Status"}</CardTitle>
           <CardDescription>
             {isHost ? "Configure and start the game" : "Get ready to play"}
           </CardDescription>
@@ -87,28 +85,43 @@ export const GameControls = ({
               <BoardSelector
                 value={selectedBoard}
                 onValueChange={onBoardChange}
-                disabled={false}
+                disabled={isPausedGame}
               />
 
               <div className="pt-2 space-y-3">
                 <Button
-                  onClick={onStartGame}
+                  onClick={isPausedGame ? onContinueGame : onStartGame}
                   disabled={!canStart || !selectedBoard}
                   className="w-full h-12 text-base font-semibold"
                   size="lg"
                 >
                   <Play className="w-5 h-5 mr-2" />
-                  {selectedBoard ? `Start Game on ${selectedBoard}` : "Select a Board to Start"}
+                  {selectedBoard
+                    ? isPausedGame
+                      ? `Continue Game on ${selectedBoard}`
+                      : `Start Game on ${selectedBoard}`
+                    : "Select a Board to Start"}
                 </Button>
 
-                {!allPlayersReady && players.length >= 2 && (
+                {isPausedGame && missingPlayers.length > 0 && (
+                  <div className="p-3 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
+                    <p className="text-sm text-yellow-600 dark:text-yellow-400 font-semibold mb-1">
+                      Waiting for required players:
+                    </p>
+                    <p className="text-xs text-yellow-600/80 dark:text-yellow-400/80">
+                      {missingPlayers.join(", ")}
+                    </p>
+                  </div>
+                )}
+
+                {!isPausedGame && !allPlayersReady && players.length >= 2 && (
                   <div className="flex items-center gap-2 text-sm text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/20 p-2 rounded">
                     <span className="text-lg">⏳</span>
                     <span>Waiting for all players to be ready</span>
                   </div>
                 )}
 
-                {players.length < 2 && (
+                {!isPausedGame && players.length < 2 && (
                   <div className="flex items-center gap-2 text-sm text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/20 p-2 rounded">
                     <span className="text-lg">👥</span>
                     <span>Need at least 2 players to start</span>

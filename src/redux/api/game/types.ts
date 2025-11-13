@@ -1,5 +1,3 @@
-import { Game } from "@/models/gameModels";
-
 export type StartCardDealingForAllRequest = {
   gameId: string;
   username: string;
@@ -26,10 +24,12 @@ export type GetCurrentGameStateResponse = {
     hasLockedInRegisters: boolean;
     revealedCardsInOrder: string[];
     currentExecutingRegister: number | null;
+    currentCheckpointPassed: number;
   }>;
   currentPhase: string;
   hostUsername: string;
   name: string;
+  isPrivate: boolean;
   gameBoard: {
     name: string;
     spaces: Array<
@@ -108,3 +108,26 @@ export interface GetAllGamesResponse {
   isFinished: boolean;
   isPrivate: boolean;
 }
+
+export type RequestGamePauseRequest = {
+  gameId: string;
+  username: string;
+};
+
+export type RespondToGamePauseRequest = {
+  gameId: string;
+  username: string;
+  approved: boolean;
+};
+
+// Paused Games
+export type GetPausedGameResponse = {
+  gameId: string;
+  gameRoomName: string;
+  hostUsername: string;
+  playerUsernames: string[];
+};
+
+export type GetPausedGamesRequest = {
+  username: string;
+};

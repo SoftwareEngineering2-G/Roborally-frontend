@@ -1,6 +1,6 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-import { Direction, Game, ProgrammingCards } from "@/models/gameModels";
-import { GetCurrentGameStateResponse } from "../api/game/types";
+import type { GetCurrentGameStateResponse } from "../api/game/types";
+import type { Celltype, Direction, Game, ProgrammingCards } from "@/models/gameModels";
 
 interface GameState {
   currentGame: Game | null;
@@ -26,16 +26,17 @@ const gameSlice = createSlice({
   name: "game",
   initialState,
   reducers: {
-    setGameState: (
-      state,
-      action: PayloadAction<GetCurrentGameStateResponse>
-    ) => {
+    setGameState: (state, action: PayloadAction<GetCurrentGameStateResponse>) => {
       // Transform the API response to match the Game type
       const response = action.payload;
+      
+      // Log raw API response to debug checkpoint field
+      
       state.currentGame = {
         gameId: response.gameId,
         hostUsername: response.hostUsername,
         name: response.name,
+        isPrivate: response.isPrivate,
         players: response.players.map((p) => ({
           username: p.username,
           robot: p.robot,
@@ -45,31 +46,28 @@ const gameSlice = createSlice({
           hasLockedInRegisters: p.hasLockedInRegisters,
           revealedCardsInOrder: p.revealedCardsInOrder as ProgrammingCards[],
           currentExecutingRegister: p.currentExecutingRegister,
+          currentCheckpoint: p.currentCheckpointPassed,
         })),
         gameBoard: {
           name: response.gameBoard.name,
           spaces: response.gameBoard.spaces.map((row) =>
             row.map((cell) => ({
-              name: cell.name as any, // Cast to Celltype
+              name: cell.name as Celltype, // Cast to Celltype
               walls: cell.walls as Direction[],
               direction: cell.direction as Direction | null,
             }))
           ),
         },
-        currentPhase: response.currentPhase as
-          | "ProgrammingPhase"
-          | "ActivationPhase",
-        currentRevealedRegister: response.currentRevealedRegister,
+        currentPhase: response.currentPhase as "ProgrammingPhase" | "ActivationPhase",
+        currentRevealedRegister: response.currentRevealedRegister
+          ? response.currentRevealedRegister - 1
+          : null, // Backend is 1-5, we use 0-4
         currentTurnUsername: response.currentTurnUsername,
         currentExecutingRegister: response.currentExecutingRegister,
         personalState: {
           hasLockedInRegisters: response.personalState.hasLockedInRegisters,
-          lockedInCards: response.personalState.lockedInCards as
-            | ProgrammingCards[]
-            | null,
-          dealtCards: response.personalState.dealtCards as
-            | ProgrammingCards[]
-            | null,
+          lockedInCards: response.personalState.lockedInCards as ProgrammingCards[] | null,
+          dealtCards: response.personalState.dealtCards as ProgrammingCards[] | null,
         },
       };
       state.isLoading = false;
@@ -121,14 +119,11 @@ const gameSlice = createSlice({
     ) => {
       if (state.currentGame) {
         // Update the current revealed register
-        state.currentGame.currentRevealedRegister =
-          action.payload.registerNumber - 1; // Backend sends 1-5, we use 0-4
+        state.currentGame.currentRevealedRegister = action.payload.registerNumber - 1; // Backend sends 1-5, we use 0-4
 
         // Update each player's revealedCardsInOrder array
         action.payload.revealedCards.forEach(({ username, card }) => {
-          const player = state.currentGame!.players.find(
-            (p) => p.username === username
-          );
+          const player = state.currentGame!.players.find((p) => p.username === username);
           if (player) {
             // Add the card to the player's revealed cards in order
             player.revealedCardsInOrder = [
@@ -142,10 +137,20 @@ const gameSlice = createSlice({
         state.executedPlayers = [];
       }
     },
-    setCurrentPhase: (
+    updatePlayerCheckpoint: (
       state,
-      action: PayloadAction<"ProgrammingPhase" | "ActivationPhase">
-    ) => {
+      action: PayloadAction<{ username: string; checkpointNumber: number }>
+      ) => {
+      if (state.currentGame) {
+        const player = state.currentGame.players.find(
+          (p) => p.username === action.payload.username
+        );
+        if (player) {
+          player.currentCheckpoint = action.payload.checkpointNumber;
+        }
+      }
+    },
+    setCurrentPhase: (state, action: PayloadAction<"ProgrammingPhase" | "ActivationPhase">) => {
       if (state.currentGame) {
         state.currentGame.currentPhase = action.payload;
       }
@@ -199,6 +204,7 @@ export const {
   playerLockedIn,
   setRevealedRegister,
   updateRevealedCards,
+  updatePlayerCheckpoint,
   setCurrentPhase,
   setCurrentTurn,
   updateRobotPosition,

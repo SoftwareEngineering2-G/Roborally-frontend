@@ -5,7 +5,7 @@ import { useDispatch } from "react-redux";
 import { toast } from "sonner";
 import { useSignalRContext } from "@/providers/SignalRProvider";
 import { userJoinedLobby, userLeftLobby, hostChanged } from "@/redux/lobby/lobbySlice";
-import { AppDispatch } from "@/redux/store";
+import type { AppDispatch } from "@/redux/store";
 
 export const useLobbySignalR = (gameId: string) => {
   const dispatch = useDispatch<AppDispatch>();
@@ -42,8 +42,7 @@ export const useLobbySignalR = (gameId: string) => {
       toast.success(`${data.newHost} is now the host`);
     };
 
-    const handleGameStarted = () => {
-    };
+    const handleGameStarted = () => {};
 
     signalR.on("UserJoinedLobby", handleUserJoined);
     signalR.on("UserLeftLobby", handleUserLeft);

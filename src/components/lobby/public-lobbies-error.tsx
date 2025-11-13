@@ -10,19 +10,23 @@ import { Gamepad2, RefreshCw } from "lucide-react";
 
 interface PublicLobbiesErrorProps {
   onRetry: () => void;
+  title?: string;
+  description?: string;
 }
 
 export default function PublicLobbiesError({
   onRetry,
+  title = "Public Lobbies",
+  description = "Join an existing game",
 }: PublicLobbiesErrorProps) {
   return (
     <Card className="glass-panel">
       <CardHeader>
         <CardTitle className="text-xl text-neon-teal flex items-center gap-2">
           <Gamepad2 className="w-5 h-5" />
-          Public Lobbies
+          {title}
         </CardTitle>
-        <CardDescription>Join an existing game</CardDescription>
+        <CardDescription>{description}</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="text-center py-8">

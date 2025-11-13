@@ -8,15 +8,23 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { Gamepad2 } from "lucide-react";
 
-export default function PublicLobbiesSkeleton() {
+interface PublicLobbiesSkeletonProps {
+  title?: string;
+  description?: string;
+}
+
+export default function PublicLobbiesSkeleton({
+  title = "Public Lobbies",
+  description = "Join an existing game",
+}: PublicLobbiesSkeletonProps) {
   return (
     <Card className="glass-panel">
       <CardHeader>
         <CardTitle className="text-xl text-neon-teal flex items-center gap-2">
           <Gamepad2 className="w-5 h-5" />
-          Public Lobbies
+          {title}
         </CardTitle>
-        <CardDescription>Join an existing game</CardDescription>
+        <CardDescription>{description}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-3">
         {Array.from({ length: 3 }, (_, i) => (

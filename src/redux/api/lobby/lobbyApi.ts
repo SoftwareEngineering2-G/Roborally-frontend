@@ -8,6 +8,7 @@ import type {
   JoinLobbyRequest,
   LeaveLobbyRequest,
   StartGameRequest,
+  ContinueGameRequest,
 } from "./types";
 
 export const lobbyApi = baseApi.injectEndpoints({
@@ -32,7 +33,7 @@ export const lobbyApi = baseApi.injectEndpoints({
         method: "POST",
         body: { username },
       }),
-      invalidatesTags: ["Lobby"],
+      invalidatesTags: (_result, _error, { gameId }) => ["Lobby", { type: "Lobby", id: gameId }],
     }),
 
     leaveLobby: builder.mutation<void, LeaveLobbyRequest>({
@@ -41,7 +42,7 @@ export const lobbyApi = baseApi.injectEndpoints({
         method: "POST",
         body: { username },
       }),
-      invalidatesTags: ["Lobby"],
+      invalidatesTags: (_result, _error, { gameId }) => ["Lobby", { type: "Lobby", id: gameId }],
     }),
 
     getLobbyInfo: builder.query<GetLobbyInfoResponse, GetLobbyInfoRequest>({
@@ -50,6 +51,7 @@ export const lobbyApi = baseApi.injectEndpoints({
         method: "GET",
         params: { username },
       }),
+      providesTags: (_result, _error, { gameId }) => [{ type: "Lobby", id: gameId }],
     }),
 
     startGame: builder.mutation<void, StartGameRequest>({
@@ -61,6 +63,35 @@ export const lobbyApi = baseApi.injectEndpoints({
           gameBoardName,
         },
       }),
+      invalidatesTags: (_result, _error, { gameId }) => [
+        "Lobby",
+        "Game",
+        { type: "Lobby", id: gameId },
+        { type: "Game", id: gameId },
+      ],
+    }),
+
+    joinContinueGameLobby: builder.mutation<void, JoinLobbyRequest>({
+      query: ({ gameId, username }) => ({
+        url: `/game-lobbies/${gameId}/join-continue`,
+        method: "POST",
+        body: { username },
+      }),
+      invalidatesTags: (_result, _error, { gameId }) => ["Lobby", { type: "Lobby", id: gameId }],
+    }),
+
+    continueGame: builder.mutation<void, ContinueGameRequest>({
+      query: ({ gameId, username }) => ({
+        url: `/game-lobbies/${gameId}/continue`,
+        method: "POST",
+        body: { username },
+      }),
+      invalidatesTags: (_result, _error, { gameId }) => [
+        "Lobby",
+        "Game",
+        { type: "Lobby", id: gameId },
+        { type: "Game", id: gameId },
+      ],
     }),
   }),
 });
@@ -72,4 +103,6 @@ export const {
   useLeaveLobbyMutation,
   useGetLobbyInfoQuery,
   useStartGameMutation,
+  useContinueGameMutation,
+  useJoinContinueGameLobbyMutation,
 } = lobbyApi;

@@ -1,10 +1,6 @@
 export type Direction = "North" | "East" | "South" | "West";
 export type GearDirection = "ClockWise" | "AntiClockWise";
-export type Celltype =
-  | "EmptySpace"
-  | "BlueConveyorBelt"
-  | "GreenConveyorBelt"
-  | "Gear";
+export type Celltype = "EmptySpace" | "BlueConveyorBelt" | "GreenConveyorBelt" | "Gear";
 // Add other cell types as needed
 
 type GameBoardCell = {
@@ -27,7 +23,7 @@ export type GamePlayer = {
   hasLockedInRegisters: boolean;
   revealedCardsInOrder: ProgrammingCards[]; // Cards revealed during activation phase in order
   currentExecutingRegister: number | null;
-
+  currentCheckpoint: number;
 };
 
 export type MyState = {
@@ -53,6 +49,7 @@ export type Game = {
   gameId: string;
   hostUsername: string;
   name: string;
+  isPrivate: boolean;
   players: GamePlayer[];
   gameBoard: GameBoard;
   currentPhase: GamePhase;
@@ -61,4 +58,3 @@ export type Game = {
   currentTurnUsername: string | null;
   currentExecutingRegister: number | null;
 };
-

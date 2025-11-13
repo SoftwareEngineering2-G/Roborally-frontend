@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { Copy, ArrowLeft, Users } from "lucide-react";
+import { Copy, ArrowLeft, Users, Pause } from "lucide-react";
 
 interface LobbyHeaderProps {
   lobbyName: string;
@@ -12,6 +12,7 @@ interface LobbyHeaderProps {
   playerCount: number;
   maxPlayers: number;
   isPrivate: boolean;
+  isPausedGame?: boolean;
   onLeaveLobby?: () => Promise<void>;
 }
 
@@ -21,6 +22,7 @@ export const LobbyHeader = ({
   playerCount,
   maxPlayers,
   isPrivate,
+  isPausedGame = false,
   onLeaveLobby,
 }: LobbyHeaderProps) => {
   const router = useRouter();
@@ -62,6 +64,15 @@ export const LobbyHeader = ({
             Back to Home
           </Button>
           <h1 className="text-2xl font-bold text-primary">{lobbyName}</h1>
+          {isPausedGame && (
+            <Badge
+              variant="secondary"
+              className="bg-yellow-500/20 text-yellow-600 dark:text-yellow-400 border-yellow-500/30"
+            >
+              <Pause className="w-3 h-3 mr-1" />
+              Resuming
+            </Badge>
+          )}
           {isPrivate && (
             <Badge
               variant="secondary"

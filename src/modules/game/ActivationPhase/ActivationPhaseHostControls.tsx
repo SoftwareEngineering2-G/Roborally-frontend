@@ -1,7 +1,10 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { useRevealNextRegisterMutation, useActivateNextBoardElementMutation } from "@/redux/api/game/gameApi";
+import {
+  useRevealNextRegisterMutation,
+  useActivateNextBoardElementMutation,
+} from "@/redux/api/game/gameApi";
 import { Crown, Users, Eye } from "lucide-react";
 import { toast } from "sonner";
 import type { Game } from "@/models/gameModels";
@@ -19,8 +22,7 @@ export const ActivationPhaseHostControls = ({
   gameState,
   username,
 }: ActivationPhaseHostControlsProps) => {
-  const [revealNextRegister, { isLoading: isRevealingRegister }] =
-    useRevealNextRegisterMutation();
+  const [revealNextRegister, { isLoading: isRevealingRegister }] = useRevealNextRegisterMutation();
   const [activateNextBoardElement, { isLoading: isActivatingBoardElement }] =
     useActivateNextBoardElementMutation();
 
@@ -28,9 +30,7 @@ export const ActivationPhaseHostControls = ({
   const currentRevealedRegister = useAppSelector(
     (state) => state.game.currentGame?.currentRevealedRegister
   );
-  const currentTurnUsername = useAppSelector(
-    (state) => state.game.currentGame?.currentTurnUsername
-  );
+  const currentTurnUsername = useAppSelector((state) => state.game.currentTurnUsername);
   const executedPlayers = useAppSelector((state) => state.game.executedPlayers);
 
   // Determine which register to reveal next (0-4)
@@ -40,8 +40,7 @@ export const ActivationPhaseHostControls = ({
   // If currentTurnUsername is null, that means a new register must be revealed
   // Otherwise, the respective player must execute their card
   const shouldRevealNextRegister = currentTurnUsername === null;
-  const canRevealNextRegister =
-    shouldRevealNextRegister && !allRegistersRevealed;
+  const canRevealNextRegister = shouldRevealNextRegister && !allRegistersRevealed;
 
   const handleRevealNextRegister = async () => {
     try {
@@ -97,13 +96,7 @@ export const ActivationPhaseHostControls = ({
     };
 
     activateBoardElements();
-  }, [
-    allPlayersExecuted,
-    currentRevealedRegister,
-    activateNextBoardElement,
-    gameId,
-    username,
-  ]);
+  }, [allPlayersExecuted, currentRevealedRegister, activateNextBoardElement, gameId, username]);
 
   return (
     <div className="fixed top-4 right-4 z-[10000] flex items-center gap-2">
