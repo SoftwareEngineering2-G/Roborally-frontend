@@ -23,6 +23,7 @@ export type GamePlayer = {
   hasLockedInRegisters: boolean;
   revealedCardsInOrder: ProgrammingCards[]; // Cards revealed during activation phase in order
   currentExecutingRegister: number | null;
+  currentCheckpoint: number;
 };
 
 export type MyState = {

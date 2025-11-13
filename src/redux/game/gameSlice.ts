@@ -25,6 +25,9 @@ const gameSlice = createSlice({
     setGameState: (state, action: PayloadAction<GetCurrentGameStateResponse>) => {
       // Transform the API response to match the Game type
       const response = action.payload;
+      
+      // Log raw API response to debug checkpoint field
+      
       state.currentGame = {
         gameId: response.gameId,
         hostUsername: response.hostUsername,
@@ -39,6 +42,7 @@ const gameSlice = createSlice({
           hasLockedInRegisters: p.hasLockedInRegisters,
           revealedCardsInOrder: p.revealedCardsInOrder as ProgrammingCards[],
           currentExecutingRegister: p.currentExecutingRegister,
+          currentCheckpoint: p.currentCheckpointPassed,
         })),
         gameBoard: {
           name: response.gameBoard.name,
@@ -129,6 +133,19 @@ const gameSlice = createSlice({
         state.executedPlayers = [];
       }
     },
+    updatePlayerCheckpoint: (
+      state,
+      action: PayloadAction<{ username: string; checkpointNumber: number }>
+      ) => {
+      if (state.currentGame) {
+        const player = state.currentGame.players.find(
+          (p) => p.username === action.payload.username
+        );
+        if (player) {
+          player.currentCheckpoint = action.payload.checkpointNumber;
+        }
+      }
+    },
     setCurrentPhase: (state, action: PayloadAction<"ProgrammingPhase" | "ActivationPhase">) => {
       if (state.currentGame) {
         state.currentGame.currentPhase = action.payload;
@@ -179,6 +196,7 @@ export const {
   playerLockedIn,
   setRevealedRegister,
   updateRevealedCards,
+  updatePlayerCheckpoint,
   setCurrentPhase,
   setCurrentTurn,
   updateRobotPosition,

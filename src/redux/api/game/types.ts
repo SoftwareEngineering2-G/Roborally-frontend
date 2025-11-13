@@ -24,6 +24,7 @@ export type GetCurrentGameStateResponse = {
     hasLockedInRegisters: boolean;
     revealedCardsInOrder: string[];
     currentExecutingRegister: number | null;
+    currentCheckpointPassed: number;
   }>;
   currentPhase: string;
   hostUsername: string;

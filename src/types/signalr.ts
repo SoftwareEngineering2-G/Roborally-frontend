@@ -72,3 +72,9 @@ export interface GamePauseResultEvent {
   requestedBy: string;
   playerResponses: Record<string, boolean>;
 }
+
+export interface CheckpointReachedEvent {
+  gameId: string;
+  username: string;
+  checkpointNumber: number;
+}

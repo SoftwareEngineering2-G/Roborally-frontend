@@ -12,11 +12,13 @@ import {
   setCurrentTurn,
   updateRobotPosition,
   markPlayerExecuted,
+  updatePlayerCheckpoint,
 } from "@/redux/game/gameSlice";
 import type {
   RegisterRevealedEvent,
   RobotMovedEvent,
   NextPlayerInTurnEvent,
+  CheckpointReachedEvent,
 } from "@/types/signalr";
 import { toast } from "sonner";
 import type { GameBoard } from "@/models/gameModels";
@@ -116,6 +118,32 @@ export const ActivationPhase = ({
 
     return () => {
       signalR.off("RobotMoved");
+    };
+  }, [signalR.isConnected, gameId, dispatch, signalR, currentGame]);
+
+  useEffect(() => {
+    if (!signalR.isConnected || !currentGame) return;
+
+    const handleCheckpointReached = (...args: unknown[]) => {
+
+      const payload = args[0] as CheckpointReachedEvent;
+
+
+      dispatch(updatePlayerCheckpoint({
+        username: payload.username,
+        checkpointNumber: payload.checkpointNumber,
+      }));
+
+      // Show toast notification
+      toast.success(
+        `${payload.username} reached checkpoint ${payload.checkpointNumber}!`
+      );
+    };
+
+    signalR.on("CheckpointReached", handleCheckpointReached);
+
+    return () => {
+      signalR.off("CheckpointReached");
     };
   }, [signalR.isConnected, gameId, dispatch, signalR, currentGame]);
 
