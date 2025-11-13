@@ -10,6 +10,7 @@ interface Player {
   username: string;
   robot: string;
   hasLockedInRegisters: boolean; // Now available for all players
+  currentCheckpoint: number;
 }
 
 interface PlayerInfoCardProps {
@@ -94,6 +95,16 @@ export const PlayerInfoCard = ({
               <div className={`w-3 h-3 rounded-full ${robotColor}`} />
               <span className="text-xs text-muted-foreground capitalize">
                 {player.robot} Robot
+              </span>
+            </div>
+
+            {/* Checkpoint Counter */}
+            <div className="flex items-center justify-between mt-2 p-1.5 rounded-md bg-surface-dark/50 border border-glass-border">
+              <span className="text-xs font-medium text-muted-foreground">
+                Checkpoint Passed:
+              </span>
+              <span className="text-xs font-bold text-neon-teal">
+                {player.currentCheckpoint}
               </span>
             </div>
 
