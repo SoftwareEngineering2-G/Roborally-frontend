@@ -9,7 +9,10 @@ updateRobotPosition,
 setRevealedRegister,
 markPlayerExecuted,
 setGameOver,
+updatePlayerCheckpoint,
 } from "@/redux/game/gameSlice";
+
+import type { GameOverEvent, CheckpointReachedEvent } from "@/types/signalr";
 
 export const useGameSignalRHandler = () => {
 const { game } = useSignalRContext(); // Connect to the /game hub
@@ -38,9 +41,16 @@ useEffect(() => {
       dispatch(markPlayerExecuted(data.username));
     });
 
+    // Handle checkpoints
+    game.on("CheckpointReached", (data: CheckpointReachedEvent) => {
+        dispatch(updatePlayerCheckpoint({username: data.username, checkpointNumber: data.checkpointNumber
+            })
+        );
+    });
+
     // Handle Game Over event
-    game.on("GameOver", (data: { winner: string }) => {
-      dispatch(setGameOver({ winner: data.winner }));
+    game.on("GameEnded", (data: GameOverEvent) => {
+      dispatch(setGameOver({ winner: data.winnerUsername }));
     });
 
     // Cleanup when component unmounts or connection changes
@@ -49,7 +59,8 @@ useEffect(() => {
       game.off("RobotMoved");
       game.off("RegisterRevealed");
       game.off("PlayerExecuted");
-      game.off("GameOver");
+      game.off("CheckpointReached");
+      game.off("GameEnded");
     };
   }, [game.isConnected]);
 };
