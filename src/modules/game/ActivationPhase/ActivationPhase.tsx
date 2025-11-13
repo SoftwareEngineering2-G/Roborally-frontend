@@ -19,7 +19,6 @@ import type {
   RobotMovedEvent,
   NextPlayerInTurnEvent,
   CheckpointReachedEvent,
-  CheckpointReachedEvent,
 } from "@/types/signalr";
 import { toast } from "sonner";
 import type { GameBoard } from "@/models/gameModels";
