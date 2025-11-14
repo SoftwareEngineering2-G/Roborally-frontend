@@ -175,7 +175,7 @@ export const ActivationPhase = ({
       // Show toast notification
       toast.success(`${payload.username} reached checkpoint ${payload.checkpointNumber}!`);
 
-      if (payload.checkpointNumber == lastCheckpointNumber) {
+      if (payload.checkpointNumber === lastCheckpointNumber) {
         requestGameEnd({ gameId, winnerUsername: payload.username });
       }
     };
