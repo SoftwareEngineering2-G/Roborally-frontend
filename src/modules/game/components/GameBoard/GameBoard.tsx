@@ -12,11 +12,11 @@ import { useSpaceImage } from "./spaceImageFactory";
 import GameOverModal from "./GameOver";
 
 // Separate component to use the hook
-const SpaceImage = ({ 
-  celltype, 
-  direction 
-}: { 
-  celltype: Celltype; 
+const SpaceImage = ({
+  celltype,
+  direction
+}: {
+  celltype: Celltype;
   direction: Direction | GearDirection | null;
 }) => {
   return useSpaceImage(celltype, direction);
@@ -53,6 +53,7 @@ export const GameBoard = ({
   className = "",
   gameBoardData,
   players = [],
+  myUsername,
 }: GameBoardProps) => {
   // Get dynamic board dimensions from the spaces array
   const boardHeight = gameBoardData.spaces.length; // Number of rows
@@ -150,8 +151,8 @@ export const GameBoard = ({
                             layoutId={`robot-${player.username}`}
                             className="absolute inset-0"
                             initial={{ scale: 0.8, opacity: 0 }}
-                            animate={{ 
-                              scale: 1, 
+                            animate={{
+                              scale: 1,
                               opacity: 1,
                               rotate: rotation,
                             }}
@@ -195,7 +196,7 @@ export const GameBoard = ({
                           >
                             <motion.div
                               className="relative w-full h-full"
-                              animate={{ 
+                              animate={{
                                 scale: [1, 1.1, 1],
                               }}
                               transition={{
@@ -229,7 +230,9 @@ export const GameBoard = ({
       </div>
     </motion.div>
 
-    <GameOverModal />
+    <GameOverModal
+    myUsername={myUsername}
+    />
         </>
   );
 };

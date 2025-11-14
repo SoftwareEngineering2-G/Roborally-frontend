@@ -194,6 +194,10 @@ const gameSlice = createSlice({
       state.currentTurnUsername = null;
       state.executedPlayers = [];
     },
+    clearGameOver: (state) => {
+      state.isGameOver = false;
+      state.winner = null;
+    },
   },
 });
 
@@ -201,6 +205,7 @@ export const {
   setGameState,
   setGameLoading,
   setGameError,
+  clearGameOver,
   playerLockedIn,
   setRevealedRegister,
   updateRevealedCards,

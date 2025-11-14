@@ -143,11 +143,6 @@ export const ActivationPhase = ({
     };
   }, [signalR.isConnected, gameId, dispatch, signalR, currentGame]);
 
-  setTimeout(() => { //TODO remove after testing
-    if(isHost) {
-      requestGameEnd({gameId, winnerUsername: username})
-    }
-  },3000)
 
   useEffect(() => {
     if (!signalR.isConnected || !currentGame) return;
@@ -167,7 +162,7 @@ export const ActivationPhase = ({
       );
 
       if(payload.checkpointNumber == lastCheckpointNumber) {
-        requestGameEnd({ gameId, username })
+        requestGameEnd({ gameId, winnerUsername: payload.username })
       }
 
     };
@@ -250,6 +245,7 @@ export const ActivationPhase = ({
             gameBoardData={gameBoard}
             players={currentGame.players}
             className="w-full h-full max-h-full"
+            myUsername={username}
           />
         </div>
         {/* Right side - Player Programs */}
