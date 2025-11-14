@@ -41,20 +41,28 @@ export const ActivationPhase = ({
 
   // Get game state from Redux (programmedCards should be populated from backend or SignalR)
   const { currentGame, currentTurnUsername } = useAppSelector((state) => state.game);
-  const [requestGameEnd, { isLoading: endingGame }] = useRequestGameEndMutation();
+  const [requestGameEnd] = useRequestGameEndMutation();
+
+  type TileWithName = {
+    name?: string;
+    Name?: string;
+  };
 
   const lastCheckpointNumber = useMemo(() => {
     if (!gameBoard?.spaces) return 0;
 
     let max = 0;
 
-    for (const row of gameBoard.spaces) {
+    for (const row of gameBoard.spaces as TileWithName[][]) {
       for (const tile of row) {
-        const tileName = (tile as any).name ?? (tile as any).Name; // handle both name/Name
+        const tileName = tile.name ?? tile.Name;
+
         if (tileName?.startsWith("Checkpoint")) {
-          const n = Number(tileName.replace("Checkpoint", ""));
-          if (!Number.isNaN(n) && n > max) {
-            max = n;
+          if (tileName) {
+            const n = Number(tileName.replace("Checkpoint", ""));
+            if (!Number.isNaN(n) && n > max) {
+              max = n;
+            }
           }
         }
       }

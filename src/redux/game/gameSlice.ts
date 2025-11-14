@@ -180,7 +180,7 @@ const gameSlice = createSlice({
         state.executedPlayers.push(action.payload);
       }
     },
-    setGameOver: (state, action: PayloadAction<{winner: String}> ) => {
+    setGameOver: (state, action: PayloadAction<{winner: string}> ) => {
       state.isGameOver = true;
       state.winner = action.payload.winner;
     },

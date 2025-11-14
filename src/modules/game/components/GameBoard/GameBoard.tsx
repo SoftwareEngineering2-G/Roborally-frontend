@@ -26,6 +26,7 @@ interface GameBoardProps {
   className?: string;
   gameBoardData: GameBoardType;
   players?: GamePlayer[]; // Add players prop
+    myUsername: string;
 }
 
 // Map robot colors to image paths
