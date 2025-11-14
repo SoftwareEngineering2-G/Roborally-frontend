@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect,useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { motion } from "framer-motion";
 import { useAppSelector, useAppDispatch } from "@/redux/hooks";
 import { GameBoard as GameBoardComponent } from "../components/GameBoard";
@@ -160,27 +160,24 @@ export const ActivationPhase = ({
     };
   }, [signalR.isConnected, gameId, dispatch, signalR, currentGame]);
 
-
   useEffect(() => {
     if (!signalR.isConnected || !currentGame) return;
     const handleCheckpointReached = (...args: unknown[]) => {
-
       const payload = args[0] as CheckpointReachedEvent;
 
-      dispatch(updatePlayerCheckpoint({
-        username: payload.username,
-        checkpointNumber: payload.checkpointNumber,
-      }));
-
-      // Show toast notification
-      toast.success(
-        `${payload.username} reached checkpoint ${payload.checkpointNumber}!`
+      dispatch(
+        updatePlayerCheckpoint({
+          username: payload.username,
+          checkpointNumber: payload.checkpointNumber,
+        })
       );
 
-      if(payload.checkpointNumber == lastCheckpointNumber) {
-        requestGameEnd({ gameId, winnerUsername: payload.username })
-      }
+      // Show toast notification
+      toast.success(`${payload.username} reached checkpoint ${payload.checkpointNumber}!`);
 
+      if (payload.checkpointNumber === lastCheckpointNumber) {
+        requestGameEnd({ gameId, winnerUsername: payload.username });
+      }
     };
 
     signalR.on("CheckpointReached", handleCheckpointReached);
@@ -188,9 +185,15 @@ export const ActivationPhase = ({
     return () => {
       signalR.off("CheckpointReached");
     };
-  }, [signalR.isConnected, gameId, dispatch, signalR, currentGame]);
-
-
+  }, [
+    signalR.isConnected,
+    gameId,
+    dispatch,
+    signalR,
+    currentGame,
+    lastCheckpointNumber,
+    requestGameEnd,
+  ]);
 
   // Listen for next player in turn events
   useEffect(() => {

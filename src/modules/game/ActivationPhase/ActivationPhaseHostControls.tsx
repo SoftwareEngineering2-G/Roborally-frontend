@@ -23,8 +23,7 @@ export const ActivationPhaseHostControls = ({
   username,
 }: ActivationPhaseHostControlsProps) => {
   const [revealNextRegister, { isLoading: isRevealingRegister }] = useRevealNextRegisterMutation();
-  const [activateNextBoardElement, { isLoading: isActivatingBoardElement }] =
-    useActivateNextBoardElementMutation();
+  const [activateNextBoardElement] = useActivateNextBoardElementMutation();
 
   // Get current revealed register, current turn, and executed players from Redux
   const currentRevealedRegister = useAppSelector(
