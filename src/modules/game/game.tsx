@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useGameState } from "./hooks/useGameState";
 import { useGameSignalR } from "./ProgrammingPhase/hooks/useGameSignalR";
+import { useGameSignalRHandler } from "./hooks/useGameSignalRHandler";
 import { useGamePause } from "./hooks/useGamePause";
 import type { ActivationPhaseStartedEvent } from "@/types/signalr";
 
@@ -38,6 +39,9 @@ export default function Game({ gameId }: Props) {
 
   // Setup SignalR connection for the host to listen to game events
   const signalR = useGameSignalR(gameId, username || "");
+
+  // Listen for all backend game events (GameOver, PlayerMoved, etc.)
+  useGameSignalRHandler();
 
   // Setup game pause functionality
   const {
@@ -115,6 +119,32 @@ export default function Game({ gameId }: Props) {
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto" />
           <p className="mt-4 text-muted-foreground">Loading game state...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (gameState.isGameOver) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center relative overflow-hidden">
+
+        {/* Confetti */}
+        <div className="pointer-events-none absolute inset-0">
+          <div className="animate-pulse text-8xl absolute top-10 left-1/2 -translate-x-1/2">🎉</div>
+          <div className="animate-bounce text-7xl absolute bottom-10 left-20">🎊</div>
+          <div className="animate-bounce text-7xl absolute bottom-10 right-20">🎊</div>
+        </div>
+
+        {/* Winner Box */}
+        <div className="bg-gray-900 px-10 py-8 rounded-3xl shadow-2xl text-center border border-cyan-500/30">
+          <h1 className="text-5xl font-extrabold text-cyan-400 drop-shadow-lg">
+            Game Over
+          </h1>
+
+          <p className="text-2xl text-white mt-6">
+            🏆 Winner:{" "}
+            <span className="font-bold text-cyan-300">{gameState.winner}</span>
+          </p>
         </div>
       </div>
     );

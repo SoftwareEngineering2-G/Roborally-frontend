@@ -2,6 +2,9 @@
 
 import React, { createContext, useContext } from "react";
 import { useSignalR } from "@/hooks/signalr/useSignalR";
+import { useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { setGameOver } from "@/redux/game/gameSlice";
 
 interface SignalRConnection {
   isConnected: boolean;
@@ -57,3 +60,4 @@ export const SignalRProvider = ({ children }: { children: React.ReactNode }) => 
     </SignalRContext.Provider>
   );
 };
+

@@ -9,13 +9,14 @@ import type {
 } from "@/models/gameModels";
 import Image from "next/image";
 import { useSpaceImage } from "./spaceImageFactory";
+import GameOverModal from "./GameOver";
 
 // Separate component to use the hook
-const SpaceImage = ({ 
-  celltype, 
-  direction 
-}: { 
-  celltype: Celltype; 
+const SpaceImage = ({
+  celltype,
+  direction
+}: {
+  celltype: Celltype;
   direction: Direction | GearDirection | null;
 }) => {
   return useSpaceImage(celltype, direction);
@@ -25,6 +26,7 @@ interface GameBoardProps {
   className?: string;
   gameBoardData: GameBoardType;
   players?: GamePlayer[]; // Add players prop
+    myUsername: string;
 }
 
 // Map robot colors to image paths
@@ -52,6 +54,7 @@ export const GameBoard = ({
   className = "",
   gameBoardData,
   players = [],
+  myUsername,
 }: GameBoardProps) => {
   // Get dynamic board dimensions from the spaces array
   const boardHeight = gameBoardData.spaces.length; // Number of rows
@@ -79,6 +82,7 @@ export const GameBoard = ({
   };
 
   return (
+      <>
     <motion.div
       className={`relative ${className}`}
       initial={{ opacity: 0, scale: 0.9 }}
@@ -148,8 +152,8 @@ export const GameBoard = ({
                             layoutId={`robot-${player.username}`}
                             className="absolute inset-0"
                             initial={{ scale: 0.8, opacity: 0 }}
-                            animate={{ 
-                              scale: 1, 
+                            animate={{
+                              scale: 1,
                               opacity: 1,
                               rotate: rotation,
                             }}
@@ -193,7 +197,7 @@ export const GameBoard = ({
                           >
                             <motion.div
                               className="relative w-full h-full"
-                              animate={{ 
+                              animate={{
                                 scale: [1, 1.1, 1],
                               }}
                               transition={{
@@ -226,5 +230,10 @@ export const GameBoard = ({
         {/* Board Labels */}
       </div>
     </motion.div>
+
+    <GameOverModal
+    myUsername={myUsername}
+    />
+        </>
   );
 };

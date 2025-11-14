@@ -150,3 +150,4 @@ export const PlayersGrid = ({
     </motion.div>
   );
 };
+
