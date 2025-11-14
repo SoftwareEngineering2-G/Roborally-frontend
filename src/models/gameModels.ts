@@ -57,4 +57,6 @@ export type Game = {
   personalState: MyState; // Player's own state information
   currentTurnUsername: string | null;
   currentExecutingRegister: number | null;
+  isGameOver?: boolean;
+  winner?: string;
 };

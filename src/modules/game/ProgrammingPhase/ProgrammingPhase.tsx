@@ -213,7 +213,7 @@ export const ProgrammingPhase = ({
     return () => {
       signalR.off("PlayerLockedInRegister");
     };
-  }, [signalR.isConnected, username, dispatch, signalR]);
+  }, [signalR.isConnected, username, dispatch, signalR, state.registers]);
 
   // Wrapper for handleUploadProgram to trigger discard animation
   const handleUploadProgramWithAnimation = async () => {
