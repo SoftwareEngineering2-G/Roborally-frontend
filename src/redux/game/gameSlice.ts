@@ -29,9 +29,6 @@ const gameSlice = createSlice({
     setGameState: (state, action: PayloadAction<GetCurrentGameStateResponse>) => {
       // Transform the API response to match the Game type
       const response = action.payload;
-      
-      // Log raw API response to debug checkpoint field
-      
       state.currentGame = {
         gameId: response.gameId,
         hostUsername: response.hostUsername,

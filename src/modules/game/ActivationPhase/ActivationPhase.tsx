@@ -112,7 +112,7 @@ export const ActivationPhase = ({
     };
   }, [signalR.isConnected, gameId, dispatch, signalR, currentGame]);
 
-  // Listen for robot movement events
+  // Listen for robot movement events (handles both card execution and pushed robots)
   useEffect(() => {
     if (!signalR.isConnected || !currentGame) return;
 
@@ -121,6 +121,8 @@ export const ActivationPhase = ({
 
       // Only process if this event is for the current game
       if (data.gameId !== gameId) return;
+
+      const isPushed = !data.executedCard || data.executedCard === "Pushed";
 
       // Update robot position in Redux
       dispatch(
@@ -132,8 +134,15 @@ export const ActivationPhase = ({
         })
       );
 
-      // Mark this player as executed
-      dispatch(markPlayerExecuted(data.username));
+      // Only mark as executed if they actually executed a card (not pushed)
+      if (!isPushed) {
+        dispatch(markPlayerExecuted(data.username));
+      }
+
+      // Show toast for pushed robots
+      if (isPushed) {
+        toast.info(`${data.username}'s robot was pushed!`);
+      }
     };
 
     signalR.on("RobotMoved", handleRobotMoved);
@@ -149,7 +158,6 @@ export const ActivationPhase = ({
     const handleCheckpointReached = (...args: unknown[]) => {
 
       const payload = args[0] as CheckpointReachedEvent;
-
 
       dispatch(updatePlayerCheckpoint({
         username: payload.username,
@@ -173,6 +181,8 @@ export const ActivationPhase = ({
       signalR.off("CheckpointReached");
     };
   }, [signalR.isConnected, gameId, dispatch, signalR, currentGame]);
+
+
 
   // Listen for next player in turn events
   useEffect(() => {

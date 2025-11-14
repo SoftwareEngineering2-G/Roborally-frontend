@@ -122,7 +122,7 @@ export const PlayerProgramDisplay = ({
             {/* Checkpoint Counter */}
             <div className="flex items-center justify-between mb-2 p-2 rounded-md bg-surface-dark/50 border border-glass-border">
               <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                Checkpoints passed:
+                Checkpoint passed : 
                 </span>
               <div className="flex items-center gap-2">
                 <span className="text-sm font-bold text-neon-teal">
