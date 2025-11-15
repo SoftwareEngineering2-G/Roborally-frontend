@@ -12,7 +12,11 @@ import {
   updatePlayerCheckpoint,
 } from "@/redux/game/gameSlice";
 
-import type { GameOverEvent, CheckpointReachedEvent, RobotMovedEvent } from "@/types/signalr";
+import type {
+  GameCompletedBroadcastEvent,
+  CheckpointReachedEvent,
+  RobotMovedEvent,
+} from "@/types/signalr";
 import type { GetCurrentGameStateResponse } from "@/redux/api/game/types";
 
 export const useGameSignalRHandler = () => {
@@ -62,9 +66,17 @@ export const useGameSignalRHandler = () => {
     });
 
     // Handle Game Over event
-    game.on("GameEnded", (...args: unknown[]) => {
-      const data = args[0] as GameOverEvent;
-      dispatch(setGameOver({ winner: data.username }));
+    game.on("GameCompleted", (...args: unknown[]) => {
+      const data = args[0] as GameCompletedBroadcastEvent;
+
+      console.log("Game Completed Event Received:", data);
+      dispatch(
+        setGameOver({
+          winner: data.winner,
+          oldRatings: data.oldRatings,
+          newRatings: data.newRatings,
+        })
+      );
     });
 
     // Cleanup when component unmounts or connection changes
@@ -74,7 +86,7 @@ export const useGameSignalRHandler = () => {
       game.off("RegisterRevealed");
       game.off("PlayerExecuted");
       game.off("CheckpointReached");
-      game.off("GameEnded");
+      game.off("GameCompleted");
     };
   }, [game.isConnected, game, dispatch]);
 };

@@ -3,13 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useGetAllGamesQuery } from "@/redux/api/game/gameApi";
 
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { History, ArrowRight, Trophy } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -60,23 +54,19 @@ const mockGames = [
   },
 ];
 
-export default function MyGames({
-  username,
-  className,
-  useMockData = false,
-}: Props) {
+export default function MyGames({ username, className, useMockData = false }: Props) {
   const router = useRouter();
 
   const {
-    data: apiGames = [],
+    data: apiGames,
     isLoading,
     error,
   } = useGetAllGamesQuery({ username }, { skip: useMockData });
 
   // Use mock data if enabled, otherwise use API data
-  const games = useMockData ? mockGames : apiGames;
+  const games = useMockData ? mockGames : apiGames?.items || [];
 
-  // Get last 5 games
+  // Get last 3 games
   const recentGames = games.slice(0, 3);
 
   if (isLoading) {
@@ -114,13 +104,11 @@ export default function MyGames({
           <div className="text-center py-8">
             <Trophy className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
             <p className="text-muted-foreground mb-2">No games played yet</p>
-            <p className="text-sm text-muted-foreground">
-              Start a game to see your history!
-            </p>
+            <p className="text-sm text-muted-foreground">Start a game to see your history!</p>
           </div>
         ) : (
           <>
-            {recentGames.map((game, index) => (
+            {recentGames.map((game: (typeof games)[0], index: number) => (
               <GameCard key={game.gameId} game={game} index={index} compact />
             ))}
           </>
@@ -146,10 +134,7 @@ function MyGamesSkeleton() {
       </CardHeader>
       <CardContent className="space-y-3">
         {[1, 2, 3].map((i) => (
-          <div
-            key={i}
-            className="p-4 border border-neon-magenta/20 rounded-lg bg-surface-dark/30"
-          >
+          <div key={i} className="p-4 border border-neon-magenta/20 rounded-lg bg-surface-dark/30">
             <div className="space-y-2">
               <Skeleton className="h-6 w-3/4" />
               <div className="flex gap-4">

@@ -17,6 +17,7 @@ export type GetCurrentGameStateResponse = {
   gameId: string;
   players: Array<{
     username: string;
+    currentRating: number;
     robot: string;
     positionX: number;
     positionY: number;
@@ -98,6 +99,8 @@ export interface GetAllGamesRequest {
   from?: string; // ISO date string (DateOnly)
   to?: string; // ISO date string (DateOnly)
   searchTag?: string; // Search by room name or host name
+  pageNumber?: number;
+  pageSize?: number;
 }
 
 export interface GetAllGamesResponse {
@@ -106,7 +109,16 @@ export interface GetAllGamesResponse {
   hostUsername: string;
   startDate: string; // ISO date string
   isFinished: boolean;
+  winner?: string | null;
   isPrivate: boolean;
+}
+
+export interface GetAllGamesEndpointResponse {
+  items: GetAllGamesResponse[];
+  totalCount: number;
+  totalPages: number;
+  currentPage: number;
+  pageSize: number;
 }
 
 export type RequestGamePauseRequest = {

@@ -20,6 +20,9 @@ interface Props {
   username: string;
 }
 
+// Export the hook for parent components to check if there are paused games
+export { useGetPausedGamesQuery };
+
 export default function PausedGames({ username }: Props) {
   const router = useRouter();
 
@@ -76,6 +79,11 @@ export default function PausedGames({ username }: Props) {
     );
   }
 
+  // Don't render anything if there are no paused games
+  if (pausedGames.length === 0) {
+    return null;
+  }
+
   return (
     <Card className="glass-panel">
       <CardHeader>
@@ -99,77 +107,63 @@ export default function PausedGames({ username }: Props) {
       </CardHeader>
       <CardContent>
         <div className="space-y-3">
-          {pausedGames.length === 0 ? (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="text-center py-12"
-            >
-              <Pause className="w-12 h-12 mx-auto text-muted-foreground mb-3" />
-              <p className="text-muted-foreground">No paused games found</p>
-              <p className="text-sm text-muted-foreground mt-1">
-                All your battles are either ongoing or completed
-              </p>
-            </motion.div>
-          ) : (
-            <AnimatePresence mode="popLayout">
-              {pausedGames.map((game, index) => (
-                <motion.div
-                  key={game.gameId}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, x: -50 }}
-                  transition={{ delay: index * 0.05 }}
-                  className="glass-panel p-4 border border-neon-teal/20 hover:border-neon-teal/40 transition-colors"
-                >
-                  <div className="flex items-center justify-between gap-4">
-                    {/* Game Info */}
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-2">
-                        <h3 className="font-bold text-foreground truncate">{game.gameRoomName}</h3>
-                        {game.hostUsername === username && (
-                          <Badge
-                            variant="secondary"
-                            className="bg-neon-magenta/20 text-neon-magenta border-neon-magenta/30 text-xs"
-                          >
-                            <Crown className="w-3 h-3 mr-1" />
-                            Host
-                          </Badge>
-                        )}
-                      </div>
-
-                      {/* Players */}
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <Users className="w-4 h-4" />
-                        <span>{game.playerUsernames.length} pilots</span>
-                        <span className="text-chrome/50">•</span>
-                        <span className="text-xs truncate">{game.playerUsernames.join(", ")}</span>
-                      </div>
+          <AnimatePresence mode="popLayout">
+            {pausedGames.map((game, index) => (
+              <motion.div
+                key={game.gameId}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, x: -50 }}
+                transition={{ delay: index * 0.05 }}
+                className="glass-panel p-4 border border-neon-teal/20 hover:border-neon-teal/40 transition-colors"
+              >
+                <div className="flex items-center justify-between gap-4">
+                  {/* Game Info */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-2">
+                      <h3 className="font-bold text-foreground truncate">{game.gameRoomName}</h3>
+                      {game.hostUsername === username && (
+                        <Badge
+                          variant="secondary"
+                          className="bg-neon-magenta/20 text-neon-magenta border-neon-magenta/30 text-xs"
+                        >
+                          <Crown className="w-3 h-3 mr-1" />
+                          Host
+                        </Badge>
+                      )}
                     </div>
 
-                    {/* Continue Button */}
-                    <Button
-                      onClick={() => handleContinueGame(game)}
-                      disabled={joining && joiningGameId === game.gameId}
-                      className="bg-neon-teal/20 hover:bg-neon-teal/40 text-neon-teal border border-neon-teal/30 shrink-0"
-                    >
-                      {joining && joiningGameId === game.gameId ? (
-                        <>
-                          <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
-                          Joining...
-                        </>
-                      ) : (
-                        <>
-                          <PlayCircle className="w-4 h-4 mr-2" />
-                          Continue
-                        </>
-                      )}
-                    </Button>
+                    {/* Players */}
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <Users className="w-4 h-4" />
+                      <span>{game.playerUsernames.length} pilots</span>
+                      <span className="text-chrome/50">•</span>
+                      <span className="text-xs truncate">{game.playerUsernames.join(", ")}</span>
+                    </div>
                   </div>
-                </motion.div>
-              ))}
-            </AnimatePresence>
-          )}
+
+                  {/* Continue Button */}
+                  <Button
+                    onClick={() => handleContinueGame(game)}
+                    disabled={joining && joiningGameId === game.gameId}
+                    className="bg-neon-teal/20 hover:bg-neon-teal/40 text-neon-teal border border-neon-teal/30 shrink-0"
+                  >
+                    {joining && joiningGameId === game.gameId ? (
+                      <>
+                        <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                        Joining...
+                      </>
+                    ) : (
+                      <>
+                        <PlayCircle className="w-4 h-4 mr-2" />
+                        Continue
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </motion.div>
+            ))}
+          </AnimatePresence>
         </div>
       </CardContent>
     </Card>

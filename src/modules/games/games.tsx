@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { useLazyGetAllGamesQuery } from "@/redux/api/game/gameApi";
@@ -36,7 +36,9 @@ export default function GamesPage() {
   const [currentPage, setCurrentPage] = useState(1);
 
   // API
-  const [trigger, { data: games = [], isLoading, error }] = useLazyGetAllGamesQuery();
+  const [trigger, { data, isLoading, error }] = useLazyGetAllGamesQuery();
+  const games = data?.items || [];
+  const totalCount = data?.totalCount || 0;
 
   // Load username and fetch games
   useEffect(() => {
@@ -48,7 +50,38 @@ export default function GamesPage() {
     }
   }, [router]);
 
-  // Automatically fetch games when filters change
+  // Track previous filter values to detect changes
+  const prevFiltersRef = useRef({
+    isPrivateFilter,
+    isFinishedFilter,
+    fromDate,
+    toDate,
+    searchTerm,
+  });
+
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    const filtersChanged =
+      prevFiltersRef.current.isPrivateFilter !== isPrivateFilter ||
+      prevFiltersRef.current.isFinishedFilter !== isFinishedFilter ||
+      prevFiltersRef.current.fromDate !== fromDate ||
+      prevFiltersRef.current.toDate !== toDate ||
+      prevFiltersRef.current.searchTerm !== searchTerm;
+
+    if (filtersChanged && currentPage !== 1) {
+      setCurrentPage(1);
+    }
+
+    prevFiltersRef.current = {
+      isPrivateFilter,
+      isFinishedFilter,
+      fromDate,
+      toDate,
+      searchTerm,
+    };
+  }, [isPrivateFilter, isFinishedFilter, fromDate, toDate, searchTerm, currentPage]);
+
+  // Fetch games when filters or page change
   useEffect(() => {
     if (!username) return;
 
@@ -74,18 +107,25 @@ export default function GamesPage() {
       params.searchTag = searchTerm;
     }
 
+    // Add pagination parameters
+    params.pageNumber = currentPage;
+    params.pageSize = ITEMS_PER_PAGE;
+
     trigger(params);
-    setCurrentPage(1); // Reset to first page on filter change
-  }, [username, isPrivateFilter, isFinishedFilter, fromDate, toDate, searchTerm, trigger]);
+  }, [
+    username,
+    isPrivateFilter,
+    isFinishedFilter,
+    fromDate,
+    toDate,
+    searchTerm,
+    currentPage,
+    trigger,
+  ]);
 
-  // Paginate games (search is now server-side via searchTag)
-  const paginatedGames = useMemo(() => {
-    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-    const endIndex = startIndex + ITEMS_PER_PAGE;
-    return games.slice(startIndex, endIndex);
-  }, [games, currentPage]);
-
-  const totalPages = Math.ceil(games.length / ITEMS_PER_PAGE);
+  // Use games directly since pagination is handled by the API
+  const paginatedGames = games;
+  const totalPages = data?.totalPages || 0;
 
   const handleClearFilters = () => {
     setIsPrivateFilter("all");
@@ -250,7 +290,7 @@ export default function GamesPage() {
                   <div>
                     <CardTitle className="text-xl text-neon-magenta">Your Games</CardTitle>
                     <CardDescription>
-                      {games.length} {games.length === 1 ? "game" : "games"} found
+                      {totalCount} {totalCount === 1 ? "game" : "games"} found
                     </CardDescription>
                   </div>
                 </div>
