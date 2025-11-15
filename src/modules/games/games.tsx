@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { useLazyGetAllGamesQuery } from "@/redux/api/game/gameApi";
@@ -50,7 +50,38 @@ export default function GamesPage() {
     }
   }, [router]);
 
-  // Automatically fetch games when filters change
+  // Track previous filter values to detect changes
+  const prevFiltersRef = useRef({
+    isPrivateFilter,
+    isFinishedFilter,
+    fromDate,
+    toDate,
+    searchTerm,
+  });
+
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    const filtersChanged =
+      prevFiltersRef.current.isPrivateFilter !== isPrivateFilter ||
+      prevFiltersRef.current.isFinishedFilter !== isFinishedFilter ||
+      prevFiltersRef.current.fromDate !== fromDate ||
+      prevFiltersRef.current.toDate !== toDate ||
+      prevFiltersRef.current.searchTerm !== searchTerm;
+
+    if (filtersChanged && currentPage !== 1) {
+      setCurrentPage(1);
+    }
+
+    prevFiltersRef.current = {
+      isPrivateFilter,
+      isFinishedFilter,
+      fromDate,
+      toDate,
+      searchTerm,
+    };
+  }, [isPrivateFilter, isFinishedFilter, fromDate, toDate, searchTerm, currentPage]);
+
+  // Fetch games when filters or page change
   useEffect(() => {
     if (!username) return;
 
@@ -104,11 +135,6 @@ export default function GamesPage() {
     setSearchTerm("");
     setCurrentPage(1);
   };
-
-  // Reset to page 1 when any filter changes
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [isPrivateFilter, isFinishedFilter, fromDate, toDate, searchTerm]);
 
   const hasActiveFilters =
     isPrivateFilter !== "all" || isFinishedFilter !== "all" || fromDate || toDate || searchTerm;
