@@ -8,7 +8,6 @@ import type {
   ExecuteProgrammingCardRequest,
   ExecuteProgrammingCardResponse,
   GetAllGamesRequest,
-  GetAllGamesResponse,
   GetAllGamesEndpointResponse,
   ActivateNextBoardElementRequest,
   RequestGamePauseRequest,

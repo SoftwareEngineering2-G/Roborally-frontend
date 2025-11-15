@@ -22,8 +22,6 @@ const GameOverModal: React.FC<GameOverModalProps> = ({ myUsername }) => {
   const [showChangeAnimation, setShowChangeAnimation] = useState<Record<string, boolean>>({});
   const [animationPhase, setAnimationPhase] = useState<"change" | "counting">("change");
 
-  const isWinner = winner === myUsername;
-
   // Two-phase animation: 1) Show change number jumping, 2) Animate rating change
   useEffect(() => {
     if (!isGameOver || !oldRatings || !newRatings) return;

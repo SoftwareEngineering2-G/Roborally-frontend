@@ -278,8 +278,7 @@ export const ProgrammingPhase = ({
           <GameBoardComponent
             gameBoardData={gameBoard}
             players={currentGame.players}
-            className="w-full h-full max-h-full"
-            myUsername={username}
+            className="mb-4"
           />
         </div>
         {/* Right side - Player Information */}
