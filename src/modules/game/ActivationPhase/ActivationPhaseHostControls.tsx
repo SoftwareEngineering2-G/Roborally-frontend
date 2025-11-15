@@ -76,17 +76,14 @@ export const ActivationPhaseHostControls = ({
           // Call the activation endpoint 3 times to activate all board elements
           // 1st: Blue Conveyor Belts
           await activateNextBoardElement({ gameId, username }).unwrap();
-          toast.success("Blue conveyor belts activated!");
 
           // 2nd: Green Conveyor Belts
           await activateNextBoardElement({ gameId, username }).unwrap();
-          toast.success("Green conveyor belts activated!");
 
           // 3rd: Gears
           await activateNextBoardElement({ gameId, username }).unwrap();
-          toast.success("Gears activated!");
 
-          toast.info("All board elements activated! Ready for next register.");
+          toast.info("All board elements activated! Ready for next round.");
         } catch (error) {
           toast.error("Failed to activate board elements");
           console.error("Failed to activate board elements:", error);

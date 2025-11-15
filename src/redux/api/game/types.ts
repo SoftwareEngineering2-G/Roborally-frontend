@@ -17,6 +17,7 @@ export type GetCurrentGameStateResponse = {
   gameId: string;
   players: Array<{
     username: string;
+    currentRating: number;
     robot: string;
     positionX: number;
     positionY: number;
@@ -106,6 +107,7 @@ export interface GetAllGamesResponse {
   hostUsername: string;
   startDate: string; // ISO date string
   isFinished: boolean;
+  winner?: string | null;
   isPrivate: boolean;
 }
 

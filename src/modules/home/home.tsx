@@ -12,6 +12,7 @@ import { CreateLobbyDialog } from "@/components/CreateLobbyDialog/create-lobby-d
 import PublicLobbies from "@/components/lobby/public-lobbies";
 import MyGames from "@/components/games/my-games";
 import PausedGames from "@/components/home/paused-games";
+import QuickLeaderboard from "@/components/home/quick-leaderboard";
 import { LogOut } from "lucide-react";
 
 export default function Home() {
@@ -58,15 +59,13 @@ export default function Home() {
       </header>
 
       <div className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 xl:grid-cols-2 3xl:grid-cols-3 gap-8">
-          {/* Left side - Quick Actions & Paused Games */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8">
+          {/* Quick Actions */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="space-y-8"
           >
-            {/* Quick Actions */}
             <Card className="glass-panel">
               <CardHeader>
                 <CardTitle className="text-xl text-neon-teal">Quick Actions</CardTitle>
@@ -80,25 +79,41 @@ export default function Home() {
                 <JoinLobbyDialog username={username} />
               </CardContent>
             </Card>
+          </motion.div>
 
-            {/* Paused Games */}
+          {/* Paused Games */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+          >
             <PausedGames username={username} />
           </motion.div>
 
-          {/* Middle - Public Lobbies */}
+          {/* Leaderboard */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
           >
+            <QuickLeaderboard />
+          </motion.div>
+
+          {/* Public Lobbies */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+          >
             <PublicLobbies username={username} />
           </motion.div>
 
-          {/* Right side - My Games */}
+          {/* My Games */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.4 }}
+            className="lg:col-span-2 xl:col-span-2"
           >
             <MyGames username={username} />
           </motion.div>

@@ -55,8 +55,15 @@ export interface NextPlayerInTurnEvent {
 }
 
 export interface GameOverEvent {
-gameId: string;
-username: string;
+  gameId: string;
+  username: string;
+}
+
+export interface GameCompletedBroadcastEvent {
+  winner: string;
+  gameId: string;
+  oldRatings: Record<string, number>;
+  newRatings: Record<string, number>;
 }
 
 // Game Pause SignalR Events
@@ -83,4 +90,3 @@ export interface CheckpointReachedEvent {
   username: string;
   checkpointNumber: number;
 }
-

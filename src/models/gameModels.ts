@@ -16,6 +16,7 @@ export type GameBoard = {
 
 export type GamePlayer = {
   username: string;
+  currentRating: number;
   robot: string;
   positionX: number;
   positionY: number;
@@ -57,6 +58,4 @@ export type Game = {
   personalState: MyState; // Player's own state information
   currentTurnUsername: string | null;
   currentExecutingRegister: number | null;
-  isGameOver?: boolean;
-  winner?: string;
 };

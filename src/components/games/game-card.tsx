@@ -14,6 +14,7 @@ interface GameCardProps {
     hostUsername: string;
     startDate: string;
     isFinished?: boolean;
+    winner?: string | null;
   };
   index?: number;
   compact?: boolean; // For smaller cards in MyGames
@@ -116,6 +117,13 @@ export function GameCard({ game, index = 0, compact = false }: GameCardProps) {
               </span>
             </div>
           </div>
+          {game.winner && (
+            <div className="flex items-center gap-1 mt-1">
+              <span className="text-yellow-400 font-semibold text-sm">
+                🏆 Winner: {game.winner}
+              </span>
+            </div>
+          )}
         </div>
         <motion.div
           animate={isOngoing && compact ? {

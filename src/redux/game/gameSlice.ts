@@ -10,6 +10,8 @@ interface GameState {
   executedPlayers: string[]; // Track which players have executed in current round
   winner: string | null;
   isGameOver: boolean;
+  oldRatings: Record<string, number> | null;
+  newRatings: Record<string, number> | null;
 }
 
 const initialState: GameState = {
@@ -20,6 +22,8 @@ const initialState: GameState = {
   executedPlayers: [],
   winner: null,
   isGameOver: false,
+  oldRatings: null,
+  newRatings: null,
 };
 
 const gameSlice = createSlice({
@@ -36,6 +40,7 @@ const gameSlice = createSlice({
         isPrivate: response.isPrivate,
         players: response.players.map((p) => ({
           username: p.username,
+          currentRating: p.currentRating,
           robot: p.robot,
           positionX: p.positionX,
           positionY: p.positionY,
@@ -137,7 +142,7 @@ const gameSlice = createSlice({
     updatePlayerCheckpoint: (
       state,
       action: PayloadAction<{ username: string; checkpointNumber: number }>
-      ) => {
+    ) => {
       if (state.currentGame) {
         const player = state.currentGame.players.find(
           (p) => p.username === action.payload.username
@@ -180,9 +185,18 @@ const gameSlice = createSlice({
         state.executedPlayers.push(action.payload);
       }
     },
-    setGameOver: (state, action: PayloadAction<{winner: string}> ) => {
+    setGameOver: (
+      state,
+      action: PayloadAction<{
+        winner: string;
+        oldRatings: Record<string, number>;
+        newRatings: Record<string, number>;
+      }>
+    ) => {
       state.isGameOver = true;
       state.winner = action.payload.winner;
+      state.oldRatings = action.payload.oldRatings;
+      state.newRatings = action.payload.newRatings;
     },
     resetGameState: (state) => {
       state.currentGame = null;
@@ -194,6 +208,8 @@ const gameSlice = createSlice({
     clearGameOver: (state) => {
       state.isGameOver = false;
       state.winner = null;
+      state.oldRatings = null;
+      state.newRatings = null;
     },
   },
 });
