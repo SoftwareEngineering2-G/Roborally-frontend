@@ -99,6 +99,8 @@ export interface GetAllGamesRequest {
   from?: string; // ISO date string (DateOnly)
   to?: string; // ISO date string (DateOnly)
   searchTag?: string; // Search by room name or host name
+  pageNumber?: number;
+  pageSize?: number;
 }
 
 export interface GetAllGamesResponse {
@@ -109,6 +111,14 @@ export interface GetAllGamesResponse {
   isFinished: boolean;
   winner?: string | null;
   isPrivate: boolean;
+}
+
+export interface GetAllGamesEndpointResponse {
+  items: GetAllGamesResponse[];
+  totalCount: number;
+  totalPages: number;
+  currentPage: number;
+  pageSize: number;
 }
 
 export type RequestGamePauseRequest = {
