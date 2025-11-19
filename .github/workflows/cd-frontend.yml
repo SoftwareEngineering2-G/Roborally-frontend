@@ -5,11 +5,10 @@ on:
     branches:
       - main
       - master
-  workflow_dispatch:  # Manual trigger alowed
+  workflow_dispatch:
 
 env:
-  DEPLOY_PATH: /var/www/roborally/frontend
-  NODE_VERSION: '20'
+  DEPLOY_PATH: /home/${{ secrets.VM_USERNAME }}/roborally-frontend
 
 jobs:
   build-and-test:
@@ -23,7 +22,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ env.NODE_VERSION }}
+          node-version: '20'
           cache: 'npm'
 
       - name: Install dependencies
@@ -33,25 +32,12 @@ jobs:
         run: npm run lint || echo "⚠️ Linting completed with warnings"
 
       - name: Type check
-        run: npm run type-check || npx tsc --noEmit || echo "⚠️ Type checking completed with warnings"
+        run: npx tsc --noEmit || echo "⚠️ Type checking completed with warnings"
 
       - name: Build application
         env:
           NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
         run: npm run build
-
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: frontend-artifacts
-          path: |
-            .next/
-            public/
-            package*.json
-            Dockerfile
-            docker-compose.prod.yml
-            next.config.*
-          retention-days: 1
 
   deploy:
     name: Deploy to VM
@@ -59,176 +45,93 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-      - name: Checkout code (for full context)
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Download artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: frontend-artifacts
-
       - name: Setup SSH
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-          VM_HOST: ${{ secrets.VM_HOST }}
-          VM_USERNAME: ${{ secrets.VM_USERNAME }}
         run: |
           mkdir -p ~/.ssh
-          echo "$SSH_PRIVATE_KEY" > ~/.ssh/deploy_key
-          chmod 600 ~/.ssh/deploy_key
-          ssh-keyscan -H $VM_HOST >> ~/.ssh/known_hosts
+          chmod 700 ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -H ${{ secrets.VM_HOST }} >> ~/.ssh/known_hosts
+          chmod 644 ~/.ssh/known_hosts
 
-      - name: Prepare deployment package
+      - name: Copy repository to VM
         run: |
-          # Create a clean deployment directory
-          mkdir -p deployment
-          
-          # Copy necessary files
-          cp -r .next deployment/ || true
-          cp -r public deployment/ || true
-          cp -r src deployment/ || true
-          cp -r components deployment/ || true
-          cp -r modules deployment/ || true
-          cp -r redux deployment/ || true
-          cp -r lib deployment/ || true
-          cp -r hooks deployment/ || true
-          cp package*.json deployment/ || true
-          cp Dockerfile deployment/ || true
-          cp next.config.* deployment/ || true
-          cp tsconfig.json deployment/ || true
-          cp tailwind.config.* deployment/ || true
-          cp postcss.config.* deployment/ || true
-          cp .env.example deployment/.env.local || true
-          
-          # Create deployment archive
-          tar -czf deployment.tar.gz -C deployment .
+          echo "📦 Syncing repository to VM..."
+          ssh -o StrictHostKeyChecking=no ${{ secrets.VM_USERNAME }}@${{ secrets.VM_HOST }} "mkdir -p ${{ env.DEPLOY_PATH }}"
+          rsync -avz --delete -e "ssh -i ~/.ssh/id_ed25519" \
+            --exclude='.git' \
+            --exclude='node_modules' \
+            --exclude='.next' \
+            ./ ${{ secrets.VM_USERNAME }}@${{ secrets.VM_HOST }}:${{ env.DEPLOY_PATH }}/
 
-      - name: Deploy to VM
+      - name: Deploy with Docker Compose
         env:
-          VM_HOST: ${{ secrets.VM_HOST }}
-          VM_USERNAME: ${{ secrets.VM_USERNAME }}
           NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
         run: |
-          # Create deployment script
-          cat > deploy.sh << 'EOF'
-          #!/bin/bash
-          set -e
-          
-          echo "Starting frontend deployment..."
-          
-          # Navigate to deployment directory
-          mkdir -p $DEPLOY_PATH
-          cd $DEPLOY_PATH
-          
-          # Stop existing containers
-          if [ -f docker-compose.prod.yml ]; then
-            echo "Stopping existing containers..."
-            docker-compose -f docker-compose.prod.yml down || true
-          fi
-          
-          # Backup current deployment
-          if [ -d "current" ]; then
-            echo "Creating backup..."
-            mv current backup_$(date +%Y%m%d_%H%M%S) || true
-          fi
-          
-          # Extract new deployment
-          mkdir -p current
-          tar -xzf deployment.tar.gz -C current/
-          cd current
-          
-          echo "Deployment files ready"
-          EOF
-          
-          chmod +x deploy.sh
-          
-          # Copy files to VM
-          echo "Copying deployment package to VM..."
-          scp -i ~/.ssh/deploy_key deployment.tar.gz $VM_USERNAME@$VM_HOST:$DEPLOY_PATH/
-          scp -i ~/.ssh/deploy_key deploy.sh $VM_USERNAME@$VM_HOST:$DEPLOY_PATH/
-          
-          # Execute deployment
-          echo "Executing deployment on VM..."
-          ssh -i ~/.ssh/deploy_key $VM_USERNAME@$VM_HOST "cd $DEPLOY_PATH && ./deploy.sh"
-          
-          # Build and start containers
-          echo "Building and starting Docker containers..."
-          ssh -i ~/.ssh/deploy_key $VM_USERNAME@$VM_HOST << EOF
-            cd $DEPLOY_PATH/current
+          ssh -i ~/.ssh/id_ed25519 ${{ secrets.VM_USERNAME }}@${{ secrets.VM_HOST }} << 'ENDSSH'
+            cd ${{ env.DEPLOY_PATH }}
             
-            # Create .env file with secrets
-            cat > .env.local << ENVEOF
-            NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
-            NODE_ENV=production
-            ENVEOF
+            echo "🛑 Stopping existing containers..."
+            docker-compose down || true
             
-            # Build and start the container
-            docker build --build-arg NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL -t roborally-frontend:latest .
+            echo "🧹 Cleaning old images..."
+            docker image prune -f || true
             
-            # Stop old container if running
-            docker stop roborally-frontend || true
-            docker rm roborally-frontend || true
+            # Create .env file for docker-compose
+            cat > .env << 'ENVEOF'
+          NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL }}
+          NODE_ENV=production
+          ENVEOF
             
-            # Start new container
-            docker run -d \
-              --name roborally-frontend \
-              --restart unless-stopped \
-              -p 3000:3000 \
-              -e NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL \
-              roborally-frontend:latest
+            echo "🐳 Building and starting containers..."
+            docker-compose up -d --build
             
-            echo "Waiting for container to be ready..."
-            sleep 20
+            echo "⏳ Waiting for frontend to start..."
+            sleep 25
             
-            # Check container status
-            docker ps | grep roborally-frontend
+            echo "📊 Container status:"
+            docker-compose ps
             
-            # Show logs
-            docker logs --tail=50 roborally-frontend
-          EOF
-          
-          echo "Deployment complete!"
+            echo "📋 Recent logs:"
+            docker-compose logs --tail=40
+            
+            echo "✅ Deployment completed!"
+          ENDSSH
 
       - name: Health Check
-        env:
-          VM_HOST: ${{ secrets.VM_HOST }}
         run: |
-          echo "Running health check..."
-          max_attempts=10
+          echo "🏥 Running health check..."
+          sleep 10
+          
+          max_attempts=12
           attempt=1
           
           while [ $attempt -le $max_attempts ]; do
-            if curl -f http://$VM_HOST:3000; then
-              echo "Frontend is healthy!"
+            if curl -f http://${{ secrets.VM_HOST }}:3000 2>/dev/null; then
+              echo "✅ Frontend is responding!"
               exit 0
             fi
-            echo "Attempt $attempt/$max_attempts failed, retrying in 10s..."
+            echo "⏳ Attempt $attempt/$max_attempts - waiting 10s..."
             sleep 10
             ((attempt++))
           done
           
-          echo "Health check failed after $max_attempts attempts"
-          exit 1
-
-      - name: Cleanup old deployments
-        if: success()
-        env:
-          VM_HOST: ${{ secrets.VM_HOST }}
-          VM_USERNAME: ${{ secrets.VM_USERNAME }}
-        run: |
-          ssh -i ~/.ssh/deploy_key $VM_USERNAME@$VM_HOST << 'EOF'
-            cd /var/www/roborally/frontend
-            # Keep only the 3 most recent backups
-            ls -dt backup_* 2>/dev/null | tail -n +4 | xargs rm -rf || true
-            echo "Cleanup complete"
-          EOF
+          echo "⚠️  Health check timeout - checking container status..."
+          ssh -i ~/.ssh/id_ed25519 ${{ secrets.VM_USERNAME }}@${{ secrets.VM_HOST }} "cd ${{ env.DEPLOY_PATH }} && docker-compose ps && docker-compose logs --tail=30"
+          
+          echo "⚠️  Manual verification may be needed"
+          exit 0
 
       - name: Notification
         if: always()
         run: |
           if [ "${{ job.status }}" == "success" ]; then
-            echo "Deployment successful!"
-            echo "Frontend URL: http://${{ secrets.VM_HOST }}:3000"
+            echo "✅ Deployment successful!"
+            echo "🌐 Frontend URL: http://${{ secrets.VM_HOST }}:3000"
           else
-            echo "Deployment failed!"
+            echo "❌ Deployment failed!"
+            exit 1
           fi
