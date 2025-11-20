@@ -65,8 +65,9 @@ export const SignIn = () => {
   // Handle success
   useEffect(() => {
     if (isSuccess && data) {
-      // Store username in localStorage
+      // Store username AND JWT token in localStorage
       localStorage.setItem("username", data.username);
+      localStorage.setItem("jwt_token", data.token);
 
       showSuccessToast(
         "Pilot Authenticated",
