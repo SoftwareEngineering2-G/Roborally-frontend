@@ -29,7 +29,6 @@ interface ExecuteCardButtonProps {
   gameId: string;
   username: string;
   cardName: string;
-  registerIndex: number;
 }
 
 const MOVEMENT_CHOICES = [
