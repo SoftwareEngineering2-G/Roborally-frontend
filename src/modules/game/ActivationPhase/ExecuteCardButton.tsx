@@ -121,7 +121,7 @@ export const ExecuteCardButton = ({ gameId, username, cardName }: ExecuteCardBut
         title={noSwapTargets ? "No available players to swap with." : undefined}
       >
         <Play className="w-4 h-4 mr-1" />
-        {isInteractiveCard ? "Configure" : isLoading ? "Executing..." : "Execute"}
+        {isLoading ? "Executing..." : isInteractiveCard ? "Configure" : "Execute"}
       </Button>
 
       <Dialog
