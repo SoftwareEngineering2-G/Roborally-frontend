@@ -44,7 +44,9 @@ export type ProgrammingCards =
   | "U-Turn"
   | "Move Back"
   | "Power Up"
-  | "Again";
+  | "Again"
+  | "Swap Position"
+  | "Movement Choice";
 
 export type Game = {
   gameId: string;

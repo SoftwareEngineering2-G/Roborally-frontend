@@ -10,7 +10,9 @@ export interface ProgramCard {
     | "Rotate Left"
     | "Rotate Right"
     | "U-Turn"
-    | "Again";
+    | "Again"
+    | "Swap Position"
+    | "Movement Choice";
   imagePath: string;
 }
 
@@ -59,6 +61,18 @@ export const SAMPLE_CARDS: ProgramCard[] = [
   },
   { id: "8", name: "U-Turn", type: "U-Turn", imagePath: "/cards/uturn.png" },
   { id: "9", name: "Again", type: "Again", imagePath: "/cards/again.png" },
+  {
+    id: "10",
+    name: "Swap Position",
+    type: "Swap Position",
+    imagePath: "/cards/swap-position.png",
+  },
+  {
+    id: "11",
+    name: "Movement Choice",
+    type: "Movement Choice",
+    imagePath: "/cards/movement-choice.png",
+  },
 ];
 
 export const INITIAL_REGISTERS: RegisterSlot[] = [
@@ -80,7 +94,9 @@ export const createCardFromBackendString = (cardName: string, id: string): Progr
     "U-Turn": "U-Turn",
     "Move Back": "Move Back",
     "Power Up": "Power Up",
-    "Again": "Again"
+    "Again": "Again",
+    "Swap Position": "Swap Position",
+    "Movement Choice": "Movement Choice",
   };
 
   const imageMap: Record<string, string> = {
@@ -92,7 +108,9 @@ export const createCardFromBackendString = (cardName: string, id: string): Progr
     "U-Turn": "/cards/uturn.png",
     "Move Back": "/cards/moveback.png",
     "Power Up": "/cards/powerup.png",
-    "Again": "/cards/again.png"
+    "Again": "/cards/again.png",
+    "Swap Position": "/cards/swap-position.png",
+    "Movement Choice": "/cards/movement-choice.png",
   };
 
   return {
