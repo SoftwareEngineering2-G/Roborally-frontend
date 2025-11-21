@@ -109,8 +109,8 @@ export const createCardFromBackendString = (cardName: string, id: string): Progr
     "Move Back": "/cards/moveback.png",
     "Power Up": "/cards/powerup.png",
     "Again": "/cards/again.png",
-    "Swap Position": "/cards/swapposition.png",
-    "Movement Choice": "/cards/movementchoice.png",
+    "Swap Position": "/cards/swap-position.png",
+    "Movement Choice": "/cards/movement-choice.png",
   };
 
   return {
