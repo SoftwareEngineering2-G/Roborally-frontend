@@ -32,7 +32,15 @@ interface ExecuteCardButtonProps {
   registerIndex: number;
 }
 
-const MOVEMENT_CHOICES = ["Move 1", "Move 2", "Move 3", "Move Back"] as const;
+const MOVEMENT_CHOICES = [
+  "Move 1",
+  "Move 2",
+  "Move 3",
+  "Move Back",
+  "Rotate Left",
+  "Rotate Right",
+  "U-Turn",
+] as const;
 
 export const ExecuteCardButton = ({ gameId, username, cardName }: ExecuteCardButtonProps) => {
   const [executeCard, { isLoading }] = useExecuteProgrammingCardMutation();
