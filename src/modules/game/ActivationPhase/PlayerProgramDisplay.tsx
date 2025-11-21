@@ -231,10 +231,19 @@ export const PlayerProgramDisplay = ({
               isCurrentPlayer &&
               revealedUpTo >= 0 &&
               revealedCards[revealedUpTo] && (
-                <div className="mt-3 flex items-center justify-between">
-                  <span className="text-xs text-neon-teal font-semibold animate-pulse">
-                    Your turn!
-                  </span>
+                <div className="mt-3 flex items-center justify-between gap-3">
+                  <div className="flex flex-col gap-1">
+                    <span className="text-xs text-neon-teal font-semibold animate-pulse">
+                      Your turn!
+                    </span>
+                    {["Swap Position", "Movement Choice"].includes(
+                      revealedCards[revealedUpTo].name
+                    ) && (
+                      <span className="text-[10px] text-chrome-light/80 uppercase tracking-wide">
+                        Interactive card — configure before executing
+                      </span>
+                    )}
+                  </div>
                   <ExecuteCardButton
                     gameId={gameId}
                     username={player.username}

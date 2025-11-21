@@ -88,10 +88,13 @@ export const gameApi = baseApi.injectEndpoints({
       ExecuteProgrammingCardResponse,
       ExecuteProgrammingCardRequest
     >({
-      query: ({ gameId, username, cardName }) => ({
+      query: ({ gameId, username, cardName, interactiveInput }) => ({
         url: `/games/${gameId}/players/${username}/execute-card`,
         method: "POST",
-        body: { cardName },
+        body: {
+          cardName,
+          interactiveInput,
+        },
       }),
     }),
 
