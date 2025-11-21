@@ -248,7 +248,6 @@ export const PlayerProgramDisplay = ({
                     gameId={gameId}
                     username={player.username}
                     cardName={revealedCards[revealedUpTo].name}
-                    registerIndex={revealedUpTo}
                   />
                 </div>
               )}
