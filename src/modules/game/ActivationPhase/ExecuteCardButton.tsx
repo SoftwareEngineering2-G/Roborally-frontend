@@ -134,8 +134,7 @@ export const ExecuteCardButton = ({ gameId, username, cardName }: ExecuteCardBut
         onOpenChange={(open) => {
           setDialogOpen(open);
           if (!open) {
-            setSelectedTarget(undefined);
-            setSelectedMovement(MOVEMENT_CHOICES[0]);
+            resetDialogState();
           }
         }}
       >
