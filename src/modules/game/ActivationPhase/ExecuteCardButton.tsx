@@ -104,10 +104,6 @@ export const ExecuteCardButton = ({ gameId, username, cardName }: ExecuteCardBut
     }
 
     if (isMovementChoiceCard) {
-      if (!selectedMovement) {
-        toast.error("Choose a movement option.");
-        return;
-      }
       void submitExecution({ selectedMovementCard: selectedMovement });
     }
   };
