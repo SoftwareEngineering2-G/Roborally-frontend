@@ -8,7 +8,7 @@ import {
   setCurrentPhase,
 } from "@/redux/game/gameSlice";
 
-export const audioMiddleware: Middleware = (store) => (next) => (action: any) => {
+export const audioMiddleware: Middleware = () => (next) => (action: unknown) => {
   const result = next(action);
 
   if (updateRobotPosition.match(action)) {
