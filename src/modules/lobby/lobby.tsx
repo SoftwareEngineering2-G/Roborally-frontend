@@ -26,6 +26,7 @@ import {
 import type { RootState, AppDispatch } from "@/redux/store";
 import { LobbyHeader, PlayersGrid, GameControls, GameInfo } from "./components";
 import { useLobbySignalR } from "./hooks/useLobbySignalR";
+import { useAudio } from "@/modules/audio/AudioContext";
 
 interface Props {
   gameId: string;
@@ -66,6 +67,12 @@ export const Lobby = ({ gameId }: Props) => {
     }
     setUsername(storedUsername);
   }, [router]);
+
+  const { playBGM } = useAudio();
+
+  useEffect(() => {
+    playBGM("lobby");
+  }, [playBGM]);
 
   useEffect(() => {
     return () => {

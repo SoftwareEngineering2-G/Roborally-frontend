@@ -18,6 +18,8 @@ import { GamePauseButton } from "./components/GamePauseButton";
 import { GamePauseDialog } from "./components/GamePauseDialog";
 import { GamePauseResultDialog } from "./components/GamePauseResultDialog";
 import GameOverModal from "./components/GameOverModal";
+import { useAudio } from "@/modules/audio/AudioContext";
+import { AudioControls } from "@/modules/audio/components/AudioControls";
 
 interface Props {
   gameId: string;
@@ -35,6 +37,12 @@ export default function Game({ gameId }: Props) {
     }
     setUsername(storedUsername);
   }, [router]);
+
+  const { playBGM } = useAudio();
+
+  useEffect(() => {
+    playBGM("game");
+  }, [playBGM]);
 
   const { gameState, isLoading, error } = useGameState(gameId, username);
 
@@ -171,6 +179,11 @@ export default function Game({ gameId }: Props) {
     <div className="relative min-h-screen">
       {/* Game Over Modal */}
       <GameOverModal myUsername={username} />
+
+      {/* Audio Controls */}
+      <div className="absolute top-4 right-4 z-50">
+        <AudioControls />
+      </div>
 
       {/* Pause Request Dialog */}
       {pauseRequest && (
