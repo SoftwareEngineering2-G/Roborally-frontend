@@ -8,6 +8,7 @@ type SignupRequest = {
 
 type SignupResponse = {
   username: string;
+  token: string; // JWT token from backend
 };
 
 type SigninRequest = {
@@ -17,6 +18,7 @@ type SigninRequest = {
 
 type SigninResponse = {
   username: string;
+  token: string; // JWT token from backend
 };
 
 export const authApi = baseApi.injectEndpoints({
