@@ -48,6 +48,8 @@ export type GetCurrentGameStateResponse = {
     hasLockedInRegisters: boolean;
     lockedInCards: string[] | null;
     dealtCards: string[] | null;
+    programmingPickPilesCount: number; // NEW - cards remaining in programming deck
+    discardPilesCount: number; // NEW - cards in discard pile
   };
 };
 
