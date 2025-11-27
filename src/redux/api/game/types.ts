@@ -74,6 +74,10 @@ export type ExecuteProgrammingCardRequest = {
   gameId: string;
   username: string;
   cardName: string;
+  interactiveInput?: {
+    targetPlayerUsername?: string;
+    selectedMovementCard?: string;
+  };
 };
 
 export interface ExecuteProgrammingCardResponse {

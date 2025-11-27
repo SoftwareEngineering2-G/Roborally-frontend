@@ -16,6 +16,10 @@ export const getCardTypeClasses = (type: ProgramCard["type"]) => {
       "bg-neon-magenta/20 border-neon-magenta shadow-glow-magenta text-neon-magenta",
     "Again":
       "bg-neon-yellow/20 border-neon-yellow shadow-glow-yellow text-neon-yellow",
+    "Swap Position":
+      "bg-neon-purple/20 border-neon-purple shadow-glow-purple text-neon-purple",
+    "Movement Choice":
+      "bg-neon-purple/20 border-neon-purple shadow-glow-purple text-neon-purple",
   };
   return typeMap[type];
 };
