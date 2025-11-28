@@ -184,6 +184,7 @@ export const ProgrammingPhase = ({
       } else {
         // Fallback: directly set cards if animation elements not found
         handlers.handleSetHand(dealtCards);
+          playSFX("card_deal");
       }
 
       toast.info(`Received ${dealtCards.length} cards`);
@@ -223,7 +224,7 @@ export const ProgrammingPhase = ({
           });
         } else {
           // No shuffle needed, deal directly
-          playSFX("card_deal");
+
           executeDealAnimation(data);
         }
       }
