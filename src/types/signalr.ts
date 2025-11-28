@@ -20,6 +20,9 @@ export interface PlayerCardsDealtEvent {
   gameId: string; // Guid from C# backend
   username: string;
   dealtCards: string[]; // List of card names as strings
+  isDeckReshuffled: boolean; // NEW - indicates if discard pile was shuffled into deck
+  programmingPickPilesCount: number; // NEW - cards remaining in programming deck
+  discardPilesCount: number; // NEW - cards in discard pile
 }
 
 export interface ActivationPhaseStartedEvent {

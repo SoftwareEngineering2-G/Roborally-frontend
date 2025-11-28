@@ -31,6 +31,8 @@ export type MyState = {
   hasLockedInRegisters: boolean;
   lockedInCards: ProgrammingCards[] | null; // Player's own locked in cards (5 cards when locked)
   dealtCards: ProgrammingCards[] | null; // Player's dealt hand (9 cards when dealt)
+  programmingPickPilesCount: number; // Cards remaining in programming deck
+  discardPilesCount: number; // Cards in discard pile
 };
 
 export type GamePhase = "ProgrammingPhase" | "ActivationPhase";

@@ -70,6 +70,8 @@ const gameSlice = createSlice({
           hasLockedInRegisters: response.personalState.hasLockedInRegisters,
           lockedInCards: response.personalState.lockedInCards as ProgrammingCards[] | null,
           dealtCards: response.personalState.dealtCards as ProgrammingCards[] | null,
+          programmingPickPilesCount: response.personalState.programmingPickPilesCount ?? 20,
+          discardPilesCount: response.personalState.discardPilesCount ?? 0,
         },
       };
       state.isLoading = false;
