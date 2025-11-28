@@ -52,16 +52,16 @@ jobs:
         run: |
           mkdir -p ~/.ssh
           chmod 700 ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
-          chmod 600 ~/.ssh/id_ed25519
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H ${{ secrets.VM_HOST }} >> ~/.ssh/known_hosts
           chmod 644 ~/.ssh/known_hosts
 
       - name: Copy repository to VM
         run: |
           echo "📦 Syncing repository to VM..."
-          ssh -o StrictHostKeyChecking=no ${{ secrets.VM_USERNAME }}@${{ secrets.VM_HOST }} "mkdir -p ${{ env.DEPLOY_PATH }}"
-          rsync -avz --delete -e "ssh -i ~/.ssh/id_ed25519" \
+          ssh ${{ secrets.VM_USERNAME }}@${{ secrets.VM_HOST }} "mkdir -p ${{ env.DEPLOY_PATH }}"
+          rsync -avz --delete -e "ssh -i ~/.ssh/id_rsa" \
             --exclude='.git' \
             --exclude='node_modules' \
             --exclude='.next' \
@@ -71,7 +71,8 @@ jobs:
         env:
           NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
         run: |
-          ssh -i ~/.ssh/id_ed25519 ${{ secrets.VM_USERNAME }}@${{ secrets.VM_HOST }} << 'ENDSSH'
+          ssh -i ~/.ssh/id_rsa ${{ secrets.VM_USERNAME }}@${{ secrets.VM_HOST }} << ENDSSH
+            export NEXT_PUBLIC_API_URL='${{ secrets.NEXT_PUBLIC_API_URL }}'
             cd ${{ env.DEPLOY_PATH }}
             
             echo "🛑 Stopping existing containers..."
@@ -81,10 +82,8 @@ jobs:
             docker image prune -f || true
             
             # Create .env file for docker-compose
-            cat > .env << 'ENVEOF'
-          NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL }}
-          NODE_ENV=production
-          ENVEOF
+            echo "NEXT_PUBLIC_API_URL=\${NEXT_PUBLIC_API_URL}" > .env
+            echo "NODE_ENV=production" >> .env
             
             echo "🐳 Building and starting containers..."
             docker-compose up -d --build
@@ -120,7 +119,7 @@ jobs:
           done
           
           echo "⚠️  Health check timeout - checking container status..."
-          ssh -i ~/.ssh/id_ed25519 ${{ secrets.VM_USERNAME }}@${{ secrets.VM_HOST }} "cd ${{ env.DEPLOY_PATH }} && docker-compose ps && docker-compose logs --tail=30"
+          ssh -i ~/.ssh/id_rsa ${{ secrets.VM_USERNAME }}@${{ secrets.VM_HOST }} "cd ${{ env.DEPLOY_PATH }} && docker-compose ps && docker-compose logs --tail=30"
           
           echo "⚠️  Manual verification may be needed"
           exit 0
