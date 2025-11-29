@@ -3,6 +3,7 @@ import Image from "next/image";
 import { cn } from "@/lib/utils";
 import type { ProgramCard } from "./types";
 import { getCardTypeClasses } from "./utils";
+import { useAudio } from "@/modules/audio/AudioContext";
 
 interface ProgramCardProps {
   card: ProgramCard;
@@ -21,6 +22,7 @@ export const ProgramCardComponent = ({
   onDragEnd,
   isDragging = false,
 }: ProgramCardProps) => {
+  const { playSFX } = useAudio();
   const handleDragStart = (e: React.DragEvent) => {
     e.dataTransfer.setData("application/json", JSON.stringify(card));
     onDragStart();
@@ -36,7 +38,13 @@ export const ProgramCardComponent = ({
         "hover:scale-105 hover:z-10",
         isDragging ? "opacity-50" : ""
       )}
-      onClick={onClick}
+      onClick={() => {
+        playSFX("ui_click");
+        onClick();
+      }}
+      onMouseEnter={() => {
+        playSFX("ui_hover");
+      }}
       draggable
       onDragStart={handleDragStart}
       onDragEnd={onDragEnd}

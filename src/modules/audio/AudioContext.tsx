@@ -4,7 +4,8 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import { audioManager, type SoundType, SOUNDS } from "./AudioManager";
 
 interface AudioContextType {
-  playBGM: (key: keyof typeof SOUNDS.bgm) => void;
+  playBGM: (key: keyof typeof SOUNDS.bgm) => Promise<void>;
+  stopBGM: () => void;
   playSFX: (key: keyof typeof SOUNDS.sfx) => void;
   setVolume: (type: SoundType, value: number) => void;
   toggleMute: () => void;
@@ -36,8 +37,12 @@ export const AudioProvider = ({ children }: { children: React.ReactNode }) => {
     setIsMuted(settings.isMuted);
   }, []);
 
-  const playBGM = (key: keyof typeof SOUNDS.bgm) => {
-    audioManager.playBGM(key);
+  const playBGM = async (key: keyof typeof SOUNDS.bgm) => {
+    await audioManager.playBGM(key);
+  };
+
+  const stopBGM = () => {
+    audioManager.stopBGM();
   };
 
   const playSFX = (key: keyof typeof SOUNDS.sfx) => {
@@ -57,6 +62,7 @@ export const AudioProvider = ({ children }: { children: React.ReactNode }) => {
 
   const value = {
     playBGM,
+    stopBGM,
     playSFX,
     setVolume: handleSetVolume,
     toggleMute: handleToggleMute,

@@ -14,6 +14,10 @@ export const SOUNDS = {
     success: "/audio/sfx/success.wav",
     error: "/audio/sfx/error.wav",
     lock_in: "/audio/sfx/lock_in.wav",
+    card_deal: "/audio/sfx/card_deal.wav",
+    game_win: "/audio/sfx/game_win.wav",
+    ui_hover: "/audio/sfx/ui_hover.wav",
+    ui_click: "/audio/sfx/ui_click.wav",
   },
 };
 
@@ -37,7 +41,7 @@ export class AudioManager {
     }
   }
 
-  playBGM(key: keyof typeof SOUNDS.bgm) {
+  async playBGM(key: keyof typeof SOUNDS.bgm) {
     if (this.currentBgmKey === key && this.bgmAudio && !this.bgmAudio.paused) return;
 
     if (this.bgmAudio) {
@@ -50,9 +54,38 @@ export class AudioManager {
     this.bgmAudio.loop = true;
     this.bgmAudio.volume = this.isMuted ? 0 : this.bgmVolume;
     
-    this.bgmAudio.play().catch((e) => {
+    try {
+      await this.bgmAudio.play();
+      console.log(`Playing BGM: ${key}`);
+    } catch (e) {
       console.warn("Autoplay blocked or audio error:", e);
-    });
+      // Store the key so we can retry when user interacts
+      this.currentBgmKey = key;
+      throw e; // Re-throw so caller knows it failed
+    }
+  }
+
+  // Method to enable audio on user interaction (bypasses autoplay restrictions)
+  async enableAudioOnInteraction() {
+    if (this.bgmAudio && this.bgmAudio.paused && this.currentBgmKey) {
+      try {
+        await this.bgmAudio.play();
+        console.log("Audio enabled after user interaction");
+        return true;
+      } catch (e) {
+        console.warn("Failed to enable audio:", e);
+        return false;
+      }
+    }
+    return false;
+  }
+
+  stopBGM() {
+    if (this.bgmAudio) {
+      this.bgmAudio.pause();
+      this.bgmAudio = null;
+    }
+    this.currentBgmKey = null;
   }
 
   playSFX(key: keyof typeof SOUNDS.sfx) {

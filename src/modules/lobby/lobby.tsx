@@ -68,11 +68,23 @@ export const Lobby = ({ gameId }: Props) => {
     setUsername(storedUsername);
   }, [router]);
 
-  const { playBGM } = useAudio();
+  const { playBGM, stopBGM } = useAudio();
 
   useEffect(() => {
-    playBGM("lobby");
-  }, [playBGM]);
+    const startLobbyMusic = async () => {
+      try {
+        await playBGM("lobby");
+      } catch {
+        console.warn("Failed to autoplay lobby music. User interaction may be required.");
+      }
+    };
+    
+    startLobbyMusic();
+    
+    return () => {
+      stopBGM();
+    };
+  }, [playBGM, stopBGM]);
 
   useEffect(() => {
     return () => {
