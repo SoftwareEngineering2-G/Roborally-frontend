@@ -23,6 +23,7 @@ import type {
 } from "@/types/signalr";
 import { toast } from "sonner";
 import type { GameBoard } from "@/models/gameModels";
+import { AudioControls } from "@/modules/audio/components/AudioControls";
 
 interface ActivationPhaseProps {
   gameId: string;
@@ -208,12 +209,8 @@ export const ActivationPhase = ({
       // Update the current turn username
       dispatch(setCurrentTurn(data.nextPlayerUsername));
 
-      // Show toast notification if it's the current user's turn
-      if (data.nextPlayerUsername === username) {
-        toast.info("It's your turn to execute your card!");
-      } else if (data.nextPlayerUsername) {
-        toast.info(`It's ${data.nextPlayerUsername}'s turn to execute!`);
-      }
+      console.log("----------------------")
+      console.log(data.nextPlayerUsername);
     };
 
     signalR.on("NextPlayerInTurn", handleNextPlayerInTurn);
@@ -244,17 +241,22 @@ export const ActivationPhase = ({
       transition={{ duration: 0.5 }}
       className="relative min-h-full"
     >
-      {/* Host Controls - Only visible to host in activation phase */}
-      {isHost && (
-        <ActivationPhaseHostControls gameId={gameId} gameState={currentGame} username={username} />
-      )}
-
       {/* Header */}
       <div className="h-20 border-b border-glass-border bg-surface-dark/50 backdrop-blur-sm flex items-center justify-between px-6">
         <div className="flex items-center gap-4">
           <h1 className="text-2xl font-bold text-neon-teal">Activation Phase</h1>
           <p className="text-sm text-muted-foreground">Watch robots execute their programs</p>
           {pauseButton}
+        </div>
+        <div className="flex items-center gap-3">
+          {isHost && (
+            <ActivationPhaseHostControls
+              gameId={gameId}
+              gameState={currentGame}
+              username={username}
+            />
+          )}
+          <AudioControls />
         </div>
       </div>
 

@@ -28,6 +28,7 @@ import { useProgrammingPhase } from "./hooks";
 import { useCardDealing } from "./useCardDealing";
 import { useCardDiscarding } from "./useCardDiscarding";
 import { useGameSignalR } from "./hooks/useGameSignalR";
+import { useAudio } from "@/modules/audio/AudioContext";
 import type { GameBoard } from "@/models/gameModels";
 
 interface ProgrammingPhaseProps {
@@ -45,6 +46,7 @@ export const ProgrammingPhase = ({
 }: ProgrammingPhaseProps) => {
   const [showProgrammingControls, setShowProgrammingControls] = useState(true);
   const dispatch = useAppDispatch();
+  const { playSFX } = useAudio();
 
   // Get game state from Redux
   const { currentGame } = useAppSelector((state) => state.game);
@@ -182,6 +184,7 @@ export const ProgrammingPhase = ({
       } else {
         // Fallback: directly set cards if animation elements not found
         handlers.handleSetHand(dealtCards);
+          playSFX("card_deal");
       }
 
       toast.info(`Received ${dealtCards.length} cards`);
@@ -221,6 +224,7 @@ export const ProgrammingPhase = ({
           });
         } else {
           // No shuffle needed, deal directly
+
           executeDealAnimation(data);
         }
       }
@@ -231,7 +235,7 @@ export const ProgrammingPhase = ({
     return () => {
       signalR.off("PlayerCardsDealt");
     };
-  }, [signalR.isConnected, username, gameId, executeDealAnimation, startShuffling, signalR]);
+  }, [signalR.isConnected, username, gameId, executeDealAnimation, startShuffling, signalR, playSFX]);
 
   // Listen for PlayerLockedInRegister events - only update Redux
   useEffect(() => {
@@ -328,13 +332,20 @@ export const ProgrammingPhase = ({
       transition={{ duration: 0.5 }}
       className="relative min-h-full"
     >
-      {/* Host Controls - Only visible to host in programming phase */}
-      {isHost && (
-        <ProgrammingPhaseHostControls gameId={gameId} gameState={currentGame} username={username} />
-      )}
-
       {/* Header */}
-      <ProgrammingHeader filledCount={filledCount} pauseButton={pauseButton} />
+      <ProgrammingHeader
+        filledCount={filledCount}
+        pauseButton={pauseButton}
+        hostControls={
+          isHost ? (
+            <ProgrammingPhaseHostControls
+              gameId={gameId}
+              gameState={currentGame}
+              username={username}
+            />
+          ) : undefined
+        }
+      />
 
       {/* Side-by-side layout: Board on left, Players on right */}
       <div className="w-full min-h-[calc(100vh-5rem)] flex">

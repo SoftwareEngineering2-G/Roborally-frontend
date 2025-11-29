@@ -2,6 +2,8 @@
 
 import { motion } from "framer-motion";
 
+import { AudioControls } from "@/modules/audio/components/AudioControls";
+
 interface ProgrammingHeaderProps {
   filledCount: number;
   hostControls?: React.ReactNode;
@@ -57,8 +59,11 @@ export const ProgrammingHeader = ({
           )}
         </div>
 
-        <div className="flex items-center gap-3">{/* Space for future header actions */}</div>
+        <div className="flex items-center gap-3">
+          <AudioControls />
+        </div>
       </div>
     </motion.div>
   );
 };
+

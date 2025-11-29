@@ -7,6 +7,7 @@ import type { RootState } from "@/redux/store";
 import { clearGameOver, resetGameState } from "@/redux/game/gameSlice";
 import Fireworks from "@/components/Fireworks/Fireworks";
 import { motion, AnimatePresence } from "framer-motion";
+import { useAudio } from "@/modules/audio/AudioContext";
 
 interface GameOverModalProps {
   myUsername: string;
@@ -15,6 +16,7 @@ interface GameOverModalProps {
 const GameOverModal: React.FC<GameOverModalProps> = ({ myUsername }) => {
   const router = useRouter();
   const dispatch = useDispatch();
+  const { playSFX } = useAudio();
   const { isGameOver, winner, oldRatings, newRatings } = useSelector(
     (state: RootState) => state.game
   );
@@ -29,6 +31,9 @@ const GameOverModal: React.FC<GameOverModalProps> = ({ myUsername }) => {
     // Initialize with old ratings
     setAnimatedRatings(oldRatings);
     setAnimationPhase("change");
+
+    // Play win sound
+    playSFX("game_win");
 
     // Phase 1: Show change numbers for 1.5 seconds
     const changeVisibility: Record<string, boolean> = {};
@@ -75,7 +80,7 @@ const GameOverModal: React.FC<GameOverModalProps> = ({ myUsername }) => {
     }, 1500);
 
     return () => clearTimeout(phaseTimeout);
-  }, [isGameOver, oldRatings, newRatings]);
+  }, [isGameOver, oldRatings, newRatings, playSFX]);
 
   const handleReturnHome = () => {
     dispatch(clearGameOver());
