@@ -93,3 +93,9 @@ export interface CheckpointReachedEvent {
   username: string;
   checkpointNumber: number;
 }
+
+export interface RoundCompletedEvent {
+  gameId: string;
+  completedRound: number;
+  newRound: number;
+}

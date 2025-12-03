@@ -336,6 +336,7 @@ export const ProgrammingPhase = ({
       <ProgrammingHeader
         filledCount={filledCount}
         pauseButton={pauseButton}
+        currentRound={currentGame.currentRound}
         hostControls={
           isHost ? (
             <ProgrammingPhaseHostControls

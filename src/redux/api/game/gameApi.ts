@@ -14,6 +14,7 @@ import type {
   RespondToGamePauseRequest,
   GetPausedGamesRequest,
   GetPausedGameResponse,
+  StartNextRoundRequest,
 } from "./types";
 
 export const gameApi = baseApi.injectEndpoints({
@@ -138,6 +139,14 @@ export const gameApi = baseApi.injectEndpoints({
         body: { winnerUsername },
       }),
     }),
+
+    startNextRound: builder.mutation<void, StartNextRoundRequest>({
+      query: ({ gameId }) => ({
+        url: `/games/${gameId}/start-next-round`,
+        method: "POST",
+        body: { gameId },
+      }),
+    }),
   }),
 });
 
@@ -156,4 +165,5 @@ export const {
   useRespondToGamePauseMutation,
   useGetPausedGamesQuery,
   useRequestGameEndMutation,
+  useStartNextRoundMutation,
 } = gameApi;

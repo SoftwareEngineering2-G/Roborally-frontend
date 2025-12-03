@@ -66,6 +66,7 @@ const gameSlice = createSlice({
           : null, // Backend is 1-5, we use 0-4
         currentTurnUsername: response.currentTurnUsername,
         currentExecutingRegister: response.currentExecutingRegister,
+        currentRound: response.roundCount ?? 1, 
         personalState: {
           hasLockedInRegisters: response.personalState.hasLockedInRegisters,
           lockedInCards: response.personalState.lockedInCards as ProgrammingCards[] | null,
@@ -187,6 +188,11 @@ const gameSlice = createSlice({
         state.executedPlayers.push(action.payload);
       }
     },
+    setCurrentRound: (state, action: PayloadAction<number>) => {
+      if (state.currentGame) {
+        state.currentGame.currentRound = action.payload;
+      }
+    },
     setGameOver: (
       state,
       action: PayloadAction<{
@@ -231,5 +237,6 @@ export const {
   markPlayerExecuted,
   setGameOver,
   resetGameState,
+  setCurrentRound,
 } = gameSlice.actions;
 export default gameSlice.reducer;
