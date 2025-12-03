@@ -3,6 +3,9 @@
 import { motion } from "framer-motion";
 
 import { AudioControls } from "@/modules/audio/components/AudioControls";
+import { Button } from "@/components/ui/button";
+import { Home } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 interface ProgrammingHeaderProps {
   filledCount: number;
@@ -17,6 +20,8 @@ export const ProgrammingHeader = ({
   pauseButton,
   currentRound,
 }: ProgrammingHeaderProps) => {
+  const router = useRouter();
+
   return (
     <motion.div
       className="sticky top-0 z-50 bg-background/80 backdrop-blur-lg border-b border-glass-border p-4"
@@ -26,6 +31,15 @@ export const ProgrammingHeader = ({
     >
       <div className="max-w-7xl mx-auto flex justify-between items-center">
         <div className="flex items-center gap-4">
+          <Button
+            onClick={() => router.push("/")}
+            variant="outline"
+            size="sm"
+            className="border-neon-teal/50 text-neon-teal hover:bg-neon-teal/10"
+          >
+            <Home className="w-4 h-4 mr-2" />
+            Home
+          </Button>
           <motion.h1 className="text-2xl font-bold neon-text" style={{ color: "#00d4ff" }}>
             Programming Phase
           </motion.h1>

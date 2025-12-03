@@ -27,6 +27,9 @@ import type {
 import { toast } from "sonner";
 import type { GameBoard } from "@/models/gameModels";
 import { AudioControls } from "@/modules/audio/components/AudioControls";
+import { Button } from "@/components/ui/button";
+import { Home } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 interface ActivationPhaseProps {
   gameId: string;
@@ -42,6 +45,7 @@ export const ActivationPhase = ({
   pauseButton,
 }: ActivationPhaseProps) => {
   const dispatch = useAppDispatch();
+  const router = useRouter();
 
   // Get game state from Redux (programmedCards should be populated from backend or SignalR)
   const { currentGame, currentTurnUsername } = useAppSelector((state) => state.game);
@@ -104,15 +108,14 @@ export const ActivationPhase = ({
         data.registerNumber === 1
           ? "first"
           : data.registerNumber === 2
-          ? "second"
-          : data.registerNumber === 3
-          ? "third"
-          : data.registerNumber === 4
-          ? "fourth"
-          : "fifth";
+            ? "second"
+            : data.registerNumber === 3
+              ? "third"
+              : data.registerNumber === 4
+                ? "fourth"
+                : "fifth";
       toast.info(
-        `${
-          registerLabel.charAt(0).toUpperCase() + registerLabel.slice(1)
+        `${registerLabel.charAt(0).toUpperCase() + registerLabel.slice(1)
         } card revealed for all players!`
       );
     };
@@ -235,7 +238,7 @@ export const ActivationPhase = ({
       dispatch(baseApi.util.invalidateTags([{ type: "Game", id: gameId }]));
 
       toast.success(`Round ${data.completedRound} complete! Round ${data.newRound} starting...`);
-      
+
     };
 
     signalR.on("RoundCompleted", handleRoundCompleted);
@@ -269,13 +272,22 @@ export const ActivationPhase = ({
       {/* Header */}
       <div className="h-20 border-b border-glass-border bg-surface-dark/50 backdrop-blur-sm flex items-center justify-between px-6">
         <div className="flex items-center gap-4">
+          <Button
+            onClick={() => router.push("/")}
+            variant="outline"
+            size="sm"
+            className="border-neon-teal/50 text-neon-teal hover:bg-neon-teal/10"
+          >
+            <Home className="w-4 h-4 mr-2" />
+            Home
+          </Button>
           <h1 className="text-2xl font-bold text-neon-teal">Activation Phase</h1>
-          
+
           {/* Round indicator for everyone */}
           <div className="flex items-center gap-1 text-xs font-semibold text-neon-cyan bg-neon-cyan/10 px-2 py-1 rounded border border-neon-cyan/30">
             <span>Round {currentGame.currentRound}</span>
           </div>
-          
+
           <p className="text-sm text-muted-foreground">Watch robots execute their programs</p>
           {pauseButton}
         </div>
