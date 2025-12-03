@@ -288,10 +288,7 @@ export const ActivationPhase = ({
             <span>Round {currentGame.currentRound}</span>
           </div>
 
-          <p className="text-sm text-muted-foreground">Watch robots execute their programs</p>
           {pauseButton}
-        </div>
-        <div className="flex items-center gap-3">
           {isHost && (
             <ActivationPhaseHostControls
               gameId={gameId}
