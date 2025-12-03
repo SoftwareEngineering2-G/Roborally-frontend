@@ -144,7 +144,7 @@ export const gameApi = baseApi.injectEndpoints({
       query: ({ gameId }) => ({
         url: `/games/${gameId}/start-next-round`,
         method: "POST",
-        body: { gameId },
+        body: {},
       }),
     }),
   }),
