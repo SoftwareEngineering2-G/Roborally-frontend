@@ -8,18 +8,21 @@ import { PlayerProgramDisplay } from "./PlayerProgramDisplay";
 import { ActivationPhaseHostControls } from "./ActivationPhaseHostControls";
 import { useGameSignalR } from "../ProgrammingPhase/hooks/useGameSignalR";
 import { useRequestGameEndMutation } from "@/redux/api/game/gameApi";
+import { baseApi } from "@/redux/api/baseApi";
 import {
   updateRevealedCards,
   setCurrentTurn,
   updateRobotPosition,
   markPlayerExecuted,
   updatePlayerCheckpoint,
+  setCurrentRound,
 } from "@/redux/game/gameSlice";
 import type {
   RegisterRevealedEvent,
   RobotMovedEvent,
   NextPlayerInTurnEvent,
   CheckpointReachedEvent,
+  RoundCompletedEvent,
 } from "@/types/signalr";
 import { toast } from "sonner";
 import type { GameBoard } from "@/models/gameModels";
@@ -220,6 +223,28 @@ export const ActivationPhase = ({
     };
   }, [signalR.isConnected, gameId, dispatch, signalR, currentGame, username]);
 
+  // Listen for round completed events
+  useEffect(() => {
+    if (!signalR.isConnected || !currentGame) return;
+
+    const handleRoundCompleted = (...args: unknown[]) => {
+      const data = args[0] as RoundCompletedEvent;
+      if (data.gameId !== gameId) return;
+      dispatch(setCurrentRound(data.newRound));
+
+      dispatch(baseApi.util.invalidateTags([{ type: "Game", id: gameId }]));
+
+      toast.success(`Round ${data.completedRound} complete! Round ${data.newRound} starting...`);
+      
+    };
+
+    signalR.on("RoundCompleted", handleRoundCompleted);
+
+    return () => {
+      signalR.off("RoundCompleted");
+    };
+  }, [signalR.isConnected, gameId, dispatch, signalR, currentGame]);
+
   // Don't render if we don't have game state
   if (!currentGame) {
     return (
@@ -245,6 +270,12 @@ export const ActivationPhase = ({
       <div className="h-20 border-b border-glass-border bg-surface-dark/50 backdrop-blur-sm flex items-center justify-between px-6">
         <div className="flex items-center gap-4">
           <h1 className="text-2xl font-bold text-neon-teal">Activation Phase</h1>
+          
+          {/* Round indicator for everyone */}
+          <div className="flex items-center gap-1 text-xs font-semibold text-neon-cyan bg-neon-cyan/10 px-2 py-1 rounded border border-neon-cyan/30">
+            <span>Round {currentGame.currentRound}</span>
+          </div>
+          
           <p className="text-sm text-muted-foreground">Watch robots execute their programs</p>
           {pauseButton}
         </div>

@@ -8,12 +8,14 @@ interface ProgrammingHeaderProps {
   filledCount: number;
   hostControls?: React.ReactNode;
   pauseButton?: React.ReactNode;
+  currentRound?: number;
 }
 
 export const ProgrammingHeader = ({
   filledCount,
   hostControls,
   pauseButton,
+  currentRound,
 }: ProgrammingHeaderProps) => {
   return (
     <motion.div
@@ -27,6 +29,17 @@ export const ProgrammingHeader = ({
           <motion.h1 className="text-2xl font-bold neon-text" style={{ color: "#00d4ff" }}>
             Programming Phase
           </motion.h1>
+
+          {/* Round indicator */}
+          {currentRound && (
+            <motion.div
+              className="text-xs font-semibold text-neon-cyan bg-neon-cyan/10 px-2 py-1 rounded border border-neon-cyan/30"
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+            >
+              Round {currentRound}
+            </motion.div>
+          )}
 
           <motion.div
             className="text-sm bg-surface-medium px-3 py-1 rounded border border-glass-border"

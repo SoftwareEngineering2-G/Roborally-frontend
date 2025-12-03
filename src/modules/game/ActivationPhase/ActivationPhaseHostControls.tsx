@@ -4,12 +4,13 @@ import { Button } from "@/components/ui/button";
 import {
   useRevealNextRegisterMutation,
   useActivateNextBoardElementMutation,
+  useStartNextRoundMutation,
 } from "@/redux/api/game/gameApi";
-import { Crown, Users, Eye } from "lucide-react";
+import { Crown, Users, Eye, RotateCw } from "lucide-react";
 import { toast } from "sonner";
 import type { Game } from "@/models/gameModels";
 import { useAppSelector } from "@/redux/hooks";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 interface ActivationPhaseHostControlsProps {
   gameId: string;
@@ -24,6 +25,8 @@ export const ActivationPhaseHostControls = ({
 }: ActivationPhaseHostControlsProps) => {
   const [revealNextRegister, { isLoading: isRevealingRegister }] = useRevealNextRegisterMutation();
   const [activateNextBoardElement] = useActivateNextBoardElementMutation();
+  const [startNextRound, { isLoading: isStartingNextRound }] = useStartNextRoundMutation();
+  const [canStartNextRound, setCanStartNextRound] = useState(false);
 
   // Get current revealed register, current turn, and executed players from Redux
   const currentRevealedRegister = useAppSelector(
@@ -83,7 +86,13 @@ export const ActivationPhaseHostControls = ({
           // 3rd: Gears
           await activateNextBoardElement({ gameId, username }).unwrap();
 
-          toast.info("All board elements activated! Ready for next round.");
+          // If this was the last register (register 4 in 0-indexed), enable next round button
+          if (currentRevealedRegister === 4) {
+            setCanStartNextRound(true);
+            toast.success("Round complete! You can start the next round.");
+          } else {
+            toast.info("Board elements activated! Ready for next register.");
+          }
         } catch (error) {
           toast.error("Failed to activate board elements");
           console.error("Failed to activate board elements:", error);
@@ -94,11 +103,27 @@ export const ActivationPhaseHostControls = ({
     activateBoardElements();
   }, [allPlayersExecuted, currentRevealedRegister, activateNextBoardElement, gameId, username]);
 
+  const handleStartNextRound = async () => {
+    try {
+      await startNextRound({ gameId }).unwrap();
+      setCanStartNextRound(false);
+      toast.success("Starting next round...");
+    } catch (error) {
+      toast.error("Failed to start next round");
+      console.error("Failed to start next round:", error);
+    }
+  };
+
   return (
     <div className="flex items-center gap-2">
       <div className="flex items-center gap-1 text-xs text-amber-400 bg-amber-400/10 px-2 py-1 rounded border border-amber-400/20">
         <Crown className="w-3 h-3" />
         <span>Host</span>
+      </div>
+
+      {/* Round indicator */}
+      <div className="flex items-center gap-1 text-xs font-semibold text-neon-cyan bg-neon-cyan/10 px-2 py-1 rounded border border-neon-cyan/30">
+        <span>Round {gameState.currentRound}</span>
       </div>
 
       <div className="flex items-center gap-2">
@@ -140,6 +165,28 @@ export const ActivationPhaseHostControls = ({
             ? "Waiting for players..."
             : `Reveal ${nextRegisterToReveal === 0 ? "First" : "Next"} Card`}
         </Button>
+
+        {/* Start Next Round Button - only shown when activation phase is complete */}
+        {allRegistersRevealed && (
+          <Button
+            onClick={handleStartNextRound}
+            disabled={!canStartNextRound || isStartingNextRound}
+            size="sm"
+            variant="outline"
+            className={`h-7 text-xs ${
+              canStartNextRound
+                ? "bg-neon-teal/10 border-neon-teal/30 text-neon-teal hover:bg-neon-teal/20 hover:border-neon-teal/50"
+                : "bg-gray-500/10 border-gray-500/30 text-gray-400 cursor-not-allowed"
+            }`}
+          >
+            <RotateCw className="w-3 h-3 mr-1" />
+            {isStartingNextRound
+              ? "Starting..."
+              : canStartNextRound
+              ? "Start Next Round"
+              : "Activating board elements..."}
+          </Button>
+        )}
       </div>
     </div>
   );

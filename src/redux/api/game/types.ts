@@ -44,6 +44,7 @@ export type GetCurrentGameStateResponse = {
   currentRevealedRegister: number | null;
   currentTurnUsername: string | null;
   currentExecutingRegister: number | null;
+  roundCount: number; 
   personalState: {
     hasLockedInRegisters: boolean;
     lockedInCards: string[] | null;
@@ -148,4 +149,8 @@ export type GetPausedGameResponse = {
 
 export type GetPausedGamesRequest = {
   username: string;
+};
+
+export type StartNextRoundRequest = {
+  gameId: string;
 };
