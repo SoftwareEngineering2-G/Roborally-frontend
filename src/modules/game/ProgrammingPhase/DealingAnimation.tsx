@@ -84,6 +84,7 @@ export const DealingCardComponent = ({
               src={card.imagePath}
               alt={card.name}
               fill
+              sizes="(max-width: 768px) 100vw, 16vw"
               className="object-cover"
               onError={(e) => {
                 const target = e.target as HTMLImageElement;
