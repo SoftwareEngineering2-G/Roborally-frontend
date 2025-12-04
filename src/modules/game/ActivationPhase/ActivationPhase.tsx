@@ -45,6 +45,7 @@ export const ActivationPhase = ({
 
   // Get game state from Redux (programmedCards should be populated from backend or SignalR)
   const { currentGame, currentTurnUsername } = useAppSelector((state) => state.game);
+  const isBatchModeActive = useAppSelector((state) => state.game.isBatchModeActive);
   const [requestGameEnd] = useRequestGameEndMutation();
 
   type TileWithName = {
@@ -323,6 +324,7 @@ export const ActivationPhase = ({
                     revealedUpTo={currentGame.currentRevealedRegister ?? -1}
                     isCurrentTurn={player.username === currentTurnUsername}
                     gameId={gameId}
+                    isBatchModeActive={isBatchModeActive}
                   />
                 ))}
             </div>

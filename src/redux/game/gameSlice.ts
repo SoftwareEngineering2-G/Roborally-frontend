@@ -12,6 +12,7 @@ interface GameState {
   isGameOver: boolean;
   oldRatings: Record<string, number> | null;
   newRatings: Record<string, number> | null;
+  isBatchModeActive: boolean; // Track if batch mode is running
 }
 
 const initialState: GameState = {
@@ -24,6 +25,7 @@ const initialState: GameState = {
   isGameOver: false,
   oldRatings: null,
   newRatings: null,
+  isBatchModeActive: false,
 };
 
 const gameSlice = createSlice({
@@ -219,6 +221,9 @@ const gameSlice = createSlice({
       state.oldRatings = null;
       state.newRatings = null;
     },
+    setBatchModeActive: (state, action: PayloadAction<boolean>) => {
+      state.isBatchModeActive = action.payload;
+    },
   },
 });
 
@@ -238,5 +243,6 @@ export const {
   setGameOver,
   resetGameState,
   setCurrentRound,
+  setBatchModeActive,
 } = gameSlice.actions;
 export default gameSlice.reducer;
