@@ -42,6 +42,7 @@ interface PlayerProgramDisplayProps {
   revealedUpTo?: number; // Which register index is revealed (0-4), undefined means none
   isCurrentTurn?: boolean; // Is it this player's turn to execute?
   gameId?: string; // Game ID for execute button
+  isBatchModeActive?: boolean; // Hide execute button during batch mode
 }
 
 export const PlayerProgramDisplay = ({
@@ -50,6 +51,7 @@ export const PlayerProgramDisplay = ({
   revealedUpTo = -1,
   isCurrentTurn = false,
   gameId = "",
+  isBatchModeActive = false,
 }: PlayerProgramDisplayProps) => {
   const robotColor =
     robotColorMap[player.robot.toLowerCase() as keyof typeof robotColorMap] ||
@@ -226,11 +228,18 @@ export const PlayerProgramDisplay = ({
               })}
             </div>
 
-            {/* Execute Button - Show only for current turn player if they are the current user */}
+            {/* Execute Button - Show for current turn player if they are the current user
+                When batch mode is active, only show button for interactive cards (they pause batch mode) */}
             {isCurrentTurn &&
               isCurrentPlayer &&
               revealedUpTo >= 0 &&
-              revealedCards[revealedUpTo] && (
+              revealedCards[revealedUpTo] &&
+              (() => {
+                const currentCard = revealedCards[revealedUpTo];
+                const isInteractiveCard = ["Swap Position", "Movement Choice"].includes(currentCard.name);
+                // Show button if: batch mode is OFF, OR batch mode is ON but card is interactive (will pause)
+                return !isBatchModeActive || isInteractiveCard;
+              })() && (
                 <div className="mt-3 flex items-center justify-between gap-3">
                   <div className="flex flex-col gap-1">
                     <span className="text-xs text-neon-teal font-semibold animate-pulse">
