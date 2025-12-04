@@ -116,25 +116,6 @@ export const ActivationPhaseHostControls = ({
 
   return (
     <div className="flex items-center gap-2">
-      <Button
-        onClick={handleRevealNextRegister}
-        disabled={!canRevealNextRegister || isRevealingRegister}
-        size="sm"
-        variant="outline"
-        className={`h-7 text-xs ${canRevealNextRegister
-          ? "bg-purple-500/10 border-purple-500/30 text-purple-400 hover:bg-purple-500/20 hover:border-purple-500/50"
-          : "bg-gray-500/10 border-gray-500/30 text-gray-400 cursor-not-allowed"
-          }`}
-      >
-        <Eye className="w-3 h-3 mr-1" />
-        {isRevealingRegister
-          ? "Revealing..."
-          : allRegistersRevealed
-            ? "All Cards Revealed"
-            : !shouldRevealNextRegister
-              ? "Waiting for players..."
-              : `Reveal ${nextRegisterToReveal === 0 ? "First" : "Next"} Card`}
-      </Button>
       <div className="flex items-center gap-1 text-xs text-amber-400 bg-amber-400/10 px-2 py-1 rounded border border-amber-400/20">
         <Crown className="w-3 h-3" />
         <span>Host</span>
@@ -159,6 +140,25 @@ export const ActivationPhaseHostControls = ({
           </div>
         )}
 
+        <Button
+          onClick={handleRevealNextRegister}
+          disabled={!canRevealNextRegister || isRevealingRegister}
+          size="sm"
+          variant="outline"
+          className={`h-7 text-xs ${canRevealNextRegister
+            ? "bg-purple-500/10 border-purple-500/30 text-purple-400 hover:bg-purple-500/20 hover:border-purple-500/50"
+            : "bg-gray-500/10 border-gray-500/30 text-gray-400 cursor-not-allowed"
+            }`}
+        >
+          <Eye className="w-3 h-3 mr-1" />
+          {isRevealingRegister
+            ? "Revealing..."
+            : allRegistersRevealed
+              ? "All Cards Revealed"
+              : !shouldRevealNextRegister
+                ? "Waiting for players..."
+                : `Reveal ${nextRegisterToReveal === 0 ? "First" : "Next"} Card`}
+        </Button>
 
         {/* Start Next Round Button - only shown when activation phase is complete */}
         {allRegistersRevealed && (
