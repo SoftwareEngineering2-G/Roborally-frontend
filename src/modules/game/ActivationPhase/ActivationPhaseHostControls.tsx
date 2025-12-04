@@ -5,12 +5,14 @@ import {
   useRevealNextRegisterMutation,
   useActivateNextBoardElementMutation,
   useStartNextRoundMutation,
+  useExecuteProgrammingCardMutation,
 } from "@/redux/api/game/gameApi";
-import { Crown, Users, Eye, RotateCw } from "lucide-react";
+import { Crown, Users, Eye, RotateCw, Play, Pause } from "lucide-react";
 import { toast } from "sonner";
 import type { Game } from "@/models/gameModels";
-import { useAppSelector } from "@/redux/hooks";
+import { useAppSelector, useAppDispatch } from "@/redux/hooks";
 import { useEffect, useRef, useState } from "react";
+import { setBatchModeActive } from "@/redux/game/gameSlice";
 
 interface ActivationPhaseHostControlsProps {
   gameId: string;
@@ -23,10 +25,15 @@ export const ActivationPhaseHostControls = ({
   gameState,
   username,
 }: ActivationPhaseHostControlsProps) => {
+  const dispatch = useAppDispatch();
   const [revealNextRegister, { isLoading: isRevealingRegister }] = useRevealNextRegisterMutation();
   const [activateNextBoardElement] = useActivateNextBoardElementMutation();
   const [startNextRound, { isLoading: isStartingNextRound }] = useStartNextRoundMutation();
+  const [executeCard] = useExecuteProgrammingCardMutation();
   const [canStartNextRound, setCanStartNextRound] = useState(false);
+  const [isBatchMode, setIsBatchMode] = useState(false);
+  const [isPausedForInteraction, setIsPausedForInteraction] = useState(false);
+  const pausedForPlayer = useRef<string | null>(null);
 
   // Get current revealed register, current turn, and executed players from Redux
   const currentRevealedRegister = useAppSelector(
@@ -103,6 +110,93 @@ export const ActivationPhaseHostControls = ({
     activateBoardElements();
   }, [allPlayersExecuted, currentRevealedRegister, activateNextBoardElement, gameId, username]);
 
+  // Batch mode auto-execution logic
+  useEffect(() => {
+    if (!isBatchMode || isPausedForInteraction) return;
+
+    // Stop batch mode if all registers are revealed AND all players have executed the last register
+    if (allRegistersRevealed && allPlayersExecuted) {
+      setIsBatchMode(false);
+      dispatch(setBatchModeActive(false));
+      toast.success("Batch mode complete - all registers executed");
+      return;
+    }
+
+    const runBatchStep = async () => {
+      // Step 1: If no register revealed yet or all players executed, reveal next register
+      if (shouldRevealNextRegister && !allRegistersRevealed) {
+        await handleRevealNextRegister();
+        return;
+      }
+
+      // Step 2: If there's a player whose turn it is, execute their card
+      if (currentTurnUsername) {
+        const player = gameState.players.find((p) => p.username === currentTurnUsername);
+        if (!player) return;
+
+        const currentRegisterIndex = currentRevealedRegister ?? 0;
+        const cardToExecute = player.revealedCardsInOrder[currentRegisterIndex];
+        
+        if (!cardToExecute) return;
+
+        // Check if card is interactive (requires user input)
+        const isInteractive = cardToExecute === "Swap Position" || cardToExecute === "Movement Choice";
+        
+        if (isInteractive) {
+          // Pause batch mode for interactive cards (keep batch mode active state, just pause execution)
+          setIsPausedForInteraction(true);
+          pausedForPlayer.current = currentTurnUsername;
+          // Don't set batch mode to false, just pause - execute button should still be hidden
+          toast.warning(`Batch mode paused: ${currentTurnUsername} needs to configure ${cardToExecute}`);
+          return;
+        }
+
+        // Execute non-interactive card automatically
+        try {
+          await executeCard({
+            gameId,
+            username: currentTurnUsername,
+            cardName: cardToExecute,
+          }).unwrap();
+        } catch (error) {
+          console.error("Batch mode execution failed:", error);
+          toast.error("Batch mode execution failed");
+          setIsBatchMode(false);
+          dispatch(setBatchModeActive(false));
+        }
+      }
+    };
+
+    // Small delay to allow state updates to propagate
+    const timer = setTimeout(runBatchStep, 800);
+    return () => clearTimeout(timer);
+  }, [
+    isBatchMode,
+    isPausedForInteraction,
+    shouldRevealNextRegister,
+    allRegistersRevealed,
+    allPlayersExecuted,
+    currentTurnUsername,
+    currentRevealedRegister,
+    gameState.players,
+    handleRevealNextRegister,
+    executeCard,
+    gameId,
+    dispatch,
+  ]);
+
+  // Resume batch mode after interactive card is executed
+  useEffect(() => {
+    if (isPausedForInteraction && pausedForPlayer.current) {
+      // Check if the paused player is no longer the current turn (meaning they executed)
+      if (currentTurnUsername !== pausedForPlayer.current) {
+        setIsPausedForInteraction(false);
+        pausedForPlayer.current = null;
+        toast.success("Batch mode resumed");
+      }
+    }
+  }, [currentTurnUsername, isPausedForInteraction]);
+
   const handleStartNextRound = async () => {
     try {
       await startNextRound({ gameId }).unwrap();
@@ -140,15 +234,52 @@ export const ActivationPhaseHostControls = ({
           </div>
         )}
 
+        {/* Batch Mode Toggle Button */}
         <Button
-          onClick={handleRevealNextRegister}
-          disabled={!canRevealNextRegister || isRevealingRegister}
+          onClick={() => {
+            const newMode = !isBatchMode;
+            setIsBatchMode(newMode);
+            dispatch(setBatchModeActive(newMode));
+            if (newMode) {
+              toast.success("Batch mode started - cards will auto-execute");
+              setIsPausedForInteraction(false);
+              pausedForPlayer.current = null;
+            } else {
+              toast.info("Batch mode stopped");
+            }
+          }}
+          disabled={allRegistersRevealed}
           size="sm"
           variant="outline"
-          className={`h-7 text-xs ${canRevealNextRegister
-            ? "bg-purple-500/10 border-purple-500/30 text-purple-400 hover:bg-purple-500/20 hover:border-purple-500/50"
-            : "bg-gray-500/10 border-gray-500/30 text-gray-400 cursor-not-allowed"
-            }`}
+          className={`h-7 text-xs ${
+            isBatchMode
+              ? "bg-amber-500/10 border-amber-500/30 text-amber-400 hover:bg-amber-500/20 hover:border-amber-500/50"
+              : "bg-green-500/10 border-green-500/30 text-green-400 hover:bg-green-500/20 hover:border-green-500/50"
+          }`}
+        >
+          {isBatchMode ? (
+            <>
+              <Pause className="w-3 h-3 mr-1" />
+              {isPausedForInteraction ? "Paused for Input" : "Stop Batch"}
+            </>
+          ) : (
+            <>
+              <Play className="w-3 h-3 mr-1" />
+              Start Batch
+            </>
+          )}
+        </Button>
+
+        <Button
+          onClick={handleRevealNextRegister}
+          disabled={!canRevealNextRegister || isRevealingRegister || isBatchMode}
+          size="sm"
+          variant="outline"
+          className={`h-7 text-xs ${
+            canRevealNextRegister && !isBatchMode
+              ? "bg-purple-500/10 border-purple-500/30 text-purple-400 hover:bg-purple-500/20 hover:border-purple-500/50"
+              : "bg-gray-500/10 border-gray-500/30 text-gray-400 cursor-not-allowed"
+          }`}
         >
           <Eye className="w-3 h-3 mr-1" />
           {isRevealingRegister
