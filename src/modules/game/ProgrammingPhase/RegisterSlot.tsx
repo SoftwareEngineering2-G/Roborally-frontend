@@ -53,7 +53,7 @@ export const RegisterSlotComponent = ({
           : "border-glass-border hover:border-neon-teal/50",
         register.card && getCardTypeClasses(register.card.type),
         isDragTarget &&
-          "border-neon-cyan border-dashed animate-pulse shadow-glow-cyan bg-neon-cyan/20 scale-105"
+        "border-neon-cyan border-dashed animate-pulse shadow-glow-cyan bg-neon-cyan/20 scale-105"
       )}
       onClick={handleClick}
       onDragOver={handleDragOver}
@@ -66,6 +66,7 @@ export const RegisterSlotComponent = ({
             src={register.card.imagePath}
             alt={register.card.name}
             fill
+            sizes="(max-width: 768px) 100vw, 20vw"
             className="object-cover rounded-md"
             onError={(e) => {
               // Fallback to text display if image fails to load

@@ -55,6 +55,7 @@ export const ProgramCardComponent = ({
           src={card.imagePath}
           alt={card.name}
           fill
+          sizes="(max-width: 768px) 100vw, 16vw"
           className="object-cover rounded-md"
           onError={(e) => {
             // Fallback to text display if image fails to load

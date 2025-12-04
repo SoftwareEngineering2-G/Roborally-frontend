@@ -90,8 +90,9 @@ export const DealingCardComponentSimple = ({
             src={card.imagePath}
             alt={card.name}
             fill
+            sizes="(max-width: 768px) 100vw, 16vw"
             className="object-cover"
-            onLoad={() => {}}
+            onLoad={() => { }}
             onError={(e) => {
               console.log(
                 "Card image failed, using enhanced fallback:",
