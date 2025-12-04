@@ -215,11 +215,6 @@ export const ActivationPhaseHostControls = ({
         <span>Host</span>
       </div>
 
-      {/* Round indicator */}
-      <div className="flex items-center gap-1 text-xs font-semibold text-neon-cyan bg-neon-cyan/10 px-2 py-1 rounded border border-neon-cyan/30">
-        <span>Round {gameState.currentRound}</span>
-      </div>
-
       <div className="flex items-center gap-2">
         {/* Show current turn information */}
         {currentTurnUsername && (
@@ -290,10 +285,10 @@ export const ActivationPhaseHostControls = ({
           {isRevealingRegister
             ? "Revealing..."
             : allRegistersRevealed
-            ? "All Cards Revealed"
-            : !shouldRevealNextRegister
-            ? "Waiting for players..."
-            : `Reveal ${nextRegisterToReveal === 0 ? "First" : "Next"} Card`}
+              ? "All Cards Revealed"
+              : !shouldRevealNextRegister
+                ? "Waiting for players..."
+                : `Reveal ${nextRegisterToReveal === 0 ? "First" : "Next"} Card`}
         </Button>
 
         {/* Start Next Round Button - only shown when activation phase is complete */}
@@ -303,18 +298,17 @@ export const ActivationPhaseHostControls = ({
             disabled={!canStartNextRound || isStartingNextRound}
             size="sm"
             variant="outline"
-            className={`h-7 text-xs ${
-              canStartNextRound
-                ? "bg-neon-teal/10 border-neon-teal/30 text-neon-teal hover:bg-neon-teal/20 hover:border-neon-teal/50"
-                : "bg-gray-500/10 border-gray-500/30 text-gray-400 cursor-not-allowed"
-            }`}
+            className={`h-7 text-xs ${canStartNextRound
+              ? "bg-neon-teal/10 border-neon-teal/30 text-neon-teal hover:bg-neon-teal/20 hover:border-neon-teal/50"
+              : "bg-gray-500/10 border-gray-500/30 text-gray-400 cursor-not-allowed"
+              }`}
           >
             <RotateCw className="w-3 h-3 mr-1" />
             {isStartingNextRound
               ? "Starting..."
               : canStartNextRound
-              ? "Start Next Round"
-              : "Activating board elements..."}
+                ? "Start Next Round"
+                : "Activating board elements..."}
           </Button>
         )}
       </div>
