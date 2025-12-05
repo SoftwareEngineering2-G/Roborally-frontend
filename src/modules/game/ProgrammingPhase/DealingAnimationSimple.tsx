@@ -1,8 +1,10 @@
 "use client";
 
+import { useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import { DealingCard } from "./useCardDealing";
+import { useAudio } from "@/modules/audio/AudioContext";
 
 interface DealingCardComponentProps {
   dealingCard: DealingCard;
@@ -14,6 +16,15 @@ export const DealingCardComponentSimple = ({
   onAnimationComplete,
 }: DealingCardComponentProps) => {
   const { startPosition, endPosition, delay, card, id } = dealingCard;
+  const { playSFX } = useAudio();
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      playSFX("card_deal");
+    }, delay);
+
+    return () => clearTimeout(timer);
+  }, [delay, playSFX]);
 
   return (
     <motion.div
@@ -79,8 +90,9 @@ export const DealingCardComponentSimple = ({
             src={card.imagePath}
             alt={card.name}
             fill
+            sizes="(max-width: 768px) 100vw, 16vw"
             className="object-cover"
-            onLoad={() => {}}
+            onLoad={() => { }}
             onError={(e) => {
               console.log(
                 "Card image failed, using enhanced fallback:",

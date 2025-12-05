@@ -1,11 +1,11 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { motion } from "framer-motion";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { playerLockedIn } from "@/redux/game/gameSlice";
 import { toast } from "sonner";
-import type { PlayerLockedInRegisterEvent } from "@/types/signalr";
+import type { PlayerLockedInRegisterEvent, PlayerCardsDealtEvent } from "@/types/signalr";
 
 // Shared components
 import { GameBoard as GameBoardComponent } from "../components/GameBoard";
@@ -18,6 +18,7 @@ import { DeckArea } from "./DeckArea";
 import { DragDropIndicator } from "./DragDropIndicator";
 import { DealingAnimationOverlaySimple } from "./DealingAnimationSimple";
 import { DiscardAnimationOverlay } from "./DiscardAnimation";
+import { ShuffleAnimationOverlay } from "./ShuffleAnimation";
 import { ProgrammingPhaseHostControls } from "./ProgrammingPhaseHostControls";
 
 // Hooks and types
@@ -27,6 +28,7 @@ import { useProgrammingPhase } from "./hooks";
 import { useCardDealing } from "./useCardDealing";
 import { useCardDiscarding } from "./useCardDiscarding";
 import { useGameSignalR } from "./hooks/useGameSignalR";
+import { useAudio } from "@/modules/audio/AudioContext";
 import type { GameBoard } from "@/models/gameModels";
 
 interface ProgrammingPhaseProps {
@@ -44,6 +46,7 @@ export const ProgrammingPhase = ({
 }: ProgrammingPhaseProps) => {
   const [showProgrammingControls, setShowProgrammingControls] = useState(true);
   const dispatch = useAppDispatch();
+  const { playSFX } = useAudio();
 
   // Get game state from Redux
   const { currentGame } = useAppSelector((state) => state.game);
@@ -55,9 +58,19 @@ export const ProgrammingPhase = ({
     username
   );
 
-  const { dealingState, startDealing, markCardAsDealt, resetDeck } = useCardDealing(20);
+  const {
+    dealingState,
+    startDealing,
+    markCardAsDealt,
+    startShuffling,
+    completeShuffling,
+    updateDeckCounts,
+  } = useCardDealing(currentGame?.personalState.programmingPickPilesCount ?? 20);
 
   const { discardingState, startDiscarding, markCardAsDiscarded } = useCardDiscarding();
+
+  // Track pending shuffle state - used for animation coordination
+  const [, setPendingDealData] = useState<PlayerCardsDealtEvent | null>(null);
 
   // Setup SignalR connection for game events
   const signalR = useGameSignalR(gameId, username);
@@ -74,6 +87,20 @@ export const ProgrammingPhase = ({
   const isLockedInFromBackend = Boolean(
     currentGame?.personalState.lockedInCards && currentGame.personalState.lockedInCards.length > 0
   );
+
+  // Track if we've received deck counts from SignalR (which is more up-to-date than Redux)
+  const hasReceivedSignalRDeckCounts = useRef(false);
+
+  // Sync deck counts from Redux ONLY on initial load (before SignalR events arrive)
+  useEffect(() => {
+    if (!currentGame) return;
+
+    // Only sync from Redux if we haven't received SignalR updates yet
+    if (!hasReceivedSignalRDeckCounts.current) {
+      const { programmingPickPilesCount, discardPilesCount } = currentGame.personalState;
+      updateDeckCounts(programmingPickPilesCount, discardPilesCount);
+    }
+  }, [currentGame, updateDeckCounts]);
 
   // Sync state from Redux personalState - this keeps UI in sync with backend state
   useEffect(() => {
@@ -127,49 +154,79 @@ export const ProgrammingPhase = ({
     }
   }, [currentGame, state.registers, state.hand.length, username, handlers]);
 
+  // Function to execute deal animation with cards
+  const executeDealAnimation = useCallback(
+    (data: PlayerCardsDealtEvent) => {
+      // Mark that we've received deck counts from SignalR - these are authoritative
+      hasReceivedSignalRDeckCounts.current = true;
+
+      // Convert backend card names to ProgramCard objects
+      const dealtCards: ProgramCard[] = data.dealtCards.map((cardName: string, index: number) =>
+        createCardFromBackendString(cardName, `dealt-${index}-${Date.now()}`)
+      );
+
+      // Update deck counts from backend FIRST (before animation starts)
+      // This ensures the UI shows correct counts immediately
+      updateDeckCounts(data.programmingPickPilesCount, data.discardPilesCount);
+
+      // Try to trigger dealing animation if deck is visible
+      const deckElement = document.querySelector("[data-deck-element]") as HTMLElement;
+      const handElements = Array.from(
+        document.querySelectorAll("[data-hand-placeholder]")
+      ) as HTMLElement[];
+
+      if (deckElement && handElements.length > 0) {
+        // Use the dealing animation system with actual cards from SignalR
+        startDealing(deckElement, handElements, dealtCards, (animatedCards: ProgramCard[]) => {
+          // The animation completes with the actual dealt cards
+          handlers.handleSetHand(animatedCards);
+        });
+      } else {
+        // Fallback: directly set cards if animation elements not found
+        handlers.handleSetHand(dealtCards);
+          playSFX("card_deal");
+      }
+
+      toast.info(`Received ${dealtCards.length} cards`);
+    },
+    [handlers, startDealing, updateDeckCounts]
+  );
+
   // Handle SignalR events - only update Redux state
   useEffect(() => {
     if (!signalR.isConnected) return;
 
     // Listen for cards dealt event
     const handlePlayerCardsDealt = (...args: unknown[]) => {
-      const data = args[0] as {
-        username: string;
-        gameId: string;
-        dealtCards: string[];
-      };
+      const data = args[0] as PlayerCardsDealtEvent;
+      console.log("PlayerCardsDealtEvent received:", data);
 
       // Dispatch custom event for host controls to sync state
       window.dispatchEvent(new CustomEvent("programmingPhaseCardsDealt"));
 
       // Only process if this event is for the current player
       if (data.username === username && data.gameId === gameId) {
-        // Convert backend card names to ProgramCard objects
-        const dealtCards: ProgramCard[] = data.dealtCards.map((cardName: string, index: number) =>
-          createCardFromBackendString(cardName, `dealt-${index}-${Date.now()}`)
-        );
+        // Check if deck was reshuffled - show shuffle animation first
+        if (data.isDeckReshuffled) {
+          // Store the deal data for after shuffle animation
+          setPendingDealData(data);
 
-        // Try to trigger dealing animation if deck is visible
-        const deckElement = document.querySelector("[data-deck-element]") as HTMLElement;
-        const handElements = Array.from(
-          document.querySelectorAll("[data-hand-placeholder]")
-        ) as HTMLElement[];
+          // Show shuffle notification
+          toast.info("🔄 Shuffling discard pile back into deck...", {
+            duration: 1500,
+          });
 
-        if (deckElement && handElements.length > 0) {
-          // Use the dealing animation system with actual cards from SignalR
-          startDealing(deckElement, handElements, dealtCards, (animatedCards: ProgramCard[]) => {
-            // The animation completes with the actual dealt cards
-            handlers.handleSetHand(animatedCards);
+          // Start shuffle animation
+          startShuffling(() => {
+            // After shuffle completes, execute the deal
+            executeDealAnimation(data);
+            setPendingDealData(null);
           });
         } else {
-          // Fallback: directly set cards if animation elements not found
-          handlers.handleSetHand(dealtCards);
+          // No shuffle needed, deal directly
+
+          executeDealAnimation(data);
         }
-
-        // Reset deck count (since cards are now dealt)
-        resetDeck();
-
-        toast.info(`Received ${dealtCards.length} cards`);
       }
     };
 
@@ -178,7 +235,7 @@ export const ProgrammingPhase = ({
     return () => {
       signalR.off("PlayerCardsDealt");
     };
-  }, [signalR.isConnected, username, gameId, handlers, resetDeck, startDealing, signalR]);
+  }, [signalR.isConnected, username, gameId, executeDealAnimation, startShuffling, signalR, playSFX]);
 
   // Listen for PlayerLockedInRegister events - only update Redux
   useEffect(() => {
@@ -232,12 +289,24 @@ export const ProgrammingPhase = ({
 
         // Start the discard animation
         startDiscarding(discardPileElement, result.cardsToDiscard, elementsWithCards, () => {
-          // After animation completes, clear the hand
+          // After animation completes, clear the hand and update discard count
           handlers.handleClearHand();
+
+          // Update the discard count - add the number of discarded cards
+          updateDeckCounts(
+            dealingState.deckCount,
+            dealingState.discardCount + result.cardsToDiscard.length
+          );
         });
       } else {
         // Fallback: just clear the hand without animation
         handlers.handleClearHand();
+
+        // Still update discard count
+        updateDeckCounts(
+          dealingState.deckCount,
+          dealingState.discardCount + result.cardsToDiscard.length
+        );
       }
     }
   };
@@ -263,13 +332,21 @@ export const ProgrammingPhase = ({
       transition={{ duration: 0.5 }}
       className="relative min-h-full"
     >
-      {/* Host Controls - Only visible to host in programming phase */}
-      {isHost && (
-        <ProgrammingPhaseHostControls gameId={gameId} gameState={currentGame} username={username} />
-      )}
-
       {/* Header */}
-      <ProgrammingHeader filledCount={filledCount} pauseButton={pauseButton} />
+      <ProgrammingHeader
+        filledCount={filledCount}
+        pauseButton={pauseButton}
+        currentRound={currentGame.currentRound}
+        hostControls={
+          isHost ? (
+            <ProgrammingPhaseHostControls
+              gameId={gameId}
+              gameState={currentGame}
+              username={username}
+            />
+          ) : undefined
+        }
+      />
 
       {/* Side-by-side layout: Board on left, Players on right */}
       <div className="w-full min-h-[calc(100vh-5rem)] flex">
@@ -325,14 +402,20 @@ export const ProgrammingPhase = ({
       {/* Programming and Discard Piles - Top Right */}
       <DeckArea
         showControls={showProgrammingControls}
-        handSize={state.hand.length}
         deckCount={dealingState.deckCount}
+        discardCount={dealingState.discardCount}
         isDealing={dealingState.isDealing}
-        onResetDeck={resetDeck}
+        isShuffling={dealingState.isShuffling}
       />
 
       {/* Drag Drop Zones Indicator */}
       <DragDropIndicator isDragging={state.isDragging} />
+
+      {/* Shuffle Animation Overlay */}
+      <ShuffleAnimationOverlay
+        isShuffling={dealingState.isShuffling}
+        onComplete={completeShuffling}
+      />
 
       {/* Dealing Animation Overlay */}
       <DealingAnimationOverlaySimple

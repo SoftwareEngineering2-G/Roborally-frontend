@@ -94,7 +94,7 @@ export const ProgrammingPhaseHostControls = ({
   }, []);
 
   return (
-    <div className="fixed top-4 right-4 z-[10000] flex items-center gap-2">
+    <div className="flex items-center gap-2">
       <div className="flex items-center gap-1 text-xs text-amber-400 bg-amber-400/10 px-2 py-1 rounded border border-amber-400/20">
         <Crown className="w-3 h-3" />
         <span>Host</span>

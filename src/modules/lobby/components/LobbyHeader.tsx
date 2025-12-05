@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { Copy, ArrowLeft, Users, Pause } from "lucide-react";
+import { AudioControls } from "@/modules/audio/components/AudioControls";
 
 interface LobbyHeaderProps {
   lobbyName: string;
@@ -88,6 +89,9 @@ export const LobbyHeader = ({
           <Users className="w-3 h-3 mr-1" />
           {playerCount}/{maxPlayers}
         </Badge>
+        <div className="ml-4">
+          <AudioControls />
+        </div>
       </div>
     </header>
   );

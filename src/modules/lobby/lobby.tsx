@@ -26,6 +26,7 @@ import {
 import type { RootState, AppDispatch } from "@/redux/store";
 import { LobbyHeader, PlayersGrid, GameControls, GameInfo } from "./components";
 import { useLobbySignalR } from "./hooks/useLobbySignalR";
+import { useAudio } from "@/modules/audio/AudioContext";
 
 interface Props {
   gameId: string;
@@ -66,6 +67,24 @@ export const Lobby = ({ gameId }: Props) => {
     }
     setUsername(storedUsername);
   }, [router]);
+
+  const { playBGM, stopBGM } = useAudio();
+
+  useEffect(() => {
+    const startLobbyMusic = async () => {
+      try {
+        await playBGM("lobby");
+      } catch {
+        console.warn("Failed to autoplay lobby music. User interaction may be required.");
+      }
+    };
+    
+    startLobbyMusic();
+    
+    return () => {
+      stopBGM();
+    };
+  }, [playBGM, stopBGM]);
 
   useEffect(() => {
     return () => {
