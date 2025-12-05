@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { ProgramCard } from "./types";
+import type { ProgramCard } from "./types";
 
 export interface DealingCard {
   id: string;
@@ -16,16 +16,18 @@ export interface CardDealingState {
   isDealing: boolean;
   dealingCards: DealingCard[];
   deckCount: number;
+  discardCount: number;
+  isShuffling: boolean;
 }
 
-export const useCardDealing = (initialDeckCount: number = 20) => {
+export const useCardDealing = (initialDeckCount = 20) => {
   const [state, setState] = useState<CardDealingState>({
     isDealing: false,
     dealingCards: [],
     deckCount: initialDeckCount,
+    discardCount: 0,
+    isShuffling: false,
   });
-
-
 
   const calculateCardPositions = useCallback(
     (placeholderElements: (HTMLElement | null)[], deckRect: DOMRect) => {
@@ -88,13 +90,14 @@ export const useCardDealing = (initialDeckCount: number = 20) => {
       }));
 
       // Complete dealing animation after all cards are dealt
+      // Note: deckCount is NOT updated here - it's updated via updateDeckCounts from backend data
       const totalDealTime = cardsToAnimate.length * 150 + 500; // cards * 150ms + 500ms for last card animation
       setTimeout(() => {
         setState((prev) => ({
           ...prev,
           isDealing: false,
           dealingCards: [],
-          deckCount: Math.max(0, prev.deckCount - cardsToAnimate.length),
+          // Don't modify deckCount here - let backend be source of truth
         }));
         onComplete(cardsToAnimate);
       }, totalDealTime);
@@ -118,10 +121,47 @@ export const useCardDealing = (initialDeckCount: number = 20) => {
     }));
   }, [initialDeckCount]);
 
+  // Start shuffle animation - triggered when backend indicates deck was reshuffled
+  const startShuffling = useCallback((onComplete: () => void) => {
+    setState((prev) => ({
+      ...prev,
+      isShuffling: true,
+    }));
+
+    // Shuffle animation takes about 3.1 seconds (8 cards * 200ms + 1500ms)
+    setTimeout(() => {
+      setState((prev) => ({
+        ...prev,
+        isShuffling: false,
+      }));
+      onComplete();
+    }, 3100);
+  }, []);
+
+  // Complete shuffle - called when shuffle animation ends
+  const completeShuffling = useCallback(() => {
+    setState((prev) => ({
+      ...prev,
+      isShuffling: false,
+    }));
+  }, []);
+
+  // Update deck counts from backend
+  const updateDeckCounts = useCallback((deckCount: number, discardCount: number) => {
+    setState((prev) => ({
+      ...prev,
+      deckCount,
+      discardCount,
+    }));
+  }, []);
+
   return {
     dealingState: state,
     startDealing,
     markCardAsDealt,
     resetDeck,
+    startShuffling,
+    completeShuffling,
+    updateDeckCounts,
   };
 };

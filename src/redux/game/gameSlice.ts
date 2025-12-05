@@ -12,6 +12,7 @@ interface GameState {
   isGameOver: boolean;
   oldRatings: Record<string, number> | null;
   newRatings: Record<string, number> | null;
+  isBatchModeActive: boolean; // Track if batch mode is running
 }
 
 const initialState: GameState = {
@@ -24,6 +25,7 @@ const initialState: GameState = {
   isGameOver: false,
   oldRatings: null,
   newRatings: null,
+  isBatchModeActive: false,
 };
 
 const gameSlice = createSlice({
@@ -66,10 +68,13 @@ const gameSlice = createSlice({
           : null, // Backend is 1-5, we use 0-4
         currentTurnUsername: response.currentTurnUsername,
         currentExecutingRegister: response.currentExecutingRegister,
+        currentRound: response.roundCount ?? 1, 
         personalState: {
           hasLockedInRegisters: response.personalState.hasLockedInRegisters,
           lockedInCards: response.personalState.lockedInCards as ProgrammingCards[] | null,
           dealtCards: response.personalState.dealtCards as ProgrammingCards[] | null,
+          programmingPickPilesCount: response.personalState.programmingPickPilesCount ?? 20,
+          discardPilesCount: response.personalState.discardPilesCount ?? 0,
         },
       };
       state.isLoading = false;
@@ -185,6 +190,11 @@ const gameSlice = createSlice({
         state.executedPlayers.push(action.payload);
       }
     },
+    setCurrentRound: (state, action: PayloadAction<number>) => {
+      if (state.currentGame) {
+        state.currentGame.currentRound = action.payload;
+      }
+    },
     setGameOver: (
       state,
       action: PayloadAction<{
@@ -211,6 +221,9 @@ const gameSlice = createSlice({
       state.oldRatings = null;
       state.newRatings = null;
     },
+    setBatchModeActive: (state, action: PayloadAction<boolean>) => {
+      state.isBatchModeActive = action.payload;
+    },
   },
 });
 
@@ -229,5 +242,7 @@ export const {
   markPlayerExecuted,
   setGameOver,
   resetGameState,
+  setCurrentRound,
+  setBatchModeActive,
 } = gameSlice.actions;
 export default gameSlice.reducer;

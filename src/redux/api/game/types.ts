@@ -44,10 +44,13 @@ export type GetCurrentGameStateResponse = {
   currentRevealedRegister: number | null;
   currentTurnUsername: string | null;
   currentExecutingRegister: number | null;
+  roundCount: number; 
   personalState: {
     hasLockedInRegisters: boolean;
     lockedInCards: string[] | null;
     dealtCards: string[] | null;
+    programmingPickPilesCount: number; // NEW - cards remaining in programming deck
+    discardPilesCount: number; // NEW - cards in discard pile
   };
 };
 
@@ -146,4 +149,8 @@ export type GetPausedGameResponse = {
 
 export type GetPausedGamesRequest = {
   username: string;
+};
+
+export type StartNextRoundRequest = {
+  gameId: string;
 };

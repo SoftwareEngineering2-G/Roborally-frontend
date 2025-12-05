@@ -8,21 +8,28 @@ import { PlayerProgramDisplay } from "./PlayerProgramDisplay";
 import { ActivationPhaseHostControls } from "./ActivationPhaseHostControls";
 import { useGameSignalR } from "../ProgrammingPhase/hooks/useGameSignalR";
 import { useRequestGameEndMutation } from "@/redux/api/game/gameApi";
+import { baseApi } from "@/redux/api/baseApi";
 import {
   updateRevealedCards,
   setCurrentTurn,
   updateRobotPosition,
   markPlayerExecuted,
   updatePlayerCheckpoint,
+  setCurrentRound,
 } from "@/redux/game/gameSlice";
 import type {
   RegisterRevealedEvent,
   RobotMovedEvent,
   NextPlayerInTurnEvent,
   CheckpointReachedEvent,
+  RoundCompletedEvent,
 } from "@/types/signalr";
 import { toast } from "sonner";
 import type { GameBoard } from "@/models/gameModels";
+import { AudioControls } from "@/modules/audio/components/AudioControls";
+import { Button } from "@/components/ui/button";
+import { Home } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 interface ActivationPhaseProps {
   gameId: string;
@@ -38,9 +45,11 @@ export const ActivationPhase = ({
   pauseButton,
 }: ActivationPhaseProps) => {
   const dispatch = useAppDispatch();
+  const router = useRouter();
 
   // Get game state from Redux (programmedCards should be populated from backend or SignalR)
   const { currentGame, currentTurnUsername } = useAppSelector((state) => state.game);
+  const isBatchModeActive = useAppSelector((state) => state.game.isBatchModeActive);
   const [requestGameEnd] = useRequestGameEndMutation();
 
   type TileWithName = {
@@ -100,15 +109,14 @@ export const ActivationPhase = ({
         data.registerNumber === 1
           ? "first"
           : data.registerNumber === 2
-          ? "second"
-          : data.registerNumber === 3
-          ? "third"
-          : data.registerNumber === 4
-          ? "fourth"
-          : "fifth";
+            ? "second"
+            : data.registerNumber === 3
+              ? "third"
+              : data.registerNumber === 4
+                ? "fourth"
+                : "fifth";
       toast.info(
-        `${
-          registerLabel.charAt(0).toUpperCase() + registerLabel.slice(1)
+        `${registerLabel.charAt(0).toUpperCase() + registerLabel.slice(1)
         } card revealed for all players!`
       );
     };
@@ -208,12 +216,8 @@ export const ActivationPhase = ({
       // Update the current turn username
       dispatch(setCurrentTurn(data.nextPlayerUsername));
 
-      // Show toast notification if it's the current user's turn
-      if (data.nextPlayerUsername === username) {
-        toast.info("It's your turn to execute your card!");
-      } else if (data.nextPlayerUsername) {
-        toast.info(`It's ${data.nextPlayerUsername}'s turn to execute!`);
-      }
+      console.log("----------------------")
+      console.log(data.nextPlayerUsername);
     };
 
     signalR.on("NextPlayerInTurn", handleNextPlayerInTurn);
@@ -222,6 +226,28 @@ export const ActivationPhase = ({
       signalR.off("NextPlayerInTurn");
     };
   }, [signalR.isConnected, gameId, dispatch, signalR, currentGame, username]);
+
+  // Listen for round completed events
+  useEffect(() => {
+    if (!signalR.isConnected || !currentGame) return;
+
+    const handleRoundCompleted = (...args: unknown[]) => {
+      const data = args[0] as RoundCompletedEvent;
+      if (data.gameId !== gameId) return;
+      dispatch(setCurrentRound(data.newRound));
+
+      dispatch(baseApi.util.invalidateTags([{ type: "Game", id: gameId }]));
+
+      toast.success(`Round ${data.completedRound} complete! Round ${data.newRound} starting...`);
+
+    };
+
+    signalR.on("RoundCompleted", handleRoundCompleted);
+
+    return () => {
+      signalR.off("RoundCompleted");
+    };
+  }, [signalR.isConnected, gameId, dispatch, signalR, currentGame]);
 
   // Don't render if we don't have game state
   if (!currentGame) {
@@ -244,17 +270,34 @@ export const ActivationPhase = ({
       transition={{ duration: 0.5 }}
       className="relative min-h-full"
     >
-      {/* Host Controls - Only visible to host in activation phase */}
-      {isHost && (
-        <ActivationPhaseHostControls gameId={gameId} gameState={currentGame} username={username} />
-      )}
-
       {/* Header */}
       <div className="h-20 border-b border-glass-border bg-surface-dark/50 backdrop-blur-sm flex items-center justify-between px-6">
         <div className="flex items-center gap-4">
+          <Button
+            onClick={() => router.push("/")}
+            variant="outline"
+            size="sm"
+            className="border-neon-teal/50 text-neon-teal hover:bg-neon-teal/10"
+          >
+            <Home className="w-4 h-4 mr-2" />
+            Home
+          </Button>
           <h1 className="text-2xl font-bold text-neon-teal">Activation Phase</h1>
-          <p className="text-sm text-muted-foreground">Watch robots execute their programs</p>
+
+          {/* Round indicator for everyone */}
+          <div className="flex items-center gap-1 text-xs font-semibold text-neon-cyan bg-neon-cyan/10 px-2 py-1 rounded border border-neon-cyan/30">
+            <span>Round {currentGame.currentRound}</span>
+          </div>
+
           {pauseButton}
+          {isHost && (
+            <ActivationPhaseHostControls
+              gameId={gameId}
+              gameState={currentGame}
+              username={username}
+            />
+          )}
+          <AudioControls />
         </div>
       </div>
 
@@ -290,6 +333,7 @@ export const ActivationPhase = ({
                     revealedUpTo={currentGame.currentRevealedRegister ?? -1}
                     isCurrentTurn={player.username === currentTurnUsername}
                     gameId={gameId}
+                    isBatchModeActive={isBatchModeActive}
                   />
                 ))}
             </div>

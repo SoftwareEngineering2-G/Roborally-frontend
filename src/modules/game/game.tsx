@@ -18,6 +18,7 @@ import { GamePauseButton } from "./components/GamePauseButton";
 import { GamePauseDialog } from "./components/GamePauseDialog";
 import { GamePauseResultDialog } from "./components/GamePauseResultDialog";
 import GameOverModal from "./components/GameOverModal";
+import { useAudio } from "@/modules/audio/AudioContext";
 
 interface Props {
   gameId: string;
@@ -35,6 +36,26 @@ export default function Game({ gameId }: Props) {
     }
     setUsername(storedUsername);
   }, [router]);
+
+  const { playBGM, stopBGM } = useAudio();
+
+  useEffect(() => {
+    // Play game BGM when component mounts
+    const startGameMusic = async () => {
+      try {
+        await playBGM("game");
+      } catch {
+        console.warn("Failed to autoplay game music. User interaction may be required.");
+      }
+    };
+    
+    startGameMusic();
+
+    // Cleanup: stop BGM when leaving the game
+    return () => {
+      stopBGM();
+    };
+  }, [playBGM, stopBGM]);
 
   const { gameState, isLoading, error } = useGameState(gameId, username);
 
@@ -171,6 +192,8 @@ export default function Game({ gameId }: Props) {
     <div className="relative min-h-screen">
       {/* Game Over Modal */}
       <GameOverModal myUsername={username} />
+
+
 
       {/* Pause Request Dialog */}
       {pauseRequest && (
