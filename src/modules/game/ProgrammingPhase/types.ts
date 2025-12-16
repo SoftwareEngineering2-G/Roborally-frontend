@@ -2,17 +2,16 @@ export interface ProgramCard {
   id: string;
   name: string;
   type:
-    | "Move 1"
-    | "Move 2"
-    | "Move 3"
-    | "Move Back"
-    | "Power Up"
-    | "Rotate Left"
-    | "Rotate Right"
-    | "U-Turn"
-    | "Again"
-    | "Swap Position"
-    | "Movement Choice";
+  | "Move 1"
+  | "Move 2"
+  | "Move 3"
+  | "Move Back"
+  | "Rotate Left"
+  | "Rotate Right"
+  | "U-Turn"
+  | "Again"
+  | "Swap Position"
+  | "Movement Choice";
   imagePath: string;
 }
 
@@ -43,32 +42,26 @@ export const SAMPLE_CARDS: ProgramCard[] = [
   },
   {
     id: "5",
-    name: "Power Up",
-    type: "Power Up",
-    imagePath: "/cards/powerup.png",
-  },
-  {
-    id: "6",
     name: "Rotate Left",
     type: "Rotate Left",
     imagePath: "/cards/rotateleft.png",
   },
   {
-    id: "7",
+    id: "6",
     name: "Rotate Right",
     type: "Rotate Right",
     imagePath: "/cards/rotateright.png",
   },
-  { id: "8", name: "U-Turn", type: "U-Turn", imagePath: "/cards/uturn.png" },
-  { id: "9", name: "Again", type: "Again", imagePath: "/cards/again.png" },
+  { id: "7", name: "U-Turn", type: "U-Turn", imagePath: "/cards/uturn.png" },
+  { id: "8", name: "Again", type: "Again", imagePath: "/cards/again.png" },
   {
-    id: "10",
+    id: "9",
     name: "Swap Position",
     type: "Swap Position",
     imagePath: "/cards/swap-position.png",
   },
   {
-    id: "11",
+    id: "10",
     name: "Movement Choice",
     type: "Movement Choice",
     imagePath: "/cards/movement-choice.png",
@@ -87,13 +80,12 @@ export const INITIAL_REGISTERS: RegisterSlot[] = [
 export const createCardFromBackendString = (cardName: string, id: string): ProgramCard => {
   const typeMap: Record<string, ProgramCard['type']> = {
     "Move 1": "Move 1",
-    "Move 2": "Move 2", 
+    "Move 2": "Move 2",
     "Move 3": "Move 3",
     "Rotate Left": "Rotate Left",
     "Rotate Right": "Rotate Right",
     "U-Turn": "U-Turn",
     "Move Back": "Move Back",
-    "Power Up": "Power Up",
     "Again": "Again",
     "Swap Position": "Swap Position",
     "Movement Choice": "Movement Choice",
@@ -107,7 +99,6 @@ export const createCardFromBackendString = (cardName: string, id: string): Progr
     "Rotate Right": "/cards/rotateright.png",
     "U-Turn": "/cards/uturn.png",
     "Move Back": "/cards/moveback.png",
-    "Power Up": "/cards/powerup.png",
     "Again": "/cards/again.png",
     "Swap Position": "/cards/swap-position.png",
     "Movement Choice": "/cards/movement-choice.png",
