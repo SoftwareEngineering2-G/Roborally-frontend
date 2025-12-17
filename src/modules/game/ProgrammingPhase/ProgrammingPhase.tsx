@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { playerLockedIn } from "@/redux/game/gameSlice";
 import { toast } from "sonner";
-import type { PlayerLockedInRegisterEvent, PlayerCardsDealtEvent } from "@/types/signalr";
+import type { PlayerLockedInRegisterEvent, PlayerCardsDealtEvent, ProgrammingTimeoutEvent } from "@/types/signalr";
 
 // Shared components
 import { GameBoard as GameBoardComponent } from "../components/GameBoard";
@@ -45,6 +45,7 @@ export const ProgrammingPhase = ({
   pauseButton,
 }: ProgrammingPhaseProps) => {
   const [showProgrammingControls, setShowProgrammingControls] = useState(true);
+  const [timerSeconds, setTimerSeconds] = useState<number | null>(null);
   const dispatch = useAppDispatch();
   const { playSFX } = useAudio();
 
@@ -184,7 +185,7 @@ export const ProgrammingPhase = ({
       } else {
         // Fallback: directly set cards if animation elements not found
         handlers.handleSetHand(dealtCards);
-          playSFX("card_deal");
+        playSFX("card_deal");
       }
 
       toast.info(`Received ${dealtCards.length} cards`);
@@ -244,6 +245,18 @@ export const ProgrammingPhase = ({
     const handlePlayerLockedInRegister = (...args: unknown[]) => {
       const data = args[0] as PlayerLockedInRegisterEvent;
 
+      // If backend sent timeout expiration timestamp, calculate remaining seconds
+      if (data.timeoutExpiresAt && timerSeconds === null) {
+        const expiresAt = new Date(data.timeoutExpiresAt);
+        const now = new Date();
+        const remainingMs = expiresAt.getTime() - now.getTime();
+        const remainingSeconds = Math.max(0, Math.floor(remainingMs / 1000)) - 3;
+
+        if (remainingSeconds > 0) {
+          setTimerSeconds(remainingSeconds);
+        }
+      }
+
       // Update Redux to mark the player as locked in
       // For current user: also store their locked cards in personalState
       if (data.username === username) {
@@ -270,7 +283,73 @@ export const ProgrammingPhase = ({
     return () => {
       signalR.off("PlayerLockedInRegister");
     };
-  }, [signalR.isConnected, username, dispatch, signalR, state.registers]);
+  }, [signalR.isConnected, username, dispatch, signalR, state.registers, currentGame, timerSeconds]);
+
+  // Timer countdown effect
+  useEffect(() => {
+    if (timerSeconds === null || timerSeconds <= 0) return;
+
+    const interval = setInterval(() => {
+      setTimerSeconds((prev) => {
+        if (prev === null || prev <= 1) {
+          return null; // Timer ended
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [timerSeconds]);
+
+  // Listen for ProgrammingTimeout events
+  useEffect(() => {
+    if (!signalR.isConnected) return;
+
+    const handleProgrammingTimeout = (...args: unknown[]) => {
+      const data = args[0] as ProgrammingTimeoutEvent;
+
+      console.log("ProgrammingTimeout event received:", data);
+
+      if (data.gameId === gameId) {
+        toast.info("⏰ Programming phase timed out!");
+
+        const playerAssignment = data.assignedCards.find(
+          (assignment) => assignment.username === username
+        );
+
+        if (playerAssignment && playerAssignment.cards.length > 0) {
+          const assignedCards: ProgramCard[] = playerAssignment.cards.map(
+            (cardName: string, index: number) =>
+              createCardFromBackendString(cardName, `timeout-${index}-${Date.now()}`)
+          );
+
+          const newRegisters = INITIAL_REGISTERS.map((register, index) => ({
+            id: register.id,
+            card: assignedCards[index] || null,
+          }));
+
+          handlers.handleSetRegisters(newRegisters);
+
+          handlers.handleClearHand();
+
+          dispatch(
+            playerLockedIn({
+              username: username,
+              lockedCards: assignedCards.map(card => card.name),
+            })
+          );
+
+          toast.info("Cards automatically assigned to registers due to timeout");
+        }
+      }
+    };
+
+    signalR.on("ProgrammingTimeout", handleProgrammingTimeout);
+
+    return () => {
+      signalR.off("ProgrammingTimeout");
+    };
+  }, [signalR.isConnected, username, gameId, handlers, dispatch, signalR]);
 
   // Wrapper for handleUploadProgram to trigger discard animation
   const handleUploadProgramWithAnimation = async () => {
@@ -347,6 +426,22 @@ export const ProgrammingPhase = ({
           ) : undefined
         }
       />
+
+      {/* Timer Display */}
+      {timerSeconds !== null && timerSeconds > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="fixed top-20 left-1/2 -translate-x-1/2 z-50"
+        >
+          <div className={`px-6 py-3 rounded-lg border-2 font-bold text-2xl shadow-lg ${timerSeconds <= 10
+            ? 'bg-red-500/20 border-red-500 text-red-400 animate-pulse'
+            : 'bg-amber-500/20 border-amber-500 text-amber-400'
+            }`}>
+            ⏱️ {timerSeconds}s
+          </div>
+        </motion.div>
+      )}
 
       {/* Side-by-side layout: Board on left, Players on right */}
       <div className="w-full min-h-[calc(100vh-5rem)] flex">

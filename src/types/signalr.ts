@@ -31,6 +31,7 @@ export interface ActivationPhaseStartedEvent {
 
 export interface PlayerLockedInRegisterEvent {
   username: string;
+  timeoutExpiresAt: string | null | undefined;
   // Note: Backend only sends username, not the cards (security)
 }
 
@@ -98,4 +99,9 @@ export interface RoundCompletedEvent {
   gameId: string;
   completedRound: number;
   newRound: number;
+}
+
+export interface ProgrammingTimeoutEvent {
+  gameId: string;
+  assignedCards: Array<{ username: string; cards: string[] }>
 }
