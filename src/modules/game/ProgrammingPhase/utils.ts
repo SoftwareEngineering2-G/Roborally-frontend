@@ -6,8 +6,6 @@ export const getCardTypeClasses = (type: ProgramCard["type"]) => {
     "Move 2": "bg-neon-teal/20 border-neon-teal shadow-glow-teal text-neon-teal",
     "Move 3": "bg-neon-teal/20 border-neon-teal shadow-glow-teal text-neon-teal",
     "Move Back": "bg-neon-lime/20 border-neon-lime text-neon-lime",
-    "Power Up":
-      "bg-neon-magenta/20 border-neon-magenta shadow-glow-magenta text-neon-magenta",
     "Rotate Left":
       "bg-neon-blue/20 border-neon-blue shadow-glow-blue text-neon-blue",
     "Rotate Right":

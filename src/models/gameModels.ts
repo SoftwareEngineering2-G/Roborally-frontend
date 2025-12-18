@@ -45,7 +45,6 @@ export type ProgrammingCards =
   | "Rotate Right"
   | "U-Turn"
   | "Move Back"
-  | "Power Up"
   | "Again"
   | "Swap Position"
   | "Movement Choice";
