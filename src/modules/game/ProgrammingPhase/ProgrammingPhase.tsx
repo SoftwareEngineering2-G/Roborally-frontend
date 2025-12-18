@@ -262,7 +262,7 @@ export const ProgrammingPhase = ({
         const expiresAt = new Date(data.timeoutExpiresAt);
         const now = new Date();
         const remainingMs = expiresAt.getTime() - now.getTime();
-        const remainingSeconds = Math.max(0, Math.floor(remainingMs / 1000)) - 3;
+        const remainingSeconds = Math.max(0, Math.floor(remainingMs / 1000)) -1;
 
         if (remainingSeconds > 0) {
           setTimerSeconds(remainingSeconds);
