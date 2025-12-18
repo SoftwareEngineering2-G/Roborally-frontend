@@ -215,10 +215,10 @@ export const useProgrammingPhase = (
   }, []);
 
   // Set registers (for restoring from backend)
-  const handleSetRegisters = useCallback((registers: RegisterSlot[]) => {
+  const handleSetRegisters = useCallback((registers: RegisterSlot[], append : boolean = true) => {
     setState((prev) => ({
       ...prev,
-      registers,
+      registers: append ? [...prev.registers, ...registers] : registers,
       selectedCard: null,
       selectedRegister: null,
     }));
