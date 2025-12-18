@@ -5,7 +5,11 @@ import { motion } from "framer-motion";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { playerLockedIn } from "@/redux/game/gameSlice";
 import { toast } from "sonner";
-import type { PlayerLockedInRegisterEvent, PlayerCardsDealtEvent, ProgrammingTimeoutEvent } from "@/types/signalr";
+import type {
+  PlayerLockedInRegisterEvent,
+  PlayerCardsDealtEvent,
+  ProgrammingTimeoutEvent,
+} from "@/types/signalr";
 
 // Shared components
 import { GameBoard as GameBoardComponent } from "../components/GameBoard";
@@ -125,7 +129,7 @@ export const ProgrammingPhase = ({
         }));
 
         // Update the registers with the locked-in cards
-        handlers.handleSetRegisters(restoredRegisters);
+        handlers.handleSetRegisters(restoredRegisters, false);
 
         // Clear the hand (cards were discarded when locked in)
         handlers.handleClearHand();
@@ -236,7 +240,15 @@ export const ProgrammingPhase = ({
     return () => {
       signalR.off("PlayerCardsDealt");
     };
-  }, [signalR.isConnected, username, gameId, executeDealAnimation, startShuffling, signalR, playSFX]);
+  }, [
+    signalR.isConnected,
+    username,
+    gameId,
+    executeDealAnimation,
+    startShuffling,
+    signalR,
+    playSFX,
+  ]);
 
   // Listen for PlayerLockedInRegister events - only update Redux
   useEffect(() => {
@@ -283,7 +295,15 @@ export const ProgrammingPhase = ({
     return () => {
       signalR.off("PlayerLockedInRegister");
     };
-  }, [signalR.isConnected, username, dispatch, signalR, state.registers, currentGame, timerSeconds]);
+  }, [
+    signalR.isConnected,
+    username,
+    dispatch,
+    signalR,
+    state.registers,
+    currentGame,
+    timerSeconds,
+  ]);
 
   // Timer countdown effect
   useEffect(() => {
@@ -328,14 +348,18 @@ export const ProgrammingPhase = ({
             card: assignedCards[index] || null,
           }));
 
-          handlers.handleSetRegisters(newRegisters);
-
+          // Clear hand first
           handlers.handleClearHand();
+
+          console.log("New registers from timeout", newRegisters);
+
+          // Set registers with false flag to completely replace existing registers
+          handlers.handleSetRegisters(newRegisters, false);
 
           dispatch(
             playerLockedIn({
               username: username,
-              lockedCards: assignedCards.map(card => card.name),
+              lockedCards: assignedCards.map((card) => card.name),
             })
           );
 
@@ -434,10 +458,13 @@ export const ProgrammingPhase = ({
           animate={{ opacity: 1, y: 0 }}
           className="fixed top-20 left-1/2 -translate-x-1/2 z-50"
         >
-          <div className={`px-6 py-3 rounded-lg border-2 font-bold text-2xl shadow-lg ${timerSeconds <= 10
-            ? 'bg-red-500/20 border-red-500 text-red-400 animate-pulse'
-            : 'bg-amber-500/20 border-amber-500 text-amber-400'
-            }`}>
+          <div
+            className={`px-6 py-3 rounded-lg border-2 font-bold text-2xl shadow-lg ${
+              timerSeconds <= 10
+                ? "bg-red-500/20 border-red-500 text-red-400 animate-pulse"
+                : "bg-amber-500/20 border-amber-500 text-amber-400"
+            }`}
+          >
             ⏱️ {timerSeconds}s
           </div>
         </motion.div>
