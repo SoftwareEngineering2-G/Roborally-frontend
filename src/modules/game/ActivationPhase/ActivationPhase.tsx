@@ -215,9 +215,6 @@ export const ActivationPhase = ({
 
       // Update the current turn username
       dispatch(setCurrentTurn(data.nextPlayerUsername));
-
-      console.log("----------------------")
-      console.log(data.nextPlayerUsername);
     };
 
     signalR.on("NextPlayerInTurn", handleNextPlayerInTurn);

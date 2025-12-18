@@ -37,7 +37,6 @@ export const useLobbySignalR = (gameId: string) => {
 
     const handleHostChanged = (...args: unknown[]) => {
       const data = args[0] as { newHost: string };
-      console.log("🔄 Host changed to:", data.newHost);
       dispatch(hostChanged({ newHost: data.newHost }));
       toast.success(`${data.newHost} is now the host`);
     };

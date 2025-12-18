@@ -33,13 +33,10 @@ interface Props {
 }
 
 export const Lobby = ({ gameId }: Props) => {
-  console.log("[Lobby] Rendered with gameId:", gameId);
   const router = useRouter();
   const dispatch = useDispatch<AppDispatch>();
   const [username, setUsername] = useState<string | null>(null);
   const [isNavigatingToGame, setIsNavigatingToGame] = useState(false);
-
-  console.log("[Lobby] Current username state:", username);
 
   const lobbyState: LobbyState = useSelector((state: RootState) => selectLobbyState(state));
   const players = useSelector((state: RootState) => selectLobbyPlayers(state));

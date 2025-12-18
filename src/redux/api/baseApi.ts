@@ -6,8 +6,6 @@ const baseUrl =
     ? "http://130.225.71.179:5100/api" // prod
     : `${process.env.NEXT_PUBLIC_API_URL}/api` || "http://localhost:5100/api"; // dev
 
-console.log("API Base URL:", baseUrl);
-
 // Custom baseQuery with JWT authentication
 const baseQueryWithAuth = fetchBaseQuery({
   baseUrl,

@@ -19,9 +19,7 @@ export const useSignalR = (url: string) => {
     // Create connection
     const backendBaseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5100";
     const fullHubUrl = `${backendBaseUrl}${url}`;
-    
-    console.log(`Full SignalR URL: ${fullHubUrl}`);
-    
+        
     const connection = new HubConnectionBuilder()
       .withUrl(fullHubUrl)
       .withAutomaticReconnect()
@@ -32,7 +30,6 @@ export const useSignalR = (url: string) => {
 
     // Simple event handlers
     connection.onclose((error) => {
-      console.log("SignalR connection closed:", error);
       setIsConnected(false);
       setIsConnecting(false);
       if (error) {
@@ -41,13 +38,11 @@ export const useSignalR = (url: string) => {
     });
 
     connection.onreconnecting((error) => {
-      console.log("SignalR reconnecting...", error);
       setIsConnecting(true);
       setIsConnected(false);
     });
 
     connection.onreconnected((connectionId) => {
-      console.log("SignalR reconnected:", connectionId);
       setIsConnected(true);
       setIsConnecting(false);
       setError(null);
@@ -56,13 +51,11 @@ export const useSignalR = (url: string) => {
     // Start connection
     const startConnection = async () => {
       try {
-        console.log("Starting SignalR connection...");
         setIsConnecting(true);
         setError(null);
         
         await connection.start();
         
-        console.log("SignalR connected successfully!");
         setIsConnected(true);
         setIsConnecting(false);
       } catch (err) {
@@ -76,7 +69,6 @@ export const useSignalR = (url: string) => {
 
     // Cleanup
     return () => {
-      console.log("Cleaning up SignalR connection...");
       
       if (connection && connection.state !== "Disconnected") {
         connection.stop().catch((err) => {

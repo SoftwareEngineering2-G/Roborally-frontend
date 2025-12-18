@@ -133,11 +133,6 @@ export const ProgrammingPhase = ({
 
         // Clear the hand (cards were discarded when locked in)
         handlers.handleClearHand();
-
-        console.log("✅ Synced locked-in state from Redux:", {
-          username,
-          lockedInCards: personalState.lockedInCards,
-        });
       }
     }
     // Restore dealt cards (if player hasn't locked in yet but has dealt cards)
@@ -150,11 +145,6 @@ export const ProgrammingPhase = ({
         );
 
         handlers.handleSetHand(restoredHand);
-
-        console.log("✅ Synced dealt cards from Redux:", {
-          username,
-          dealtCards: personalState.dealtCards,
-        });
       }
     }
   }, [currentGame, state.registers, state.hand.length, username, handlers]);
@@ -204,7 +194,6 @@ export const ProgrammingPhase = ({
     // Listen for cards dealt event
     const handlePlayerCardsDealt = (...args: unknown[]) => {
       const data = args[0] as PlayerCardsDealtEvent;
-      console.log("PlayerCardsDealtEvent received:", data);
 
       // Dispatch custom event for host controls to sync state
       window.dispatchEvent(new CustomEvent("programmingPhaseCardsDealt"));
@@ -328,7 +317,6 @@ export const ProgrammingPhase = ({
     const handleProgrammingTimeout = (...args: unknown[]) => {
       const data = args[0] as ProgrammingTimeoutEvent;
 
-      console.log("ProgrammingTimeout event received:", data);
 
       if (data.gameId === gameId) {
         toast.info("⏰ Programming phase timed out!");

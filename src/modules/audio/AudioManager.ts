@@ -56,7 +56,6 @@ export class AudioManager {
     
     try {
       await this.bgmAudio.play();
-      console.log(`Playing BGM: ${key}`);
     } catch (e) {
       console.warn("Autoplay blocked or audio error:", e);
       // Store the key so we can retry when user interacts
