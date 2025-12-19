@@ -43,7 +43,7 @@ interface ProgrammingPhaseProps {
 }
 
 /**
- * @author nilanjanadevkota 2025-10-19 11:13:21 +0200 45
+ * @author Nilanjana Devkota 2025-10-19 11:13:21 +0200 45
  */
 export const ProgrammingPhase = ({
   gameId,

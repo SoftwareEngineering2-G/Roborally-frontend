@@ -42,7 +42,7 @@ const MOVEMENT_CHOICES = [
 ] as const;
 
 /**
- * @author Satish 2025-11-24 10:19:43 +0100 44
+ * @author Satish Gurung 2025-11-24 10:19:43 +0100 44
  */
 export const ExecuteCardButton = ({ gameId, username, cardName }: ExecuteCardButtonProps) => {
   const [executeCard, { isLoading }] = useExecuteProgrammingCardMutation();
@@ -64,9 +64,9 @@ export const ExecuteCardButton = ({ gameId, username, cardName }: ExecuteCardBut
 
   const noSwapTargets = isSwapCard && swapTargets.length === 0;
 
-/**
- * @author Satish 2025-11-24 10:19:43 +0100 64
- */
+  /**
+   * @author Satish Gurung 2025-11-24 10:19:43 +0100 64
+   */
   const resetDialogState = () => {
     setDialogOpen(false);
     setSelectedTarget(undefined);
@@ -90,9 +90,9 @@ export const ExecuteCardButton = ({ gameId, username, cardName }: ExecuteCardBut
     }
   };
 
-/**
- * @author Satish 2025-11-24 10:19:43 +0100 87
- */
+  /**
+   * @author Satish Gurung 2025-11-24 10:19:43 +0100 87
+   */
   const handleExecute = () => {
     if (isInteractiveCard) {
       setDialogOpen(true);
@@ -101,9 +101,9 @@ export const ExecuteCardButton = ({ gameId, username, cardName }: ExecuteCardBut
     void submitExecution();
   };
 
-/**
- * @author Satish 2025-11-24 10:19:43 +0100 95
- */
+  /**
+   * @author Satish Gurung 2025-11-24 10:19:43 +0100 95
+   */
   const handleDialogConfirm = () => {
     if (isSwapCard) {
       if (!selectedTarget) {
