@@ -103,5 +103,6 @@ export interface RoundCompletedEvent {
 
 export interface ProgrammingTimeoutEvent {
   gameId: string;
-  assignedCards: Array<{ username: string; cards: string[] }>
+  username: string;
+  assignedCards: string[];
 }

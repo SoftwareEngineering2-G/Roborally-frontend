@@ -332,12 +332,10 @@ export const ProgrammingPhase = ({
       if (data.gameId === gameId) {
         toast.info("⏰ Programming phase timed out!");
 
-        const playerAssignment = data.assignedCards.find(
-          (assignment) => assignment.username === username
-        );
+        if (data.username !== username) return;
 
-        if (playerAssignment && playerAssignment.cards.length > 0) {
-          const assignedCards: ProgramCard[] = playerAssignment.cards.map(
+        if (data.assignedCards && data.assignedCards.length > 0) {
+          const assignedCards: ProgramCard[] = data.assignedCards.map(
             (cardName: string, index: number) =>
               createCardFromBackendString(cardName, `timeout-${index}-${Date.now()}`)
           );
