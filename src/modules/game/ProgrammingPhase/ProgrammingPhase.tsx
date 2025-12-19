@@ -255,8 +255,8 @@ export const ProgrammingPhase = ({
     const handlePlayerLockedInRegister = (...args: unknown[]) => {
       const data = args[0] as PlayerLockedInRegisterEvent;
 
-      // If backend sent timeout expiration timestamp, calculate remaining seconds
       if (data.timeoutExpiresAt && timerSeconds === null) {
+        // First lock in for this phase - start the timer
         const expiresAt = new Date(data.timeoutExpiresAt);
         const now = new Date();
         const remainingMs = expiresAt.getTime() - now.getTime();
@@ -264,6 +264,15 @@ export const ProgrammingPhase = ({
 
         if (remainingSeconds > 0) {
           setTimerSeconds(remainingSeconds);
+        }
+      } else {
+        // If all players have locked in, clear the timer
+        const allLockedIn = currentGame?.players.every((player =>
+          currentGame.personalState.lockedInCards && currentGame.personalState.lockedInCards.length > 0
+        ));
+
+        if (allLockedIn) {
+          setTimerSeconds(null);
         }
       }
 
@@ -456,11 +465,10 @@ export const ProgrammingPhase = ({
           className="fixed top-20 left-1/2 -translate-x-1/2 z-50"
         >
           <div
-            className={`px-6 py-3 rounded-lg border-2 font-bold text-2xl shadow-lg ${
-              timerSeconds <= 10
-                ? "bg-red-500/20 border-red-500 text-red-400 animate-pulse"
-                : "bg-amber-500/20 border-amber-500 text-amber-400"
-            }`}
+            className={`px-6 py-3 rounded-lg border-2 font-bold text-2xl shadow-lg ${timerSeconds <= 10
+              ? "bg-red-500/20 border-red-500 text-red-400 animate-pulse"
+              : "bg-amber-500/20 border-amber-500 text-amber-400"
+              }`}
           >
             ⏱️ {timerSeconds}s
           </div>
