@@ -9,6 +9,9 @@ interface DealingCardComponentProps {
   onAnimationComplete: (cardId: string) => void;
 }
 
+/**
+ * @author Sachin Baral 2025-09-29 20:21:16 +0200 12
+ */
 export const DealingCardComponent = ({
   dealingCard,
   onAnimationComplete,
@@ -117,11 +120,13 @@ interface DealingAnimationOverlayProps {
   onCardDealt: (cardId: string) => void;
 }
 
+/**
+ * @author Sachin Baral 2025-09-29 20:21:16 +0200 120
+ */
 export const DealingAnimationOverlay = ({
   dealingCards,
   onCardDealt,
 }: DealingAnimationOverlayProps) => {
-
   return (
     <AnimatePresence>
       {dealingCards.map((dealingCard) => (

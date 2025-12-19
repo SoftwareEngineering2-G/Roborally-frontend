@@ -29,6 +29,9 @@ interface GameControlsProps {
   onCopyGameId: () => void;
 }
 
+/**
+ * @author Sachin Baral 2025-09-20 20:56:36 +0200 32
+ */
 export const GameControls = ({
   isHost,
   currentPlayerReady,

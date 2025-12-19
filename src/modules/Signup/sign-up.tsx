@@ -5,13 +5,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { UserPlus, Loader2, CalendarIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import z from "zod";
@@ -26,11 +20,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
 import ElectricBorder from "@/components/ElectricBorder/electric-border";
@@ -45,6 +35,9 @@ const formSchema = z.object({
 
 type FormData = z.infer<typeof formSchema>;
 
+/**
+ * @author Sachin Baral 2025-09-15 08:43:34 +0200 48
+ */
 export const Signup = () => {
   const [signup, { isLoading, error, isSuccess, data }] = useSignupMutation();
   const router = useRouter();
@@ -115,27 +108,20 @@ export const Signup = () => {
               >
                 <UserPlus className="w-8 h-8 text-accent-foreground" />
               </motion.div>
-              <CardTitle className="text-3xl font-bold text-neon-magenta">
-                Join RoboRally
-              </CardTitle>
+              <CardTitle className="text-3xl font-bold text-neon-magenta">Join RoboRally</CardTitle>
               <CardDescription className="text-lg text-chrome-light">
                 Create your pilot profile and command your robot
               </CardDescription>
             </CardHeader>
             <CardContent>
               <Form {...form}>
-                <form
-                  onSubmit={form.handleSubmit(onSubmit)}
-                  className="space-y-6"
-                >
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                   <FormField
                     control={form.control}
                     name="username"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-chrome-light font-medium">
-                          Username
-                        </FormLabel>
+                        <FormLabel className="text-chrome-light font-medium">Username</FormLabel>
                         <FormControl>
                           <Input
                             type="text"
@@ -154,9 +140,7 @@ export const Signup = () => {
                     name="password"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-chrome-light font-medium">
-                          Password
-                        </FormLabel>
+                        <FormLabel className="text-chrome-light font-medium">Password</FormLabel>
                         <FormControl>
                           <Input
                             type="password"
@@ -201,8 +185,7 @@ export const Signup = () => {
                               selected={field.value}
                               onSelect={field.onChange}
                               disabled={(date) =>
-                                date > new Date() ||
-                                date < new Date("1900-01-01")
+                                date > new Date() || date < new Date("1900-01-01")
                               }
                               captionLayout="dropdown"
                             />
@@ -216,10 +199,7 @@ export const Signup = () => {
                     )}
                   />
 
-                  <motion.div
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                  >
+                  <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                     <Button
                       type="submit"
                       disabled={isLoading}

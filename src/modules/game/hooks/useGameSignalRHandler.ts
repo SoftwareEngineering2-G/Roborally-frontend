@@ -19,6 +19,9 @@ import type {
 } from "@/types/signalr";
 import type { GetCurrentGameStateResponse } from "@/redux/api/game/types";
 
+/**
+ * @author thorrila 2025-11-11 13:41:48 +0100 22
+ */
 export const useGameSignalRHandler = () => {
   const { game } = useSignalRContext(); // Connect to the /game hub
   const dispatch = useDispatch();

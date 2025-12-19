@@ -14,6 +14,9 @@ interface PhaseHeaderProps {
   hostControls?: React.ReactNode;
 }
 
+/**
+ * @author Sachin Baral 2025-09-29 19:51:47 +0200 17
+ */
 export const PhaseHeader = ({
   currentPhase,
   filledCount,
@@ -37,9 +40,7 @@ export const PhaseHeader = ({
             }}
             transition={{ duration: 0.3 }}
           >
-            {currentPhase === "programming"
-              ? "Programming Phase"
-              : "Activation Phase"}
+            {currentPhase === "programming" ? "Programming Phase" : "Activation Phase"}
           </motion.h1>
 
           {currentPhase === "programming" && (

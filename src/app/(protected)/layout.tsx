@@ -3,6 +3,9 @@ import React from "react";
 import { useRouter } from "next/navigation";
 import { isAuthenticated } from "@/lib/auth-utils";
 
+/**
+ * @author Sachin Baral 2025-09-16 21:38:48 +0200 6
+ */
 export default function Layout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const [isChecking, setIsChecking] = React.useState(true);

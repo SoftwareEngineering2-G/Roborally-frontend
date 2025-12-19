@@ -9,6 +9,9 @@ interface DiscardingCardComponentProps {
   onAnimationComplete: (cardId: string) => void;
 }
 
+/**
+ * @author Sachin Baral 2025-11-04 21:25:08 +0100 12
+ */
 export const DiscardingCardComponent = ({
   discardingCard,
   onAnimationComplete,
@@ -126,6 +129,9 @@ interface DiscardAnimationOverlayProps {
   onCardDiscarded: (cardId: string) => void;
 }
 
+/**
+ * @author Sachin Baral 2025-11-04 21:25:08 +0100 129
+ */
 export const DiscardAnimationOverlay = ({
   discardingCards,
   onCardDiscarded,

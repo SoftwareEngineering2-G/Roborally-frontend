@@ -16,6 +16,9 @@ type ElectricBorderProps = PropsWithChildren<{
   style?: CSSProperties;
 }>;
 
+/**
+ * @author Sachin Baral 2025-09-16 11:52:02 +0200 19
+ */
 function hexToRgba(hex: string, alpha = 1): string {
   if (!hex) return `rgba(0,0,0,${alpha})`;
   let h = hex.replace("#", "");
@@ -26,7 +29,13 @@ function hexToRgba(hex: string, alpha = 1): string {
       .join("");
   }
   const int = parseInt(h, 16);
+/**
+ * @author Sachin Baral 2025-09-16 11:52:02 +0200 29
+ */
   const r = (int >> 16) & 255;
+/**
+ * @author Sachin Baral 2025-09-16 11:52:02 +0200 30
+ */
   const g = (int >> 8) & 255;
   const b = int & 255;
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
@@ -47,6 +56,9 @@ const ElectricBorder: React.FC<ElectricBorderProps> = ({
   const rootRef = useRef<HTMLDivElement | null>(null);
   const strokeRef = useRef<HTMLDivElement | null>(null);
 
+/**
+ * @author Sachin Baral 2025-09-16 11:52:02 +0200 50
+ */
   const updateAnim = () => {
     const svg = svgRef.current;
     const host = rootRef.current;

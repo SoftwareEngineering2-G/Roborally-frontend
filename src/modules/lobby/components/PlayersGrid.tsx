@@ -19,6 +19,9 @@ interface PlayersGridProps {
   requiredPlayers?: string[] | null;
 }
 
+/**
+ * @author Sachin Baral 2025-09-20 20:56:36 +0200 22
+ */
 export const PlayersGrid = ({
   players,
   maxPlayers,
@@ -150,4 +153,3 @@ export const PlayersGrid = ({
     </motion.div>
   );
 };
-

@@ -40,6 +40,9 @@ interface JoinLobbyDialogProps {
   trigger?: React.ReactNode;
 }
 
+/**
+ * @author Sachin Baral 2025-09-20 20:56:36 +0200 43
+ */
 export const JoinLobbyDialog = ({
   username,
   trigger,
@@ -75,6 +78,9 @@ export const JoinLobbyDialog = ({
     }
   }, [isSuccess, router, form]);
 
+/**
+ * @author Sachin Baral 2025-09-20 20:56:36 +0200 78
+ */
   const defaultTrigger = (
     <Button variant="outline">
       <Key className="w-4 h-4 mr-2" />

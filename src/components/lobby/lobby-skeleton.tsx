@@ -5,6 +5,9 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Users, Crown, Zap, Cpu, Cog } from "lucide-react";
 import { useEffect, useState } from "react";
 
+/**
+ * @author Sachin Baral 2025-09-20 20:56:36 +0200 8
+ */
 const RobotIcon = ({ className }: { className?: string }) => (
   <motion.div
     className={`relative ${className}`}
@@ -36,6 +39,9 @@ const RobotIcon = ({ className }: { className?: string }) => (
   </motion.div>
 );
 
+/**
+ * @author Sachin Baral 2025-09-20 20:56:36 +0200 39
+ */
 const CircuitPattern = () => (
   <motion.div
     className="absolute inset-0 opacity-10"
@@ -73,6 +79,9 @@ const CircuitPattern = () => (
   </motion.div>
 );
 
+/**
+ * @author Sachin Baral 2025-09-20 20:56:36 +0200 76
+ */
 const GlitchSkeleton = ({ className }: { className?: string }) => {
   return (
     <motion.div
@@ -103,6 +112,9 @@ const GlitchSkeleton = ({ className }: { className?: string }) => {
   );
 };
 
+/**
+ * @author Sachin Baral 2025-09-20 20:56:36 +0200 106
+ */
 const LoadingOrb = () => (
   <motion.div
     className="relative w-12 h-12 mx-auto mb-4"
@@ -126,6 +138,9 @@ const LoadingOrb = () => (
   </motion.div>
 );
 
+/**
+ * @author Sachin Baral 2025-09-20 20:56:36 +0200 129
+ */
 const FloatingIcons = () => (
   <div className="absolute inset-0 overflow-hidden pointer-events-none">
     {[Zap, Cog, Crown, Users].map((Icon, index) => (
@@ -153,6 +168,9 @@ const FloatingIcons = () => (
   </div>
 );
 
+/**
+ * @author Sachin Baral 2025-09-20 20:56:36 +0200 156
+ */
 export const LobbyLoadingSkeleton = () => {
   const [isMounted, setIsMounted] = useState(false);
 
@@ -369,6 +387,9 @@ export const LobbyLoadingSkeleton = () => {
   );
 };
 
+/**
+ * @author Sachin Baral 2025-09-20 20:56:36 +0200 372
+ */
 export const LobbyErrorState = ({
   message,
   onRetry,

@@ -2,6 +2,9 @@
 
 import { Toaster as Sonner, ToasterProps } from "sonner";
 
+/**
+ * @author Sachin Baral 2025-09-15 08:43:34 +0200 5
+ */
 const Toaster = ({ ...props }: ToasterProps) => {
   return (
     <>
@@ -26,17 +29,13 @@ const Toaster = ({ ...props }: ToasterProps) => {
         @keyframes cyber-pulse {
           0%,
           100% {
-            box-shadow: 0 0 5px hsl(var(--neon-teal) / 0.5),
-              0 0 10px hsl(var(--neon-teal) / 0.3),
-              0 0 15px hsl(var(--neon-teal) / 0.1),
-              inset 0 1px 0 hsl(var(--neon-teal) / 0.2);
+            box-shadow: 0 0 5px hsl(var(--neon-teal) / 0.5), 0 0 10px hsl(var(--neon-teal) / 0.3),
+              0 0 15px hsl(var(--neon-teal) / 0.1), inset 0 1px 0 hsl(var(--neon-teal) / 0.2);
             border-color: hsl(var(--neon-teal) / 0.6);
           }
           50% {
-            box-shadow: 0 0 20px hsl(var(--neon-teal) / 0.8),
-              0 0 30px hsl(var(--neon-teal) / 0.6),
-              0 0 40px hsl(var(--neon-teal) / 0.4),
-              0 0 50px hsl(var(--neon-teal) / 0.2),
+            box-shadow: 0 0 20px hsl(var(--neon-teal) / 0.8), 0 0 30px hsl(var(--neon-teal) / 0.6),
+              0 0 40px hsl(var(--neon-teal) / 0.4), 0 0 50px hsl(var(--neon-teal) / 0.2),
               inset 0 1px 0 hsl(var(--neon-teal) / 0.4);
             border-color: hsl(var(--neon-teal));
             transform: scale(1.02);
@@ -46,16 +45,12 @@ const Toaster = ({ ...props }: ToasterProps) => {
         @keyframes success-flash {
           0%,
           100% {
-            box-shadow: 0 0 10px hsl(var(--neon-lime) / 0.6),
-              0 0 20px hsl(var(--neon-lime) / 0.4),
-              0 0 30px hsl(var(--neon-lime) / 0.2),
-              inset 0 0 20px hsl(var(--neon-lime) / 0.1);
+            box-shadow: 0 0 10px hsl(var(--neon-lime) / 0.6), 0 0 20px hsl(var(--neon-lime) / 0.4),
+              0 0 30px hsl(var(--neon-lime) / 0.2), inset 0 0 20px hsl(var(--neon-lime) / 0.1);
           }
           50% {
-            box-shadow: 0 0 25px hsl(var(--neon-lime) / 1),
-              0 0 35px hsl(var(--neon-lime) / 0.8),
-              0 0 45px hsl(var(--neon-lime) / 0.6),
-              0 0 60px hsl(var(--neon-lime) / 0.4),
+            box-shadow: 0 0 25px hsl(var(--neon-lime) / 1), 0 0 35px hsl(var(--neon-lime) / 0.8),
+              0 0 45px hsl(var(--neon-lime) / 0.6), 0 0 60px hsl(var(--neon-lime) / 0.4),
               inset 0 0 30px hsl(var(--neon-lime) / 0.2);
             transform: scale(1.05);
           }
@@ -65,14 +60,12 @@ const Toaster = ({ ...props }: ToasterProps) => {
           0%,
           100% {
             box-shadow: 0 0 10px hsl(var(--neon-magenta) / 0.7),
-              0 0 20px hsl(var(--neon-magenta) / 0.5),
-              0 0 30px hsl(var(--neon-magenta) / 0.3);
+              0 0 20px hsl(var(--neon-magenta) / 0.5), 0 0 30px hsl(var(--neon-magenta) / 0.3);
           }
           25%,
           75% {
             box-shadow: 0 0 30px hsl(var(--neon-magenta) / 1),
-              0 0 40px hsl(var(--neon-magenta) / 0.8),
-              0 0 50px hsl(var(--neon-magenta) / 0.6),
+              0 0 40px hsl(var(--neon-magenta) / 0.8), 0 0 50px hsl(var(--neon-magenta) / 0.6),
               0 0 70px hsl(var(--neon-magenta) / 0.4);
             transform: scale(1.03) translateX(2px);
           }

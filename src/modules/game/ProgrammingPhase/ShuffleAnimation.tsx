@@ -23,6 +23,9 @@ interface ShuffleCard {
  * being shuffled from the discard pile back into the programming deck.
  * Features neon glows, particle effects, and smooth arc trajectories.
  */
+/**
+ * @author Truong Son NGO 2025-11-28 15:35:41 +0100 26
+ */
 export const ShuffleAnimation = ({
   isShuffling,
   discardPosition,
@@ -72,6 +75,9 @@ export const ShuffleAnimation = ({
   if (!isShuffling) return null;
 
   // Calculate the midpoint for the arc
+/**
+ * @author Truong Son NGO 2025-11-28 15:35:41 +0100 75
+ */
   const midX = (discardPosition.x + deckPosition.x) / 2;
   const midY = Math.min(discardPosition.y, deckPosition.y) - 100;
 
@@ -330,6 +336,9 @@ interface ShuffleAnimationOverlayProps {
 /**
  * ShuffleAnimationOverlay - A wrapper that finds the deck elements and
  * triggers the shuffle animation with proper positioning.
+ */
+/**
+ * @author Truong Son NGO 2025-11-28 15:35:41 +0100 334
  */
 export const ShuffleAnimationOverlay = ({
   isShuffling,

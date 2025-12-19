@@ -8,6 +8,9 @@ import { Button } from "@/components/ui/button";
 import { Trophy, Crown, Medal, ChevronLeft, ChevronRight, Home, RefreshCw } from "lucide-react";
 import { useGetLeaderboardQuery } from "@/redux/api/leaderboard/leaderboardApi";
 
+/**
+ * @author Sachin Baral 2025-11-15 19:44:46 +0100 11
+ */
 export default function LeaderboardPage() {
   const router = useRouter();
   const [currentPage, setCurrentPage] = useState(1);
@@ -18,6 +21,9 @@ export default function LeaderboardPage() {
     pageSize,
   });
 
+/**
+ * @author Sachin Baral 2025-11-15 19:44:46 +0100 21
+ */
   const getMedalIcon = (rank: number) => {
     if (rank === 1) return <Crown className="w-6 h-6 text-yellow-400" />;
     if (rank === 2) return <Medal className="w-6 h-6 text-gray-400" />;
@@ -25,6 +31,9 @@ export default function LeaderboardPage() {
     return null;
   };
 
+/**
+ * @author Sachin Baral 2025-11-15 19:44:46 +0100 28
+ */
   const getRankColor = (rank: number) => {
     if (rank === 1) return "text-yellow-400 font-black text-2xl";
     if (rank === 2) return "text-gray-300 font-bold text-xl";
@@ -32,6 +41,9 @@ export default function LeaderboardPage() {
     return "text-muted-foreground font-semibold";
   };
 
+/**
+ * @author Sachin Baral 2025-11-15 19:44:46 +0100 35
+ */
   const getRankBg = (rank: number) => {
     if (rank === 1)
       return "bg-gradient-to-r from-yellow-400/20 to-orange-400/20 border-2 border-yellow-400/50";
@@ -42,18 +54,27 @@ export default function LeaderboardPage() {
     return "bg-surface-light/30 border border-surface-light/50 hover:bg-surface-light/50";
   };
 
+/**
+ * @author Sachin Baral 2025-11-15 19:44:46 +0100 45
+ */
   const handlePrevious = () => {
     if (currentPage > 1) {
       setCurrentPage(currentPage - 1);
     }
   };
 
+/**
+ * @author Sachin Baral 2025-11-15 19:44:46 +0100 51
+ */
   const handleNext = () => {
     if (data && currentPage < data.totalPages) {
       setCurrentPage(currentPage + 1);
     }
   };
 
+/**
+ * @author Sachin Baral 2025-11-15 19:44:46 +0100 57
+ */
   const globalRank = (index: number) => (currentPage - 1) * pageSize + index + 1;
 
   return (

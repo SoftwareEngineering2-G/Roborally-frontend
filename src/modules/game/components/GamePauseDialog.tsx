@@ -23,6 +23,9 @@ interface GamePauseDialogProps {
   isLoading?: boolean;
 }
 
+/**
+ * @author Truong Son NGO 2025-11-12 15:33:18 +0100 26
+ */
 export const GamePauseDialog = ({
   open,
   onOpenChange,

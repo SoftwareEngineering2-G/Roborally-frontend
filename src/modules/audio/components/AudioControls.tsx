@@ -11,6 +11,9 @@ import { Slider } from "@/components/ui/slider";
 import { Label } from "@/components/ui/label";
 import { useAudio } from "../AudioContext";
 
+/**
+ * @author Sachin Baral 2025-11-28 13:34:08 +0100 14
+ */
 export const AudioControls = () => {
   const { bgmVolume, sfxVolume, isMuted, setVolume, toggleMute } = useAudio();
 

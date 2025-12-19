@@ -32,6 +32,9 @@ interface Props {
   gameId: string;
 }
 
+/**
+ * @author Sachin Baral 2025-09-20 20:56:36 +0200 35
+ */
 export const Lobby = ({ gameId }: Props) => {
   const router = useRouter();
   const dispatch = useDispatch<AppDispatch>();
@@ -75,9 +78,9 @@ export const Lobby = ({ gameId }: Props) => {
         console.warn("Failed to autoplay lobby music. User interaction may be required.");
       }
     };
-    
+
     startLobbyMusic();
-    
+
     return () => {
       stopBGM();
     };
@@ -183,6 +186,9 @@ export const Lobby = ({ gameId }: Props) => {
     }
   };
 
+  /**
+   * @author Sachin Baral 2025-09-23 16:36:21 +0200 186
+   */
   const copyGameId = () => {
     navigator.clipboard.writeText(lobbyData.gameId);
   };

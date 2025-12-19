@@ -23,6 +23,9 @@ interface Props {
 // Export the hook for parent components to check if there are paused games
 export { useGetPausedGamesQuery };
 
+/**
+ * @author Truong Son NGO 2025-11-12 15:33:18 +0100 26
+ */
 export default function PausedGames({ username }: Props) {
   const router = useRouter();
 
@@ -59,6 +62,9 @@ export default function PausedGames({ username }: Props) {
     }
   };
 
+/**
+ * @author Truong Son NGO 2025-11-12 15:33:18 +0100 62
+ */
   const handleRefresh = () => {
     refetch();
   };

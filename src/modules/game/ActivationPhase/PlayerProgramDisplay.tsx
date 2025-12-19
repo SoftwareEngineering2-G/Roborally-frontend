@@ -45,6 +45,9 @@ interface PlayerProgramDisplayProps {
   isBatchModeActive?: boolean; // Hide execute button during batch mode
 }
 
+/**
+ * @author Sachin Baral 2025-11-04 21:25:08 +0100 48
+ */
 export const PlayerProgramDisplay = ({
   player,
   isCurrentPlayer = false,

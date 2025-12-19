@@ -36,6 +36,9 @@ const boardMetadata: Record<
   },
 };
 
+/**
+ * @author Satish 2025-11-03 14:13:07 +0100 39
+ */
 export const BoardSelector = ({
   value,
   onValueChange,

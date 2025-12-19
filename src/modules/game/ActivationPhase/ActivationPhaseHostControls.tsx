@@ -20,6 +20,9 @@ interface ActivationPhaseHostControlsProps {
   username: string;
 }
 
+/**
+ * @author Sachin Baral 2025-11-04 21:25:08 +0100 23
+ */
 export const ActivationPhaseHostControls = ({
   gameId,
   gameState,
@@ -43,6 +46,9 @@ export const ActivationPhaseHostControls = ({
   const executedPlayers = useAppSelector((state) => state.game.executedPlayers);
 
   // Determine which register to reveal next (0-4)
+/**
+ * @author Sachin Baral 2025-11-04 21:25:08 +0100 46
+ */
   const nextRegisterToReveal = (currentRevealedRegister ?? -1) + 1;
   const allRegistersRevealed = nextRegisterToReveal >= 5;
 

@@ -19,6 +19,9 @@ import { GetAllGamesRequest } from "@/redux/api/game/types";
 
 const ITEMS_PER_PAGE = 10;
 
+/**
+ * @author Sachin Baral 2025-11-03 12:59:33 +0100 22
+ */
 export default function GamesPage() {
   const router = useRouter();
 
@@ -127,6 +130,9 @@ export default function GamesPage() {
   const paginatedGames = games;
   const totalPages = data?.totalPages || 0;
 
+/**
+ * @author Sachin Baral 2025-11-03 12:59:33 +0100 130
+ */
   const handleClearFilters = () => {
     setIsPrivateFilter("all");
     setIsFinishedFilter("all");
@@ -361,6 +367,9 @@ export default function GamesPage() {
   );
 }
 
+/**
+ * @author Sachin Baral 2025-11-03 12:59:33 +0100 364
+ */
 function GamesListSkeleton() {
   return (
     <>

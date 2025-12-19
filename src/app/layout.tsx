@@ -14,6 +14,9 @@ export const metadata: Metadata = {
   description: "Roborally game that can be played online",
 };
 
+/**
+ * @author Sachin Baral 2025-09-14 15:13:55 +0200 17
+ */
 export default function RootLayout({
   children,
 }: Readonly<{

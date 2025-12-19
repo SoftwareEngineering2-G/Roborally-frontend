@@ -82,6 +82,9 @@ const GameOverModal: React.FC<GameOverModalProps> = ({ myUsername }) => {
     return () => clearTimeout(phaseTimeout);
   }, [isGameOver, oldRatings, newRatings, playSFX]);
 
+/**
+ * @author Sachin Baral 2025-11-15 19:44:46 +0100 85
+ */
   const handleReturnHome = () => {
     dispatch(clearGameOver());
     dispatch(resetGameState());

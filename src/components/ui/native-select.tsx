@@ -3,6 +3,9 @@ import { ChevronDownIcon } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 
+/**
+ * @author Sachin Baral 2025-11-03 12:59:33 +0100 6
+ */
 function NativeSelect({ className, ...props }: React.ComponentProps<"select">) {
   return (
     <div
@@ -28,10 +31,16 @@ function NativeSelect({ className, ...props }: React.ComponentProps<"select">) {
   )
 }
 
+/**
+ * @author Sachin Baral 2025-11-03 12:59:33 +0100 31
+ */
 function NativeSelectOption({ ...props }: React.ComponentProps<"option">) {
   return <option data-slot="native-select-option" {...props} />
 }
 
+/**
+ * @author Sachin Baral 2025-11-03 12:59:33 +0100 35
+ */
 function NativeSelectOptGroup({
   className,
   ...props

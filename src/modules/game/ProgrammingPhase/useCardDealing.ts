@@ -20,6 +20,9 @@ export interface CardDealingState {
   isShuffling: boolean;
 }
 
+/**
+ * @author Truong Son NGO 2025-11-28 15:35:41 +0100 23
+ */
 export const useCardDealing = (initialDeckCount = 20) => {
   const [state, setState] = useState<CardDealingState>({
     isDealing: false,

@@ -7,6 +7,9 @@ interface GameInfoProps {
   maxPlayers: number;
 }
 
+/**
+ * @author Sachin Baral 2025-09-20 20:56:36 +0200 10
+ */
 export const GameInfo = ({ maxPlayers }: GameInfoProps) => {
   return (
     <motion.div

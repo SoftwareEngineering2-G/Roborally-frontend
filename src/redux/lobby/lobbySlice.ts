@@ -148,14 +148,32 @@ export const {
 export default lobbySlice.reducer;
 
 // Selectors
+/**
+ * @author Sachin Baral 2025-09-23 16:36:21 +0200 151
+ */
 export const selectLobbyState = (state: { lobby: LobbyState }) => state.lobby;
+/**
+ * @author Truong Son NGO 2025-11-12 15:33:18 +0100 152
+ */
 export const selectLobbyPlayers = (state: { lobby: LobbyState }) => state.lobby.players;
+/**
+ * @author Truong Son NGO 2025-11-12 15:33:18 +0100 153
+ */
 export const selectCurrentPlayer = (state: { lobby: LobbyState }, username: string) =>
   state.lobby.players.find((p) => p.username === username);
+/**
+ * @author Sachin Baral 2025-09-23 16:36:21 +0200 155
+ */
 export const selectIsHost = (state: { lobby: LobbyState }, username: string) =>
   state.lobby.hostUsername === username;
+/**
+ * @author Sachin Baral 2025-09-23 16:36:21 +0200 157
+ */
 export const selectAllPlayersReady = (state: { lobby: LobbyState }) =>
   state.lobby.players.every((p) => p.isReady);
+/**
+ * @author Truong Son NGO 2025-11-12 15:33:18 +0100 159
+ */
 export const selectCanStartGame = (state: { lobby: LobbyState }, username: string) => {
   const isHost = state.lobby.hostUsername === username;
   const allReady = state.lobby.players.every((p) => p.isReady);
@@ -184,10 +202,16 @@ export const selectMissingRequiredPlayers = createSelector(
   }
 );
 
+/**
+ * @author Truong Son NGO 2025-11-12 15:33:18 +0100 187
+ */
 export const selectIsPausedGame = (state: { lobby: LobbyState }) => {
   return state.lobby.requiredPlayers !== null && state.lobby.requiredPlayers.length > 0;
 };
 
+/**
+ * @author Truong Son NGO 2025-11-12 15:33:18 +0100 191
+ */
 export const selectGamePausedBoardName = (state: { lobby: LobbyState }) => {
   if (state.lobby.requiredPlayers === null || state.lobby.requiredPlayers.length === 0) return null;
   return state.lobby.gamePausedBoardName;

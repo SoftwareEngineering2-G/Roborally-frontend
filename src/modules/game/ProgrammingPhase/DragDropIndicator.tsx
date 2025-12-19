@@ -6,6 +6,9 @@ interface DragDropIndicatorProps {
   isDragging: boolean;
 }
 
+/**
+ * @author Sachin Baral 2025-09-30 22:13:00 +0200 9
+ */
 export const DragDropIndicator = ({ isDragging }: DragDropIndicatorProps) => {
   if (!isDragging) return null;
 

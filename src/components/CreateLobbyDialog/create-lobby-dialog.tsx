@@ -24,6 +24,9 @@ interface CreateRoomDialogProps {
   trigger?: React.ReactNode;
 }
 
+/**
+ * @author Sachin Baral 2025-09-20 20:56:36 +0200 27
+ */
 export const CreateLobbyDialog = ({
   username,
   trigger,
@@ -66,6 +69,9 @@ export const CreateLobbyDialog = ({
     }
   };
 
+/**
+ * @author Sachin Baral 2025-09-20 20:56:36 +0200 69
+ */
   const defaultTrigger = (
     <Button className="w-full bg-gradient-primary" disabled={creating}>
       <Plus className="w-4 h-4 mr-2" />

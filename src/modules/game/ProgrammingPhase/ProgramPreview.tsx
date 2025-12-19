@@ -9,14 +9,15 @@ interface ProgramPreviewProps {
   registers: RegisterSlot[];
 }
 
+/**
+ * @author Sachin Baral 2025-09-30 22:13:00 +0200 12
+ */
 export const ProgramPreview = ({ registers }: ProgramPreviewProps) => {
   return (
     <Card className="p-4 glass-panel sticky top-4">
       <div className="flex items-center gap-2 mb-4">
         <Eye className="w-4 h-4 text-neon-blue" />
-        <h3 className="text-lg font-semibold text-neon-blue">
-          Program Preview
-        </h3>
+        <h3 className="text-lg font-semibold text-neon-blue">Program Preview</h3>
       </div>
 
       <div className="space-y-2">
@@ -27,10 +28,7 @@ export const ProgramPreview = ({ registers }: ProgramPreviewProps) => {
             </span>
             {register.card ? (
               <span
-                className={cn(
-                  "px-2 py-1 rounded text-xs",
-                  getCardTypeClasses(register.card.type)
-                )}
+                className={cn("px-2 py-1 rounded text-xs", getCardTypeClasses(register.card.type))}
               >
                 {register.card.name}
               </span>

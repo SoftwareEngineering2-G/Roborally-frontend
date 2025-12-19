@@ -24,6 +24,9 @@ interface Props {
   gameId: string;
 }
 
+/**
+ * @author Sachin Baral 2025-10-01 21:43:01 +0200 27
+ */
 export default function Game({ gameId }: Props) {
   const router = useRouter();
   const [username, setUsername] = useState<string>("");
@@ -48,7 +51,7 @@ export default function Game({ gameId }: Props) {
         console.warn("Failed to autoplay game music. User interaction may be required.");
       }
     };
-    
+
     startGameMusic();
 
     // Cleanup: stop BGM when leaving the game
@@ -85,6 +88,9 @@ export default function Game({ gameId }: Props) {
   useEffect(() => {
     if (!signalR.isConnected) return;
 
+    /**
+     * @author Suhani Pandey 2025-10-10 13:02:29 +0200 88
+     */
     const handleActivationPhaseStarted = (...args: unknown[]) => {
       const data = args[0] as ActivationPhaseStartedEvent;
       if (data.gameId === gameId) {
@@ -156,6 +162,9 @@ export default function Game({ gameId }: Props) {
   ) : null;
 
   // Render appropriate phase based on game state
+  /**
+   * @author Sachin Baral 2025-10-01 21:43:01 +0200 159
+   */
   const renderPhase = () => {
     switch (gameState.currentPhase) {
       case "ProgrammingPhase":
@@ -192,8 +201,6 @@ export default function Game({ gameId }: Props) {
     <div className="relative min-h-screen">
       {/* Game Over Modal */}
       <GameOverModal myUsername={username} />
-
-
 
       {/* Pause Request Dialog */}
       {pauseRequest && (

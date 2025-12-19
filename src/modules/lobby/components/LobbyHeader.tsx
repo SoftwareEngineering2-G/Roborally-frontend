@@ -17,6 +17,9 @@ interface LobbyHeaderProps {
   onLeaveLobby?: () => Promise<void>;
 }
 
+/**
+ * @author Sachin Baral 2025-09-20 20:56:36 +0200 20
+ */
 export const LobbyHeader = ({
   lobbyName,
   gameId,
@@ -28,6 +31,9 @@ export const LobbyHeader = ({
 }: LobbyHeaderProps) => {
   const router = useRouter();
 
+/**
+ * @author Sachin Baral 2025-09-20 20:56:36 +0200 31
+ */
   const copyRoomKey = () => {
     navigator.clipboard.writeText(gameId);
     toast.success("Room key copied!", {

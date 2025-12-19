@@ -2,16 +2,16 @@ export interface ProgramCard {
   id: string;
   name: string;
   type:
-  | "Move 1"
-  | "Move 2"
-  | "Move 3"
-  | "Move Back"
-  | "Rotate Left"
-  | "Rotate Right"
-  | "U-Turn"
-  | "Again"
-  | "Swap Position"
-  | "Movement Choice";
+    | "Move 1"
+    | "Move 2"
+    | "Move 3"
+    | "Move Back"
+    | "Rotate Left"
+    | "Rotate Right"
+    | "U-Turn"
+    | "Again"
+    | "Swap Position"
+    | "Movement Choice";
   imagePath: string;
 }
 
@@ -77,8 +77,11 @@ export const INITIAL_REGISTERS: RegisterSlot[] = [
 ];
 
 // Helper function to create card from backend string
+/**
+ * @author Sachin Baral 2025-09-30 23:31:47 +0200 80
+ */
 export const createCardFromBackendString = (cardName: string, id: string): ProgramCard => {
-  const typeMap: Record<string, ProgramCard['type']> = {
+  const typeMap: Record<string, ProgramCard["type"]> = {
     "Move 1": "Move 1",
     "Move 2": "Move 2",
     "Move 3": "Move 3",
@@ -86,7 +89,7 @@ export const createCardFromBackendString = (cardName: string, id: string): Progr
     "Rotate Right": "Rotate Right",
     "U-Turn": "U-Turn",
     "Move Back": "Move Back",
-    "Again": "Again",
+    Again: "Again",
     "Swap Position": "Swap Position",
     "Movement Choice": "Movement Choice",
   };
@@ -99,7 +102,7 @@ export const createCardFromBackendString = (cardName: string, id: string): Progr
     "Rotate Right": "/cards/rotateright.png",
     "U-Turn": "/cards/uturn.png",
     "Move Back": "/cards/moveback.png",
-    "Again": "/cards/again.png",
+    Again: "/cards/again.png",
     "Swap Position": "/cards/swap-position.png",
     "Movement Choice": "/cards/movement-choice.png",
   };
@@ -108,6 +111,6 @@ export const createCardFromBackendString = (cardName: string, id: string): Progr
     id,
     name: cardName,
     type: typeMap[cardName] || "Move 1", // fallback
-    imagePath: imageMap[cardName] || "/cards/move1.png" // fallback
+    imagePath: imageMap[cardName] || "/cards/move1.png", // fallback
   };
 };

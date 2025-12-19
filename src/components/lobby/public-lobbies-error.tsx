@@ -14,6 +14,9 @@ interface PublicLobbiesErrorProps {
   description?: string;
 }
 
+/**
+ * @author Truong Son NGO 2025-09-21 21:26:17 +0200 17
+ */
 export default function PublicLobbiesError({
   onRetry,
   title = "Public Lobbies",

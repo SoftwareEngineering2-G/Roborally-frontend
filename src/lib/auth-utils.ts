@@ -1,6 +1,9 @@
 /* JWT Authentication Utility Functions */
 
 /* Check if user is authenticated with a valid JWT token */
+/**
+ * @author Gaurav Pandey 2025-11-25 15:10:36 +0100 4
+ */
 export function isAuthenticated(): boolean {
   if (typeof window === 'undefined') return false;
 
@@ -12,6 +15,9 @@ export function isAuthenticated(): boolean {
 }
 
 /* Check if JWT token is expired */
+/**
+ * @author Gaurav Pandey 2025-11-25 15:10:36 +0100 15
+ */
 export function isTokenExpired(token: string): boolean {
   try {
     // Decode JWT payload (middle part of token)
@@ -27,6 +33,9 @@ export function isTokenExpired(token: string): boolean {
 }
 
 /* Get the authenticated username from JWT token */
+/**
+ * @author Gaurav Pandey 2025-11-25 15:10:36 +0100 30
+ */
 export function getAuthenticatedUsername(): string | null {
   if (typeof window === 'undefined') return null;
 
@@ -44,12 +53,18 @@ export function getAuthenticatedUsername(): string | null {
 }
 
 /*Get JWT token from local*/
+/**
+ * @author Gaurav Pandey 2025-11-25 15:10:36 +0100 47
+ */
 export function getToken(): string | null {
   if (typeof window === 'undefined') return null;
   return localStorage.getItem("jwt_token");
 }
 
 /* Logout user by clearing auth data */
+/**
+ * @author Gaurav Pandey 2025-11-25 15:10:36 +0100 53
+ */
 export function logout(): void {
   if (typeof window === 'undefined') return;
 

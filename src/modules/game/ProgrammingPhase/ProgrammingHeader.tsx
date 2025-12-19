@@ -14,6 +14,9 @@ interface ProgrammingHeaderProps {
   currentRound?: number;
 }
 
+/**
+ * @author Sachin Baral 2025-09-30 22:13:00 +0200 17
+ */
 export const ProgrammingHeader = ({
   filledCount,
   hostControls,
@@ -93,4 +96,3 @@ export const ProgrammingHeader = ({
     </motion.div>
   );
 };
-
