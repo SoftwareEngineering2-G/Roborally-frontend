@@ -7,6 +7,9 @@ import { Button } from "@/components/ui/button";
 import { Trophy, Crown, Medal, ChevronRight, RefreshCw } from "lucide-react";
 import { useGetLeaderboardQuery } from "@/redux/api/leaderboard/leaderboardApi";
 
+/**
+ * @author Sachin Baral 2025-11-15 19:44:46 +0100 10
+ */
 export default function QuickLeaderboard() {
   const router = useRouter();
   const { data, isLoading, error, refetch } = useGetLeaderboardQuery({
@@ -14,6 +17,9 @@ export default function QuickLeaderboard() {
     pageSize: 10,
   });
 
+/**
+ * @author Sachin Baral 2025-11-15 19:44:46 +0100 17
+ */
   const getMedalIcon = (rank: number) => {
     if (rank === 1) return <Crown className="w-5 h-5 text-yellow-400" />;
     if (rank === 2) return <Medal className="w-5 h-5 text-gray-400" />;
@@ -21,6 +27,9 @@ export default function QuickLeaderboard() {
     return null;
   };
 
+/**
+ * @author Sachin Baral 2025-11-15 19:44:46 +0100 24
+ */
   const getRankColor = (rank: number) => {
     if (rank === 1) return "text-yellow-400 font-black";
     if (rank === 2) return "text-gray-300 font-bold";

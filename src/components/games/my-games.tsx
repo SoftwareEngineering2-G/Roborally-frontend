@@ -54,6 +54,9 @@ const mockGames = [
   },
 ];
 
+/**
+ * @author Sachin Baral 2025-11-15 19:44:46 +0100 57
+ */
 export default function MyGames({ username, className, useMockData = false }: Props) {
   const router = useRouter();
 
@@ -118,6 +121,9 @@ export default function MyGames({ username, className, useMockData = false }: Pr
   );
 }
 
+/**
+ * @author Sachin Baral 2025-11-03 12:59:33 +0100 121
+ */
 function MyGamesSkeleton() {
   return (
     <Card className="glass-panel">
@@ -149,6 +155,9 @@ function MyGamesSkeleton() {
   );
 }
 
+/**
+ * @author Sachin Baral 2025-11-03 12:59:33 +0100 152
+ */
 function MyGamesError() {
   return (
     <Card className="glass-panel">

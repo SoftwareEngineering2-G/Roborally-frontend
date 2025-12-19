@@ -42,6 +42,9 @@ interface ProgrammingPhaseProps {
   pauseButton?: React.ReactNode;
 }
 
+/**
+ * @author Nilanjana Devkota 2025-10-19 11:13:21 +0200 45
+ */
 export const ProgrammingPhase = ({
   gameId,
   username,
@@ -133,11 +136,6 @@ export const ProgrammingPhase = ({
 
         // Clear the hand (cards were discarded when locked in)
         handlers.handleClearHand();
-
-        console.log("✅ Synced locked-in state from Redux:", {
-          username,
-          lockedInCards: personalState.lockedInCards,
-        });
       }
     }
     // Restore dealt cards (if player hasn't locked in yet but has dealt cards)
@@ -150,11 +148,6 @@ export const ProgrammingPhase = ({
         );
 
         handlers.handleSetHand(restoredHand);
-
-        console.log("✅ Synced dealt cards from Redux:", {
-          username,
-          dealtCards: personalState.dealtCards,
-        });
       }
     }
   }, [currentGame, state.registers, state.hand.length, username, handlers]);
@@ -202,9 +195,11 @@ export const ProgrammingPhase = ({
     if (!signalR.isConnected) return;
 
     // Listen for cards dealt event
+    /**
+     * @author Sachin Baral 2025-10-01 21:43:01 +0200 195
+     */
     const handlePlayerCardsDealt = (...args: unknown[]) => {
       const data = args[0] as PlayerCardsDealtEvent;
-      console.log("PlayerCardsDealtEvent received:", data);
 
       // Dispatch custom event for host controls to sync state
       window.dispatchEvent(new CustomEvent("programmingPhaseCardsDealt"));
@@ -254,6 +249,9 @@ export const ProgrammingPhase = ({
   useEffect(() => {
     if (!signalR.isConnected) return;
 
+    /**
+     * @author Sachin Baral 2025-10-01 21:43:01 +0200 246
+     */
     const handlePlayerLockedInRegister = (...args: unknown[]) => {
       const data = args[0] as PlayerLockedInRegisterEvent;
 
@@ -262,7 +260,7 @@ export const ProgrammingPhase = ({
         const expiresAt = new Date(data.timeoutExpiresAt);
         const now = new Date();
         const remainingMs = expiresAt.getTime() - now.getTime();
-        const remainingSeconds = Math.max(0, Math.floor(remainingMs / 1000)) -1;
+        const remainingSeconds = Math.max(0, Math.floor(remainingMs / 1000)) - 1;
 
         if (remainingSeconds > 0) {
           setTimerSeconds(remainingSeconds);
@@ -325,10 +323,11 @@ export const ProgrammingPhase = ({
   useEffect(() => {
     if (!signalR.isConnected) return;
 
+    /**
+     * @author Vincenzo Altaserse 2025-12-18 17:39:57 +0100 317
+     */
     const handleProgrammingTimeout = (...args: unknown[]) => {
       const data = args[0] as ProgrammingTimeoutEvent;
-
-      console.log("ProgrammingTimeout event received:", data);
 
       if (data.gameId === gameId) {
         toast.info("⏰ Programming phase timed out!");

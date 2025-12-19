@@ -38,6 +38,9 @@ interface ActivationPhaseProps {
   pauseButton?: React.ReactNode;
 }
 
+/**
+ * @author Sachin Baral 2025-11-04 21:25:08 +0100 41
+ */
 export const ActivationPhase = ({
   gameId,
   username,
@@ -90,6 +93,9 @@ export const ActivationPhase = ({
   useEffect(() => {
     if (!signalR.isConnected || !currentGame) return;
 
+/**
+ * @author Suhani Pandey 2025-10-10 13:02:29 +0200 93
+ */
     const handleRegisterRevealed = (...args: unknown[]) => {
       const data = args[0] as RegisterRevealedEvent;
 
@@ -132,6 +138,9 @@ export const ActivationPhase = ({
   useEffect(() => {
     if (!signalR.isConnected || !currentGame) return;
 
+/**
+ * @author Suhani Pandey 2025-10-15 21:46:36 +0200 135
+ */
     const handleRobotMoved = (...args: unknown[]) => {
       const data = args[0] as RobotMovedEvent;
 
@@ -170,6 +179,9 @@ export const ActivationPhase = ({
 
   useEffect(() => {
     if (!signalR.isConnected || !currentGame) return;
+/**
+ * @author Suhani Pandey 2025-11-13 16:21:34 +0100 173
+ */
     const handleCheckpointReached = (...args: unknown[]) => {
       const payload = args[0] as CheckpointReachedEvent;
 
@@ -207,6 +219,9 @@ export const ActivationPhase = ({
   useEffect(() => {
     if (!signalR.isConnected || !currentGame) return;
 
+/**
+ * @author Sachin Baral 2025-11-04 21:25:08 +0100 210
+ */
     const handleNextPlayerInTurn = (...args: unknown[]) => {
       const data = args[0] as NextPlayerInTurnEvent;
 
@@ -215,9 +230,6 @@ export const ActivationPhase = ({
 
       // Update the current turn username
       dispatch(setCurrentTurn(data.nextPlayerUsername));
-
-      console.log("----------------------")
-      console.log(data.nextPlayerUsername);
     };
 
     signalR.on("NextPlayerInTurn", handleNextPlayerInTurn);
@@ -231,6 +243,9 @@ export const ActivationPhase = ({
   useEffect(() => {
     if (!signalR.isConnected || !currentGame) return;
 
+/**
+ * @author Suhani Pandey 2025-12-03 21:34:17 +0100 231
+ */
     const handleRoundCompleted = (...args: unknown[]) => {
       const data = args[0] as RoundCompletedEvent;
       if (data.gameId !== gameId) return;

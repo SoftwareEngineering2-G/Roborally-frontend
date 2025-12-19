@@ -21,8 +21,7 @@ const boardMetadata: Record<
   }
 > = {
   "Starter Course": {
-    description:
-      "Classic circuit design with dual conveyor loops - perfect for beginners",
+    description: "Classic circuit design with dual conveyor loops - perfect for beginners",
     difficulty: "Easy",
     color: "from-blue-500/20 to-cyan-500/20",
     icon: "🎯",
@@ -36,11 +35,10 @@ const boardMetadata: Record<
   },
 };
 
-export const BoardSelector = ({
-  value,
-  onValueChange,
-  disabled = false,
-}: BoardSelectorProps) => {
+/**
+ * @author Satish Gurung 2025-11-03 14:13:07 +0100 39
+ */
+export const BoardSelector = ({ value, onValueChange, disabled = false }: BoardSelectorProps) => {
   const { data: boards, isLoading, error } = useGetAvailableBoardsQuery();
 
   if (isLoading) {
@@ -52,9 +50,7 @@ export const BoardSelector = ({
         </div>
         <div className="flex items-center justify-center gap-2 p-8 border rounded-lg bg-muted/50">
           <Loader2 className="h-5 w-5 animate-spin text-primary" />
-          <span className="text-sm text-muted-foreground">
-            Loading available boards...
-          </span>
+          <span className="text-sm text-muted-foreground">Loading available boards...</span>
         </div>
       </div>
     );
@@ -69,9 +65,7 @@ export const BoardSelector = ({
         </div>
         <div className="flex items-center gap-2 p-4 border rounded-lg bg-destructive/10">
           <Map className="h-5 w-5 text-destructive" />
-          <span className="text-sm text-destructive">
-            Failed to load game boards
-          </span>
+          <span className="text-sm text-destructive">Failed to load game boards</span>
         </div>
       </div>
     );
@@ -116,10 +110,7 @@ export const BoardSelector = ({
             >
               {/* Background gradient */}
               <div
-                className={cn(
-                  "absolute inset-0 bg-gradient-to-br opacity-50",
-                  metadata.color
-                )}
+                className={cn("absolute inset-0 bg-gradient-to-br opacity-50", metadata.color)}
               />
 
               {/* Content */}
@@ -160,9 +151,7 @@ export const BoardSelector = ({
                   )}
                 </div>
 
-                <p className="text-sm text-muted-foreground">
-                  {metadata.description}
-                </p>
+                <p className="text-sm text-muted-foreground">{metadata.description}</p>
               </div>
 
               {/* Selected indicator */}

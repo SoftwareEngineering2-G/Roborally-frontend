@@ -4,13 +4,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { Zap, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import z from "zod";
@@ -29,20 +23,15 @@ import { useSigninMutation } from "@/redux/api/auth/authApi";
 import { showErrorToast, showSuccessToast } from "@/lib/toast-handler";
 
 const formSchema = z.object({
-  username: z
-    .string()
-    .min(2, "Username must be at least 2 characters")
-    .max(100)
-    .trim(),
-  password: z
-    .string()
-    .min(4, "Password must be at least 4 characters")
-    .max(100)
-    .trim(),
+  username: z.string().min(2, "Username must be at least 2 characters").max(100).trim(),
+  password: z.string().min(4, "Password must be at least 4 characters").max(100).trim(),
 });
 
 type FormData = z.infer<typeof formSchema>;
 
+/**
+ * @author Sachin Baral 2025-09-15 08:43:34 +0200 46
+ */
 export const SignIn = () => {
   const [signin, { isLoading, error, isSuccess, data }] = useSigninMutation();
   const router = useRouter();
@@ -111,27 +100,20 @@ export const SignIn = () => {
               >
                 <Zap className="w-8 h-8 text-accent-foreground" />
               </motion.div>
-              <CardTitle className="text-3xl font-bold text-neon-magenta">
-                RoboRally
-              </CardTitle>
+              <CardTitle className="text-3xl font-bold text-neon-magenta">RoboRally</CardTitle>
               <CardDescription className="text-lg text-chrome-light">
                 Power up your robot and enter the arena
               </CardDescription>
             </CardHeader>
             <CardContent>
               <Form {...form}>
-                <form
-                  onSubmit={form.handleSubmit(onSubmit)}
-                  className="space-y-6"
-                >
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                   <FormField
                     control={form.control}
                     name="username"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-chrome-light font-medium">
-                          Username
-                        </FormLabel>
+                        <FormLabel className="text-chrome-light font-medium">Username</FormLabel>
                         <FormControl>
                           <Input
                             type="text"
@@ -150,9 +132,7 @@ export const SignIn = () => {
                     name="password"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-chrome-light font-medium">
-                          Password
-                        </FormLabel>
+                        <FormLabel className="text-chrome-light font-medium">Password</FormLabel>
                         <FormControl>
                           <Input
                             type="password"
@@ -166,10 +146,7 @@ export const SignIn = () => {
                     )}
                   />
 
-                  <motion.div
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                  >
+                  <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                     <Button
                       type="submit"
                       disabled={isLoading}

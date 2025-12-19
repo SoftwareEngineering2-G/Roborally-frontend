@@ -21,6 +21,9 @@ interface GamePauseResultDialogProps {
   onContinue: () => void;
 }
 
+/**
+ * @author Truong Son NGO 2025-11-12 15:33:18 +0100 24
+ */
 export const GamePauseResultDialog = ({
   open,
   onOpenChange,

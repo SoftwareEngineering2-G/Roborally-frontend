@@ -3,6 +3,9 @@
 import { useEffect, useRef, useState } from "react";
 import { HubConnection, HubConnectionBuilder, LogLevel } from "@microsoft/signalr";
 
+/**
+ * @author Sachin Baral 2025-09-30 17:34:55 +0200 6
+ */
 export const useSignalR = (url: string) => {
   const connectionRef = useRef<HubConnection | null>(null);
   const [isConnected, setIsConnected] = useState(false);
@@ -14,14 +17,11 @@ export const useSignalR = (url: string) => {
     if (connectionRef.current) {
       return;
     }
-    
-    
+
     // Create connection
     const backendBaseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5100";
     const fullHubUrl = `${backendBaseUrl}${url}`;
-    
-    console.log(`Full SignalR URL: ${fullHubUrl}`);
-    
+
     const connection = new HubConnectionBuilder()
       .withUrl(fullHubUrl)
       .withAutomaticReconnect()
@@ -32,7 +32,6 @@ export const useSignalR = (url: string) => {
 
     // Simple event handlers
     connection.onclose((error) => {
-      console.log("SignalR connection closed:", error);
       setIsConnected(false);
       setIsConnecting(false);
       if (error) {
@@ -41,13 +40,11 @@ export const useSignalR = (url: string) => {
     });
 
     connection.onreconnecting((error) => {
-      console.log("SignalR reconnecting...", error);
       setIsConnecting(true);
       setIsConnected(false);
     });
 
     connection.onreconnected((connectionId) => {
-      console.log("SignalR reconnected:", connectionId);
       setIsConnected(true);
       setIsConnecting(false);
       setError(null);
@@ -56,13 +53,11 @@ export const useSignalR = (url: string) => {
     // Start connection
     const startConnection = async () => {
       try {
-        console.log("Starting SignalR connection...");
         setIsConnecting(true);
         setError(null);
-        
+
         await connection.start();
-        
-        console.log("SignalR connected successfully!");
+
         setIsConnected(true);
         setIsConnecting(false);
       } catch (err) {
@@ -76,24 +71,28 @@ export const useSignalR = (url: string) => {
 
     // Cleanup
     return () => {
-      console.log("Cleaning up SignalR connection...");
-      
       if (connection && connection.state !== "Disconnected") {
         connection.stop().catch((err) => {
           console.error("Error stopping SignalR:", err);
         });
       }
-      
+
       connectionRef.current = null;
     };
   }, [url]);
 
   // Event listener
+  /**
+   * @author Sachin Baral 2025-10-01 21:43:01 +0200 84
+   */
   const on = (eventName: string, handler: (...args: unknown[]) => void) => {
     connectionRef.current?.on(eventName, handler);
   };
 
-  // Remove event listener  
+  // Remove event listener
+  /**
+   * @author Sachin Baral 2025-09-30 23:31:47 +0200 89
+   */
   const off = (eventName: string) => {
     connectionRef.current?.off(eventName);
   };
@@ -108,7 +107,7 @@ export const useSignalR = (url: string) => {
 
   return {
     isConnected,
-    isConnecting, 
+    isConnecting,
     error,
     on,
     off,

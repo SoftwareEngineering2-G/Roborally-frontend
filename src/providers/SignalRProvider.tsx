@@ -19,6 +19,9 @@ interface SignalRContextType {
 
 const SignalRContext = createContext<SignalRContextType | null>(null);
 
+/**
+ * @author Sachin Baral 2025-09-30 23:31:47 +0200 22
+ */
 export const useSignalRContext = () => {
   const context = useContext(SignalRContext);
   if (!context) {
@@ -27,6 +30,9 @@ export const useSignalRContext = () => {
   return context;
 };
 
+/**
+ * @author Sachin Baral 2025-09-30 23:31:47 +0200 30
+ */
 export const SignalRProvider = ({ children }: { children: React.ReactNode }) => {
   // Initialize both connections at top level
   const lobbySignalR = useSignalR("/game-lobbies");

@@ -13,6 +13,9 @@ import PausedGames, { useGetPausedGamesQuery } from "@/components/home/paused-ga
 import MyProfile from "@/components/home/my-profile";
 import { LogOut, Trophy, User } from "lucide-react";
 
+/**
+ * @author Satish Gurung 2025-09-18 11:52:50 +0200 16
+ */
 export default function Home() {
   const router = useRouter();
 

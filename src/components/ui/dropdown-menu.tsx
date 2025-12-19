@@ -1,36 +1,39 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu"
-import { CheckIcon, ChevronRightIcon, CircleIcon } from "lucide-react"
+import * as React from "react";
+import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
+import { CheckIcon, ChevronRightIcon, CircleIcon } from "lucide-react";
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
 
-function DropdownMenu({
-  ...props
-}: React.ComponentProps<typeof DropdownMenuPrimitive.Root>) {
-  return <DropdownMenuPrimitive.Root data-slot="dropdown-menu" {...props} />
+/**
+ * @author Sachin Baral 2025-09-15 08:43:34 +0200 9
+ */
+function DropdownMenu({ ...props }: React.ComponentProps<typeof DropdownMenuPrimitive.Root>) {
+  return <DropdownMenuPrimitive.Root data-slot="dropdown-menu" {...props} />;
 }
 
+/**
+ * @author Sachin Baral 2025-09-15 08:43:34 +0200 15
+ */
 function DropdownMenuPortal({
   ...props
 }: React.ComponentProps<typeof DropdownMenuPrimitive.Portal>) {
-  return (
-    <DropdownMenuPrimitive.Portal data-slot="dropdown-menu-portal" {...props} />
-  )
+  return <DropdownMenuPrimitive.Portal data-slot="dropdown-menu-portal" {...props} />;
 }
 
+/**
+ * @author Sachin Baral 2025-09-15 08:43:34 +0200 23
+ */
 function DropdownMenuTrigger({
   ...props
 }: React.ComponentProps<typeof DropdownMenuPrimitive.Trigger>) {
-  return (
-    <DropdownMenuPrimitive.Trigger
-      data-slot="dropdown-menu-trigger"
-      {...props}
-    />
-  )
+  return <DropdownMenuPrimitive.Trigger data-slot="dropdown-menu-trigger" {...props} />;
 }
 
+/**
+ * @author Sachin Baral 2025-09-15 08:43:34 +0200 34
+ */
 function DropdownMenuContent({
   className,
   sideOffset = 4,
@@ -48,25 +51,27 @@ function DropdownMenuContent({
         {...props}
       />
     </DropdownMenuPrimitive.Portal>
-  )
+  );
 }
 
-function DropdownMenuGroup({
-  ...props
-}: React.ComponentProps<typeof DropdownMenuPrimitive.Group>) {
-  return (
-    <DropdownMenuPrimitive.Group data-slot="dropdown-menu-group" {...props} />
-  )
+/**
+ * @author Sachin Baral 2025-09-15 08:43:34 +0200 54
+ */
+function DropdownMenuGroup({ ...props }: React.ComponentProps<typeof DropdownMenuPrimitive.Group>) {
+  return <DropdownMenuPrimitive.Group data-slot="dropdown-menu-group" {...props} />;
 }
 
+/**
+ * @author Sachin Baral 2025-09-15 08:43:34 +0200 62
+ */
 function DropdownMenuItem({
   className,
   inset,
   variant = "default",
   ...props
 }: React.ComponentProps<typeof DropdownMenuPrimitive.Item> & {
-  inset?: boolean
-  variant?: "default" | "destructive"
+  inset?: boolean;
+  variant?: "default" | "destructive";
 }) {
   return (
     <DropdownMenuPrimitive.Item
@@ -79,9 +84,12 @@ function DropdownMenuItem({
       )}
       {...props}
     />
-  )
+  );
 }
 
+/**
+ * @author Sachin Baral 2025-09-15 08:43:34 +0200 85
+ */
 function DropdownMenuCheckboxItem({
   className,
   children,
@@ -105,20 +113,21 @@ function DropdownMenuCheckboxItem({
       </span>
       {children}
     </DropdownMenuPrimitive.CheckboxItem>
-  )
+  );
 }
 
+/**
+ * @author Sachin Baral 2025-09-15 08:43:34 +0200 111
+ */
 function DropdownMenuRadioGroup({
   ...props
 }: React.ComponentProps<typeof DropdownMenuPrimitive.RadioGroup>) {
-  return (
-    <DropdownMenuPrimitive.RadioGroup
-      data-slot="dropdown-menu-radio-group"
-      {...props}
-    />
-  )
+  return <DropdownMenuPrimitive.RadioGroup data-slot="dropdown-menu-radio-group" {...props} />;
 }
 
+/**
+ * @author Sachin Baral 2025-09-15 08:43:34 +0200 122
+ */
 function DropdownMenuRadioItem({
   className,
   children,
@@ -140,29 +149,32 @@ function DropdownMenuRadioItem({
       </span>
       {children}
     </DropdownMenuPrimitive.RadioItem>
-  )
+  );
 }
 
+/**
+ * @author Sachin Baral 2025-09-15 08:43:34 +0200 146
+ */
 function DropdownMenuLabel({
   className,
   inset,
   ...props
 }: React.ComponentProps<typeof DropdownMenuPrimitive.Label> & {
-  inset?: boolean
+  inset?: boolean;
 }) {
   return (
     <DropdownMenuPrimitive.Label
       data-slot="dropdown-menu-label"
       data-inset={inset}
-      className={cn(
-        "px-2 py-1.5 text-sm font-medium data-[inset]:pl-8",
-        className
-      )}
+      className={cn("px-2 py-1.5 text-sm font-medium data-[inset]:pl-8", className)}
       {...props}
     />
-  )
+  );
 }
 
+/**
+ * @author Sachin Baral 2025-09-15 08:43:34 +0200 166
+ */
 function DropdownMenuSeparator({
   className,
   ...props
@@ -173,38 +185,39 @@ function DropdownMenuSeparator({
       className={cn("bg-border -mx-1 my-1 h-px", className)}
       {...props}
     />
-  )
+  );
 }
 
-function DropdownMenuShortcut({
-  className,
-  ...props
-}: React.ComponentProps<"span">) {
+/**
+ * @author Sachin Baral 2025-09-15 08:43:34 +0200 179
+ */
+function DropdownMenuShortcut({ className, ...props }: React.ComponentProps<"span">) {
   return (
     <span
       data-slot="dropdown-menu-shortcut"
-      className={cn(
-        "text-muted-foreground ml-auto text-xs tracking-widest",
-        className
-      )}
+      className={cn("text-muted-foreground ml-auto text-xs tracking-widest", className)}
       {...props}
     />
-  )
+  );
 }
 
-function DropdownMenuSub({
-  ...props
-}: React.ComponentProps<typeof DropdownMenuPrimitive.Sub>) {
-  return <DropdownMenuPrimitive.Sub data-slot="dropdown-menu-sub" {...props} />
+/**
+ * @author Sachin Baral 2025-09-15 08:43:34 +0200 195
+ */
+function DropdownMenuSub({ ...props }: React.ComponentProps<typeof DropdownMenuPrimitive.Sub>) {
+  return <DropdownMenuPrimitive.Sub data-slot="dropdown-menu-sub" {...props} />;
 }
 
+/**
+ * @author Sachin Baral 2025-09-15 08:43:34 +0200 201
+ */
 function DropdownMenuSubTrigger({
   className,
   inset,
   children,
   ...props
 }: React.ComponentProps<typeof DropdownMenuPrimitive.SubTrigger> & {
-  inset?: boolean
+  inset?: boolean;
 }) {
   return (
     <DropdownMenuPrimitive.SubTrigger
@@ -219,9 +232,12 @@ function DropdownMenuSubTrigger({
       {children}
       <ChevronRightIcon className="ml-auto size-4" />
     </DropdownMenuPrimitive.SubTrigger>
-  )
+  );
 }
 
+/**
+ * @author Sachin Baral 2025-09-15 08:43:34 +0200 225
+ */
 function DropdownMenuSubContent({
   className,
   ...props
@@ -235,7 +251,7 @@ function DropdownMenuSubContent({
       )}
       {...props}
     />
-  )
+  );
 }
 
 export {
@@ -254,4 +270,4 @@ export {
   DropdownMenuSub,
   DropdownMenuSubTrigger,
   DropdownMenuSubContent,
-}
+};

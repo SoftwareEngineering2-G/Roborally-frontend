@@ -17,6 +17,9 @@ export interface CardDiscardingState {
   discardingCards: DiscardingCard[];
 }
 
+/**
+ * @author Sachin Baral 2025-11-04 21:25:08 +0100 20
+ */
 export const useCardDiscarding = () => {
   const [state, setState] = useState<CardDiscardingState>({
     isDiscarding: false,

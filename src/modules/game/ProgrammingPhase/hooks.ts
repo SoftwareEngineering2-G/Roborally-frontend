@@ -5,6 +5,9 @@ import { playerLockedIn } from "@/redux/game/gameSlice";
 import { useRegistersProgrammedMutation } from "@/redux/api/game/playerApi";
 import type { ProgramCard, RegisterSlot, ProgrammingPhaseState } from "./types";
 
+/**
+ * @author Sachin Baral 2025-09-30 22:13:00 +0200 8
+ */
 export const useProgrammingPhase = (
   initialHand: ProgramCard[],
   initialRegisters: RegisterSlot[],
@@ -23,8 +26,7 @@ export const useProgrammingPhase = (
   });
 
   // API mutation for submitting locked-in program
-  const [registersProgrammed, { isLoading: isSubmitting }] =
-    useRegistersProgrammedMutation();
+  const [registersProgrammed, { isLoading: isSubmitting }] = useRegistersProgrammedMutation();
 
   // Card selection (mobile-friendly)
   const handleCardSelect = useCallback((card: ProgramCard) => {
@@ -69,8 +71,7 @@ export const useProgrammingPhase = (
         // Otherwise, just select/deselect the register
         return {
           ...prev,
-          selectedRegister:
-            prev.selectedRegister === registerId ? null : registerId,
+          selectedRegister: prev.selectedRegister === registerId ? null : registerId,
           selectedCard: null,
         };
       });
@@ -186,15 +187,7 @@ export const useProgrammingPhase = (
       toast.error("Failed to lock in program. Please try again.");
       return { success: false, cardsToDiscard: [] };
     }
-  }, [
-    state.registers,
-    state.hand,
-    gameId,
-    username,
-    registersProgrammed,
-    isSubmitting,
-    dispatch,
-  ]);
+  }, [state.registers, state.hand, gameId, username, registersProgrammed, isSubmitting, dispatch]);
 
   // Set hand (for dealing cards)
   const handleSetHand = useCallback((newHand: ProgramCard[]) => {
@@ -215,7 +208,7 @@ export const useProgrammingPhase = (
   }, []);
 
   // Set registers (for restoring from backend)
-  const handleSetRegisters = useCallback((registers: RegisterSlot[], append : boolean = true) => {
+  const handleSetRegisters = useCallback((registers: RegisterSlot[], append: boolean = true) => {
     setState((prev) => ({
       ...prev,
       registers: append ? [...prev.registers, ...registers] : registers,

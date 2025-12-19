@@ -41,6 +41,9 @@ const MOVEMENT_CHOICES = [
   "U-Turn",
 ] as const;
 
+/**
+ * @author Satish Gurung 2025-11-24 10:19:43 +0100 44
+ */
 export const ExecuteCardButton = ({ gameId, username, cardName }: ExecuteCardButtonProps) => {
   const [executeCard, { isLoading }] = useExecuteProgrammingCardMutation();
   const { executedPlayers, currentGame } = useAppSelector((state) => state.game);
@@ -61,6 +64,9 @@ export const ExecuteCardButton = ({ gameId, username, cardName }: ExecuteCardBut
 
   const noSwapTargets = isSwapCard && swapTargets.length === 0;
 
+  /**
+   * @author Satish Gurung 2025-11-24 10:19:43 +0100 64
+   */
   const resetDialogState = () => {
     setDialogOpen(false);
     setSelectedTarget(undefined);
@@ -84,6 +90,9 @@ export const ExecuteCardButton = ({ gameId, username, cardName }: ExecuteCardBut
     }
   };
 
+  /**
+   * @author Satish Gurung 2025-11-24 10:19:43 +0100 87
+   */
   const handleExecute = () => {
     if (isInteractiveCard) {
       setDialogOpen(true);
@@ -92,6 +101,9 @@ export const ExecuteCardButton = ({ gameId, username, cardName }: ExecuteCardBut
     void submitExecution();
   };
 
+  /**
+   * @author Satish Gurung 2025-11-24 10:19:43 +0100 95
+   */
   const handleDialogConfirm = () => {
     if (isSwapCard) {
       if (!selectedTarget) {

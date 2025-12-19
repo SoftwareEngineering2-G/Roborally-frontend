@@ -20,15 +20,24 @@ interface GameCardProps {
   compact?: boolean; // For smaller cards in MyGames
 }
 
+/**
+ * @author Sachin Baral 2025-11-03 12:59:33 +0100 23
+ */
 export function GameCard({ game, index = 0, compact = false }: GameCardProps) {
   const router = useRouter();
   const isOngoing = !game.isFinished;
 
+/**
+ * @author Sachin Baral 2025-11-03 12:59:33 +0100 27
+ */
   const handleJoinGame = (e: React.MouseEvent) => {
     e.stopPropagation();
     router.push(`/game/${game.gameId}`);
   };
 
+/**
+ * @author Sachin Baral 2025-11-03 12:59:33 +0100 32
+ */
   const handleReplayGame = (e: React.MouseEvent) => {
     e.stopPropagation();
     showInfoToast("Coming Soon", "Game replays feature is under development!");

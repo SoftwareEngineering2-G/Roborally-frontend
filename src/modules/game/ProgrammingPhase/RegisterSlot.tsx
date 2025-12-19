@@ -14,6 +14,9 @@ interface RegisterSlotProps {
   isLocked?: boolean;
 }
 
+/**
+ * @author Sachin Baral 2025-09-30 22:13:00 +0200 17
+ */
 export const RegisterSlotComponent = ({
   register,
   onCardDrop,
@@ -23,10 +26,16 @@ export const RegisterSlotComponent = ({
   isDragTarget = false,
   isLocked = false,
 }: RegisterSlotProps) => {
+  /**
+   * @author Sachin Baral 2025-09-30 22:13:00 +0200 26
+   */
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
   };
 
+  /**
+   * @author Sachin Baral 2025-09-30 22:13:00 +0200 30
+   */
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     const cardData = e.dataTransfer.getData("application/json");
@@ -36,6 +45,9 @@ export const RegisterSlotComponent = ({
     }
   };
 
+  /**
+   * @author Sachin Baral 2025-09-30 22:13:00 +0200 39
+   */
   const handleClick = () => {
     if (register.card) {
       onCardRemove();
@@ -53,7 +65,7 @@ export const RegisterSlotComponent = ({
           : "border-glass-border hover:border-neon-teal/50",
         register.card && getCardTypeClasses(register.card.type),
         isDragTarget &&
-        "border-neon-cyan border-dashed animate-pulse shadow-glow-cyan bg-neon-cyan/20 scale-105"
+          "border-neon-cyan border-dashed animate-pulse shadow-glow-cyan bg-neon-cyan/20 scale-105"
       )}
       onClick={handleClick}
       onDragOver={handleDragOver}
@@ -108,9 +120,7 @@ export const RegisterSlotComponent = ({
           <div className="absolute inset-0 bg-gradient-to-br from-neon-cyan/30 to-neon-magenta/20 rounded-lg" />
           <div className="absolute inset-0 border-2 border-dashed border-neon-cyan/80 rounded-lg animate-bounce" />
           <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-            <div className="text-neon-cyan text-xs font-bold animate-pulse">
-              ⚡ DROP HERE ⚡
-            </div>
+            <div className="text-neon-cyan text-xs font-bold animate-pulse">⚡ DROP HERE ⚡</div>
           </div>
         </>
       )}
@@ -120,11 +130,7 @@ export const RegisterSlotComponent = ({
         <div className="absolute inset-0 bg-gradient-to-br from-green-500/20 to-emerald-500/20 rounded-lg border-2 border-green-500/40 pointer-events-none">
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="bg-green-500/30 backdrop-blur-sm rounded-full p-1.5 border border-green-400/50">
-              <svg
-                className="w-4 h-4 text-green-300"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
+              <svg className="w-4 h-4 text-green-300" fill="currentColor" viewBox="0 0 20 20">
                 <path
                   fillRule="evenodd"
                   d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"

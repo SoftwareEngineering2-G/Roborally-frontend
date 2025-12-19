@@ -12,6 +12,9 @@ import { useSpaceImage } from "./spaceImageFactory";
 import { useEffect, useState } from "react";
 
 // Separate component to use the hook
+/**
+ * @author Andrej Jurco 2025-11-14 09:46:20 +0100 15
+ */
 const SpaceImage = ({
   celltype,
   direction,
@@ -47,6 +50,9 @@ const directionRotationMap: Record<Direction, number> = {
   West: 270,
 };
 
+/**
+ * @author Sachin Baral 2025-11-15 19:44:46 +0100 50
+ */
 export const GameBoard = ({ className = "", gameBoardData, players = [] }: GameBoardProps) => {
   // Get dynamic board dimensions from the spaces array
   const boardHeight = gameBoardData.spaces.length; // Number of rows
@@ -97,6 +103,9 @@ export const GameBoard = ({ className = "", gameBoardData, players = [] }: GameB
   });
 
   // Helper function to find robots at a specific position
+/**
+ * @author Suhani Pandey 2025-10-15 21:46:36 +0200 100
+ */
   const getRobotsAtPosition = (x: number, y: number): GamePlayer[] => {
     return players.filter((player) => player.positionX === x && player.positionY === y);
   };

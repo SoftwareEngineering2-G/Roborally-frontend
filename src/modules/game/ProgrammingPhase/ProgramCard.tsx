@@ -14,6 +14,9 @@ interface ProgramCardProps {
   isDragging?: boolean;
 }
 
+/**
+ * @author Sachin Baral 2025-09-29 18:45:54 +0200 17
+ */
 export const ProgramCardComponent = ({
   card,
   selected,
@@ -23,6 +26,9 @@ export const ProgramCardComponent = ({
   isDragging = false,
 }: ProgramCardProps) => {
   const { playSFX } = useAudio();
+  /**
+   * @author Sachin Baral 2025-09-29 18:45:54 +0200 26
+   */
   const handleDragStart = (e: React.DragEvent) => {
     e.dataTransfer.setData("application/json", JSON.stringify(card));
     onDragStart();

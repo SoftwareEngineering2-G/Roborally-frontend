@@ -27,6 +27,9 @@ interface Props {
   username: string;
 }
 
+/**
+ * @author Truong Son NGO 2025-09-21 21:26:17 +0200 30
+ */
 export default function PublicLobbies({ username }: Props) {
   const router = useRouter();
 
@@ -77,6 +80,9 @@ export default function PublicLobbies({ username }: Props) {
     }
   };
 
+/**
+ * @author Sachin Baral 2025-09-20 20:56:36 +0200 80
+ */
   const handleRefresh = () => {
     refetch();
   };

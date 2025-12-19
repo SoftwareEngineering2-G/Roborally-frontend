@@ -20,6 +20,9 @@ interface UseGamePauseOptions {
   username: string;
 }
 
+/**
+ * @author Truong Son NGO 2025-11-12 15:33:18 +0100 23
+ */
 export const useGamePause = ({ gameId, username }: UseGamePauseOptions) => {
   const router = useRouter();
   const { game: signalR } = useSignalRContext();
@@ -78,6 +81,9 @@ export const useGamePause = ({ gameId, username }: UseGamePauseOptions) => {
   };
 
   // Handle result dialog continue
+/**
+ * @author Truong Son NGO 2025-11-12 15:33:18 +0100 81
+ */
   const handleContinue = () => {
     setShowResultDialog(false);
     setPauseResult(null);
@@ -90,6 +96,9 @@ export const useGamePause = ({ gameId, username }: UseGamePauseOptions) => {
   };
 
   // Handle cancel request (requester only)
+/**
+ * @author Truong Son NGO 2025-11-12 15:33:18 +0100 93
+ */
   const handleCancelRequest = () => {
     setShowRequestDialog(false);
     setPauseRequest(null);
@@ -101,6 +110,9 @@ export const useGamePause = ({ gameId, username }: UseGamePauseOptions) => {
     if (!signalR.isConnected) return;
 
     // Pause request received
+/**
+ * @author Truong Son NGO 2025-11-12 15:33:18 +0100 104
+ */
     const handleGamePauseRequested = (...args: unknown[]) => {
       const data = args[0] as GamePauseRequestedEvent;
 
@@ -119,6 +131,9 @@ export const useGamePause = ({ gameId, username }: UseGamePauseOptions) => {
     };
 
     // Player response received (for requester to see)
+/**
+ * @author Truong Son NGO 2025-11-12 15:33:18 +0100 122
+ */
     const handleGamePauseResponse = (...args: unknown[]) => {
       const data = args[0] as GamePauseResponseEvent;
 
@@ -137,6 +152,9 @@ export const useGamePause = ({ gameId, username }: UseGamePauseOptions) => {
     };
 
     // Final result received
+/**
+ * @author Truong Son NGO 2025-11-12 15:33:18 +0100 140
+ */
     const handleGamePauseResult = (...args: unknown[]) => {
       const data = args[0] as GamePauseResultEvent;
 

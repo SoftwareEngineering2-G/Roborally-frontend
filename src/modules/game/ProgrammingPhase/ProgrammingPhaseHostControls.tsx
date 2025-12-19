@@ -16,6 +16,9 @@ interface ProgrammingPhaseHostControlsProps {
   username: string;
 }
 
+/**
+ * @author Sachin Baral 2025-11-04 21:25:08 +0100 19
+ */
 export const ProgrammingPhaseHostControls = ({
   gameId,
   gameState,
@@ -75,6 +78,9 @@ export const ProgrammingPhaseHostControls = ({
 
   // Listen for card dealing events to update cardsDealt state
   useEffect(() => {
+/**
+ * @author Sachin Baral 2025-11-04 21:25:08 +0100 78
+ */
     const handlePlayerCardsDealt = () => {
       setCardsDealt(true);
     };

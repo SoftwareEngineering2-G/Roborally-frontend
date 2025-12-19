@@ -13,6 +13,9 @@ interface PublicLobbiesSkeletonProps {
   description?: string;
 }
 
+/**
+ * @author Truong Son NGO 2025-11-12 15:33:18 +0100 16
+ */
 export default function PublicLobbiesSkeleton({
   title = "Public Lobbies",
   description = "Join an existing game",

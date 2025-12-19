@@ -39,6 +39,9 @@ const robotImageMap: Record<string, string> = {
   white: "/robots/white_robot.jpg",
 };
 
+/**
+ * @author Sachin Baral 2025-11-04 21:25:08 +0100 42
+ */
 export const PlayerInfoCard = ({
   player,
   isCurrentPlayer = false,

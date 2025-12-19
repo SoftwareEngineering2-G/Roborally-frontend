@@ -15,10 +15,16 @@ interface Firework {
   life?: number;
 }
 
+/**
+ * @author Sachin Baral 2025-11-15 19:44:46 +0100 18
+ */
 export default function Fireworks() {
   const [fireworks, setFireworks] = useState<Firework[]>([]);
   const timeoutsRef = useRef<number[]>([]);
 
+/**
+ * @author Sachin Baral 2025-11-15 19:44:46 +0100 22
+ */
   const launchFirework = () => {
     const id = Date.now() + Math.random();
     const startX = Math.random() * (window.innerWidth - 200) + 100;
@@ -46,6 +52,9 @@ export default function Fireworks() {
       // Create explosion particles
       const particles: Firework[] = [];
       for (let i = 0; i < 50; i++) {
+/**
+ * @author Sachin Baral 2025-11-15 19:44:46 +0100 49
+ */
         const angle = (Math.PI * 2 * i) / 50;
         const velocity = 2 + Math.random() * 3;
         particles.push({
@@ -95,6 +104,9 @@ export default function Fireworks() {
   useEffect(() => {
     let animationFrameId: number;
 
+/**
+ * @author Sachin Baral 2025-11-15 19:44:46 +0100 98
+ */
     const animate = () => {
       setFireworks((prev) => {
         const updated: Firework[] = [];

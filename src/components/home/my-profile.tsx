@@ -14,6 +14,9 @@ interface Props {
   username: string;
 }
 
+/**
+ * @author Sachin Baral 2025-11-15 19:44:46 +0100 17
+ */
 export default function MyProfile({ username }: Props) {
   const router = useRouter();
 
@@ -33,11 +36,17 @@ export default function MyProfile({ username }: Props) {
 
   const recentGames = gamesData?.items || [];
 
+/**
+ * @author Sachin Baral 2025-11-15 19:44:46 +0100 36
+ */
   const handleRefresh = () => {
     refetchProfile();
     refetchGames();
   };
 
+/**
+ * @author Sachin Baral 2025-11-15 19:44:46 +0100 41
+ */
   const formatBirthday = (birthday: string) => {
     try {
       return new Date(birthday).toLocaleDateString("en-US", {

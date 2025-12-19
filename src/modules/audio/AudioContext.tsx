@@ -16,6 +16,9 @@ interface AudioContextType {
 
 const AudioContext = createContext<AudioContextType | null>(null);
 
+/**
+ * @author Sachin Baral 2025-11-28 13:34:08 +0100 19
+ */
 export const useAudio = () => {
   const context = useContext(AudioContext);
   if (!context) {
@@ -24,6 +27,9 @@ export const useAudio = () => {
   return context;
 };
 
+/**
+ * @author Sachin Baral 2025-11-28 13:34:08 +0100 27
+ */
 export const AudioProvider = ({ children }: { children: React.ReactNode }) => {
   const [bgmVolume, setBgmVolume] = useState(0.3);
   const [sfxVolume, setSfxVolume] = useState(0.5);
@@ -41,20 +47,32 @@ export const AudioProvider = ({ children }: { children: React.ReactNode }) => {
     await audioManager.playBGM(key);
   };
 
+/**
+ * @author Sachin Baral 2025-11-29 14:37:39 +0100 44
+ */
   const stopBGM = () => {
     audioManager.stopBGM();
   };
 
+/**
+ * @author Sachin Baral 2025-11-28 13:34:08 +0100 48
+ */
   const playSFX = (key: keyof typeof SOUNDS.sfx) => {
     audioManager.playSFX(key);
   };
 
+/**
+ * @author Sachin Baral 2025-11-28 13:34:08 +0100 52
+ */
   const handleSetVolume = (type: SoundType, value: number) => {
     audioManager.setVolume(type, value);
     if (type === "bgm") setBgmVolume(value);
     else setSfxVolume(value);
   };
 
+/**
+ * @author Sachin Baral 2025-11-28 13:34:08 +0100 58
+ */
   const handleToggleMute = () => {
     const muted = audioManager.toggleMute();
     setIsMuted(muted);

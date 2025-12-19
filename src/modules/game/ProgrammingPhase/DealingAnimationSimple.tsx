@@ -11,6 +11,9 @@ interface DealingCardComponentProps {
   onAnimationComplete: (cardId: string) => void;
 }
 
+/**
+ * @author Sachin Baral 2025-09-29 20:21:16 +0200 14
+ */
 export const DealingCardComponentSimple = ({
   dealingCard,
   onAnimationComplete,
@@ -92,12 +95,9 @@ export const DealingCardComponentSimple = ({
             fill
             sizes="(max-width: 768px) 100vw, 16vw"
             className="object-cover"
-            onLoad={() => { }}
+            onLoad={() => {}}
             onError={(e) => {
-              console.log(
-                "Card image failed, using enhanced fallback:",
-                card.imagePath
-              );
+              console.log("Card image failed, using enhanced fallback:", card.imagePath);
               const target = e.target as HTMLImageElement;
               target.style.display = "none";
               // Create enhanced fallback content
@@ -118,8 +118,7 @@ export const DealingCardComponentSimple = ({
           <div
             className="absolute inset-0 rounded-lg"
             style={{
-              background:
-                "linear-gradient(45deg, rgba(0, 255, 255, 0.1), rgba(255, 0, 255, 0.1))",
+              background: "linear-gradient(45deg, rgba(0, 255, 255, 0.1), rgba(255, 0, 255, 0.1))",
               boxShadow: "inset 0 0 20px rgba(0, 255, 255, 0.2)",
             }}
           />
@@ -128,8 +127,7 @@ export const DealingCardComponentSimple = ({
           <div
             className="absolute inset-0 rounded-lg border border-neon-cyan/30"
             style={{
-              background:
-                "linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, transparent 50%)",
+              background: "linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, transparent 50%)",
             }}
           />
         </div>
@@ -143,6 +141,9 @@ interface DealingAnimationOverlayProps {
   onCardDealt: (cardId: string) => void;
 }
 
+/**
+ * @author Sachin Baral 2025-09-29 20:21:16 +0200 146
+ */
 export const DealingAnimationOverlaySimple = ({
   dealingCards,
   onCardDealt,

@@ -13,6 +13,9 @@ interface DeckAreaProps {
   isShuffling?: boolean;
 }
 
+/**
+ * @author Sachin Baral 2025-09-30 22:13:00 +0200 16
+ */
 export const DeckArea = ({
   showControls,
   deckCount,
