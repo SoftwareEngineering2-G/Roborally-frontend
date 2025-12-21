@@ -13,6 +13,10 @@ export function getSpaceImageURI(
     return `/spaces/Gear_${direction}.png`;
   }
 
+  if (celltype === "PriorityAntenna") {
+    return "/spaces/PriorityAntenna.png";
+  }
+
   return `/spaces/${celltype}.png`;
 }
 

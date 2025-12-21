@@ -1,6 +1,6 @@
 export type Direction = "North" | "East" | "South" | "West";
 export type GearDirection = "ClockWise" | "AntiClockWise";
-export type Celltype = "EmptySpace" | "BlueConveyorBelt" | "GreenConveyorBelt" | "Gear";
+export type Celltype = "EmptySpace" | "BlueConveyorBelt" | "GreenConveyorBelt" | "Gear" | "PriorityAntenna";
 // Add other cell types as needed
 
 type GameBoardCell = {
